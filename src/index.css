@@ -1,0 +1,135 @@
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    overflow: hidden;
+    touch-action: manipulation;
+}
+
+* {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* === WICHTIGER ROOT FIX === */
+#ui-root {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* === SVG SCALING FIX === */
+#lcars-svg {
+    width: 100%;
+    height: 100%;
+    max-width: 1280px;
+    max-height: 720px;
+    display: block;
+}
+
+/* === COLORS === */
+.lcars-Maincolor {
+    fill: #0000ff;
+}
+
+.lcars-color-001 {
+    fill: #6200ff;
+}
+
+.lcars-color-002 {
+    fill: #6363ff;
+}
+
+.lcars-color-003 {
+    fill: #4c39fc;
+}
+
+.lcars-color-004 {
+    fill: #1dbfff;
+}
+
+:root {
+    --lcars-color-005: #303091;
+}
+
+.lcars-color-005 {
+    fill: var(--lcars-color-005);
+}
+
+:root {
+    --lcars-color-006: #53539b;
+}
+
+.lcars-color-006 {
+    fill: var(--lcars-color-005);
+}
+
+
+
+/* === FONT === */
+@font-face {
+    font-family: 'HelveticaUC';
+    src: url('./vendor/HelveticaUC.otf') format('opentype');
+}
+
+/* === TEXT === */
+.lcars-text-room,
+.lcars-text-clock,
+.lcars-text-date,
+.lcars-text-temp {
+    fill: #fff;
+    font-family: HelveticaUC, Arial, sans-serif;
+}
+
+.lcars-text-room {
+    font-size: 120px;
+}
+
+.lcars-text-clock {
+    font-size: 200px;
+}
+
+.lcars-text-date,
+.lcars-text-temp {
+    font-size: 80px;
+}
+
+/* === CONTENT === */
+#content-container {
+    width: 1070px;
+    height: 670px;
+    display: none;
+    /* Standardmäßig unsichtbar */
+}
+
+#content-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* === INTERACTION FIX === */
+svg {
+    pointer-events: none;
+}
+
+foreignObject,
+#subbuttons-container,
+#menu-button-container,
+button {
+    pointer-events: auto;
+}
+
+#ui-layer {
+    width: 1280px;
+    height: 720px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: top left;
+}

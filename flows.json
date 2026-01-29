@@ -1,0 +1,862 @@
+[
+    {
+        "id": "4b460709d174f300",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "1e3b1a6193c2b0c3",
+        "type": "tab",
+        "label": "Rollo",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "46d093f4cc5b1185",
+        "type": "tab",
+        "label": "Backup",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "03b8dbfbfab8bc9f",
+        "type": "junction",
+        "z": "1e3b1a6193c2b0c3",
+        "x": 480,
+        "y": 60,
+        "wires": [
+            [
+                "7ac61214f2a9bf45"
+            ]
+        ]
+    },
+    {
+        "id": "4f4ed0cc81a764ca",
+        "type": "telegram bot",
+        "botname": "LCARS",
+        "usernames": "Matze_LCARS_bot",
+        "chatids": "599846758",
+        "baseapiurl": "",
+        "testenvironment": false,
+        "updatemode": "polling",
+        "pollinterval": 300,
+        "usesocks": false,
+        "sockshost": "",
+        "socksprotocol": "socks5",
+        "socksport": 6667,
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbothost": "0.0.0.0",
+        "localbotport": 8443,
+        "publicbotport": 8443,
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    },
+    {
+        "id": "d1b8132041c373d2",
+        "type": "uibuilder",
+        "z": "4b460709d174f300",
+        "name": "",
+        "topic": "",
+        "url": "lcars",
+        "okToGo": true,
+        "fwdInMessages": true,
+        "allowScripts": false,
+        "allowStyles": false,
+        "copyIndex": true,
+        "templateFolder": "blank",
+        "extTemplate": "",
+        "showfolder": false,
+        "reload": true,
+        "sourceFolder": "src",
+        "deployedVersion": "7.5.0",
+        "showMsgUib": true,
+        "title": "",
+        "descr": "",
+        "editurl": "vscode://vscode-remote/ssh-remote+192.168.2.107/home/matze/.node-red/uibuilder/lcars/?windowId=_blank",
+        "x": 460,
+        "y": 180,
+        "wires": [
+            [
+                "c9101ca450bedf3c",
+                "5f2e89ce3d2f122c"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "inject_reload",
+        "type": "inject",
+        "z": "4b460709d174f300",
+        "name": "Reload Browser",
+        "props": [
+            {
+                "p": "_uib",
+                "v": "{\"reload\":true}",
+                "vt": "jsonata"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "3",
+        "topic": "",
+        "x": 180,
+        "y": 280,
+        "wires": [
+            [
+                "d1b8132041c373d2"
+            ]
+        ]
+    },
+    {
+        "id": "46a0a10897488461",
+        "type": "inject",
+        "z": "4b460709d174f300",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "true",
+        "payloadType": "str",
+        "x": 130,
+        "y": 460,
+        "wires": [
+            [
+                "reload_msg"
+            ]
+        ]
+    },
+    {
+        "id": "reload_msg",
+        "type": "change",
+        "z": "4b460709d174f300",
+        "name": "Build reload command",
+        "rules": [
+            {
+                "t": "set",
+                "p": "_uib",
+                "pt": "msg",
+                "to": "{\"reload\":true}",
+                "tot": "json"
+            }
+        ],
+        "x": 360,
+        "y": 380,
+        "wires": [
+            [
+                "d1b8132041c373d2"
+            ]
+        ]
+    },
+    {
+        "id": "e24c36813a7d52aa",
+        "type": "inject",
+        "z": "4b460709d174f300",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "mode",
+        "payload": "{\"mode\": \"home\"}",
+        "payloadType": "json",
+        "x": 180,
+        "y": 180,
+        "wires": [
+            [
+                "d1b8132041c373d2"
+            ]
+        ]
+    },
+    {
+        "id": "21f588239cda1d76",
+        "type": "function",
+        "z": "4b460709d174f300",
+        "name": "function 1",
+        "func": "msg.topic = \"mode\";\nmsg.payload = { mode: \"night\" }; // unbedingt Objekt\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 540,
+        "wires": [
+            [
+                "d1b8132041c373d2"
+            ]
+        ]
+    },
+    {
+        "id": "484758032168f888",
+        "type": "inject",
+        "z": "4b460709d174f300",
+        "name": "Trigger",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 540,
+        "wires": [
+            [
+                "21f588239cda1d76"
+            ]
+        ]
+    },
+    {
+        "id": "c9101ca450bedf3c",
+        "type": "link out",
+        "z": "4b460709d174f300",
+        "name": "ROLLO",
+        "mode": "link",
+        "links": [],
+        "x": 675,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "5d917904e71d9b5c",
+        "type": "comment",
+        "z": "4b460709d174f300",
+        "name": "Rollo",
+        "info": "",
+        "x": 790,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "inject_temp",
+        "type": "inject",
+        "z": "4b460709d174f300",
+        "name": "Temperatur ID 1",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "5",
+        "topic": "",
+        "payload": "{\"id\":1,\"temp\":22.8}",
+        "payloadType": "json",
+        "x": 520,
+        "y": 520,
+        "wires": [
+            [
+                "d1b8132041c373d2"
+            ]
+        ]
+    },
+    {
+        "id": "5f2e89ce3d2f122c",
+        "type": "debug",
+        "z": "4b460709d174f300",
+        "name": "debug 2",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 740,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "c56d6e642cae5f30",
+        "type": "inject",
+        "z": "4b460709d174f300",
+        "name": "mode",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"mode\": \"night\" } ",
+        "payloadType": "json",
+        "x": 130,
+        "y": 620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "aa0975d6d357a44c",
+        "type": "telegram sender",
+        "z": "4b460709d174f300",
+        "name": "",
+        "bot": "4f4ed0cc81a764ca",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 990,
+        "y": 480,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c79cfb9b34fd1b2e",
+        "type": "telegram receiver",
+        "z": "4b460709d174f300",
+        "name": "",
+        "bot": "4f4ed0cc81a764ca",
+        "saveDataDir": "",
+        "filterCommands": false,
+        "hasinput": false,
+        "inputs": 0,
+        "handleallupdates": false,
+        "x": 1010,
+        "y": 560,
+        "wires": [
+            [
+                "515949d3ccff8280"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "515949d3ccff8280",
+        "type": "debug",
+        "z": "4b460709d174f300",
+        "name": "debug 6",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1220,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "49d34e4197def05c",
+        "type": "function",
+        "z": "4b460709d174f300",
+        "name": "function 2",
+        "func": "msg.payload = {\n    type: \"message\",\n    chatId: 599846758,\n    content: \"Hallo Matze 👋 Telegram aus Node-RED läuft!\"\n};\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 740,
+        "y": 640,
+        "wires": [
+            [
+                "aa0975d6d357a44c"
+            ]
+        ]
+    },
+    {
+        "id": "ec51dec7107163c1",
+        "type": "inject",
+        "z": "4b460709d174f300",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 560,
+        "y": 640,
+        "wires": [
+            [
+                "49d34e4197def05c"
+            ]
+        ]
+    },
+    {
+        "id": "7ac61214f2a9bf45",
+        "type": "uib-sender",
+        "z": "1e3b1a6193c2b0c3",
+        "url": "lcars",
+        "uibId": "d1b8132041c373d2",
+        "name": "",
+        "topic": "",
+        "passthrough": true,
+        "return": false,
+        "outputs": 1,
+        "x": 610,
+        "y": 60,
+        "wires": [
+            [
+                "7f8e15e4623dc93e"
+            ]
+        ]
+    },
+    {
+        "id": "f59bce790c9b19f4",
+        "type": "link in",
+        "z": "1e3b1a6193c2b0c3",
+        "name": "ROLLO",
+        "links": [
+            "c9101ca450bedf3c"
+        ],
+        "x": 115,
+        "y": 160,
+        "wires": [
+            [
+                "b7d0832562e3a41c",
+                "72e10f96dd64f9fb",
+                "ec97209fc180dfbb"
+            ]
+        ]
+    },
+    {
+        "id": "1b63d1168cc1b5b1",
+        "type": "rpi-gpio out",
+        "z": "1e3b1a6193c2b0c3",
+        "name": "Rollo AB",
+        "pin": "19",
+        "set": "",
+        "level": "0",
+        "freq": "",
+        "out": "out",
+        "bcm": true,
+        "x": 620,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "7f8e15e4623dc93e",
+        "type": "debug",
+        "z": "1e3b1a6193c2b0c3",
+        "name": "debug 3",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 900,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "b18a0d80af9628cc",
+        "type": "rpi-gpio out",
+        "z": "1e3b1a6193c2b0c3",
+        "name": "Rollo AUF",
+        "pin": "26",
+        "set": "",
+        "level": "0",
+        "freq": "",
+        "out": "out",
+        "bcm": true,
+        "x": 610,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "b7d0832562e3a41c",
+        "type": "rollo",
+        "z": "1e3b1a6193c2b0c3",
+        "name": "Rollo Tür",
+        "rolloId": "1",
+        "longPressMs": 800,
+        "autoStopAufMs": "20000",
+        "autoStopAbMs": "20000",
+        "x": 340,
+        "y": 160,
+        "wires": [
+            [
+                "03b8dbfbfab8bc9f",
+                "32a02b0eedeff4a3"
+            ],
+            [
+                "b18a0d80af9628cc"
+            ],
+            [
+                "1b63d1168cc1b5b1"
+            ]
+        ],
+        "outputLabels": [
+            "UI",
+            "",
+            ""
+        ]
+    },
+    {
+        "id": "72e10f96dd64f9fb",
+        "type": "rollo",
+        "z": "1e3b1a6193c2b0c3",
+        "name": "Rollo Fenster",
+        "rolloId": "2",
+        "longPressMs": 800,
+        "autoStopAufMs": "20000",
+        "autoStopAbMs": "20000",
+        "x": 350,
+        "y": 320,
+        "wires": [
+            [
+                "03b8dbfbfab8bc9f"
+            ],
+            [
+                "5edf477f0bb7f6c7"
+            ],
+            [
+                "7b5e8ebe603338d7"
+            ]
+        ]
+    },
+    {
+        "id": "7b5e8ebe603338d7",
+        "type": "rpi-gpio out",
+        "z": "1e3b1a6193c2b0c3",
+        "name": "Rollo AB",
+        "pin": "12",
+        "set": "",
+        "level": "0",
+        "freq": "",
+        "out": "out",
+        "bcm": true,
+        "x": 620,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "5edf477f0bb7f6c7",
+        "type": "rpi-gpio out",
+        "z": "1e3b1a6193c2b0c3",
+        "name": "Rollo AUF",
+        "pin": "6",
+        "set": "",
+        "level": "0",
+        "freq": "",
+        "out": "out",
+        "bcm": true,
+        "x": 610,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "32a02b0eedeff4a3",
+        "type": "debug",
+        "z": "1e3b1a6193c2b0c3",
+        "name": "debug 1",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 920,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "ec97209fc180dfbb",
+        "type": "debug",
+        "z": "1e3b1a6193c2b0c3",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 360,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "962acbf1f482f3d8",
+        "type": "exec",
+        "z": "46d093f4cc5b1185",
+        "command": "/home/matze/node-red-backup.sh",
+        "addpay": "payload",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 500,
+        "y": 160,
+        "wires": [
+            [],
+            [],
+            [
+                "e7723a4e9877f2d5"
+            ]
+        ]
+    },
+    {
+        "id": "0c77cc8ad1306f48",
+        "type": "inject",
+        "z": "46d093f4cc5b1185",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 240,
+        "y": 260,
+        "wires": [
+            [
+                "962acbf1f482f3d8"
+            ]
+        ]
+    },
+    {
+        "id": "7a1a445a0c59efa5",
+        "type": "telegram command",
+        "z": "46d093f4cc5b1185",
+        "name": "",
+        "command": "/backup",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "4f4ed0cc81a764ca",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 150,
+        "y": 160,
+        "wires": [
+            [
+                "962acbf1f482f3d8"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "e7723a4e9877f2d5",
+        "type": "function",
+        "z": "46d093f4cc5b1185",
+        "name": "function 3",
+        "func": "// Prüfen, ob das Backup erfolgreich war\nlet statusText;\nif (msg.payload.code === 0) {\n    // Erfolg\n    statusText = \"✅ Backup erfolgreich erstellt!\";\n} else {\n    // Fehler\n    statusText = \"❌ Backup fehlgeschlagen!\";\n}\n\n// Optional: Ausgabe des Skripts mit in Telegram schicken\nlet output = msg.payload.stdout || \"\";\nif (output) {\n    statusText += `\\n\\nDetails:\\n${output}`;\n}\n\n// Telegram Nachricht vorbereiten\nmsg.payload = {\n    type: \"message\",\n    chatId: 599846758,  // Hier deine Chat-ID eintragen\n    content: statusText\n};\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 180,
+        "wires": [
+            [
+                "290da3d13ab3c5a2"
+            ]
+        ]
+    },
+    {
+        "id": "290da3d13ab3c5a2",
+        "type": "telegram sender",
+        "z": "46d093f4cc5b1185",
+        "name": "",
+        "bot": "4f4ed0cc81a764ca",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1030,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "eca9e1dc01079b29",
+        "type": "exec",
+        "z": "46d093f4cc5b1185",
+        "command": "/home/matze/.node-red/projects/LCARS/git-autocommit.sh",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 570,
+        "y": 460,
+        "wires": [
+            [],
+            [],
+            [
+                "56cc5c607288b19d"
+            ]
+        ]
+    },
+    {
+        "id": "56cc5c607288b19d",
+        "type": "debug",
+        "z": "46d093f4cc5b1185",
+        "name": "debug 5",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1000,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "d8b813bb5a7be347",
+        "type": "inject",
+        "z": "46d093f4cc5b1185",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1",
+        "topic": "",
+        "x": 210,
+        "y": 460,
+        "wires": [
+            [
+                "eca9e1dc01079b29"
+            ]
+        ]
+    },
+    {
+        "id": "exec_git_push",
+        "type": "exec",
+        "z": "46d093f4cc5b1185",
+        "command": "cd /home/matze/.node-red/projects/LCARS && git push origin master",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Git Push",
+        "x": 770,
+        "y": 660,
+        "wires": [
+            [],
+            [],
+            [
+                "debug_git_push"
+            ]
+        ]
+    },
+    {
+        "id": "debug_git_push",
+        "type": "debug",
+        "z": "46d093f4cc5b1185",
+        "name": "Git Push Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "x": 1020,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "305f9ad8eeaf231d",
+        "type": "inject",
+        "z": "46d093f4cc5b1185",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 580,
+        "y": 660,
+        "wires": [
+            [
+                "exec_git_push"
+            ]
+        ]
+    }
+]

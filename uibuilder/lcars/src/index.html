@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>LCARS — Template B</title>
+
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="button.css">
+
+    <script src="./vendor/anime.min.js"></script>
+</head>
+
+<body>
+
+    <div id="lcars-container">
+
+        <svg id="lcars-svg" viewBox="0 0 1280 720" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+
+            <!-- ================= CONTENT LAYER ================= -->
+    <foreignObject x="210" y="25" width="1070" height="670">
+        <div id="content-container">
+            <div id="content-inner"></div>
+        </div>
+    </foreignObject>
+
+            <!-- ================= TOP LAYOUT ================= -->
+            <g id="layout-top">
+
+                <!-- Top Left Block -->
+                <rect width="210" height="225" class="lcars-Maincolor" />
+
+                <!-- Upper Bow -->
+                <g transform="translate(0,225)">
+                    <path d="M210,0L210,50C210,77.6,232.4,100,260,100L310,100L310,125L125,125C56,125,0,69,0,0Z"
+                        class="lcars-Maincolor" />
+                </g>
+
+                <!-- Lower Bow -->
+                <g transform="translate(0,360)">
+                    <path d="M0 125C0 56.01 56.01 0 125 0H310V25H260C232.4 25 210 47.4 210 75V125H0Z"
+                        class="lcars-Maincolor" />
+                </g>
+
+                <!-- Horizontal Lines -->
+                <g transform="translate(309,325)">
+                    <rect width="401" height="25" class="lcars-Maincolor" />
+                </g>
+                <g transform="translate(715,325)">
+                    <rect width="40" height="25" class="lcars-color-001" />
+                </g>
+                <g transform="translate(760,325)">
+                    <rect width="200" height="25" class="lcars-color-003" />
+                </g>
+                <g transform="translate(965,325)">
+                    <rect width="315" height="25" class="lcars-Maincolor" />
+                </g>
+
+                <g transform="translate(309,360)">
+                    <rect width="401" height="25" class="lcars-Maincolor" />
+                </g>
+                <g transform="translate(715,360)">
+                    <rect width="40" height="25" class="lcars-color-002" />
+                </g>
+                <g transform="translate(760,360)">
+                    <rect width="200" height="12" class="lcars-color-004" />
+                </g>
+                <g transform="translate(965,360)">
+                    <rect width="315" height="25" class="lcars-Maincolor" />
+                </g>
+
+            </g>
+
+            <!-- ================= FOREGROUND TEXT ================= -->
+            <g id="foreground">
+                <text id="lcars-room" x="1280" y="90" class="lcars-text-room" text-anchor="end">Wohnzimmer</text>
+
+                <text id="lcars-clock" x="250" y="150" class="lcars-text-clock" text-anchor="start">00:00:00</text>
+
+                <text id="lcars-date" x="250" y="250" class="lcars-text-date" text-anchor="start">Montag
+                    01.01.2026</text>
+
+                <text id="temp-1" x="1280" y="250" class="lcars-text-temp" text-anchor="end">-- °C</text>
+            </g>
+
+            <!-- ================= SUBBUTTONS ================= -->
+            <foreignObject x="0" y="130" width="210" height="365">
+                <div id="subbuttons-container">
+                    <button class="subbtn" data-page="licht">LICHT</button>
+                    <button class="subbtn" data-page="rollo">ROLLO</button>
+                    <button class="subbtn" data-page="heizung">HEIZUNG</button>
+                    <button class="subbtn" data-page="sonstiges">SONSTIGES</button>
+                </div>
+            </foreignObject>
+
+            <!-- ================= MENU BUTTON ================= -->
+            <foreignObject x="0" y="490" width="210" height="100">
+                <div id="menu-button-container">
+                    <button id="menu-btn" class="menu-btn">MENÜ</button>
+                </div>
+            </foreignObject>
+
+            <!-- ================= BOTTOM BOW ================= -->
+            <g transform="translate(0,595)">
+                <path d="M210,0L210,50C210,77.6,232.4,100,260,100L310,100L310,125L125,125C56,125,0,69,0,0Z"
+                    class="lcars-Maincolor" />
+            </g>
+
+            <!-- ================= BOTTOM LINE ================= -->
+            <g transform="translate(309,695)">
+                <rect width="971" height="25" class="lcars-Maincolor" />
+            </g>
+
+        </svg>
+    </div>
+
+    <!-- ================= SCRIPTS ================= -->
+    <script src="../uibuilder/uibuilder.iife.min.js"></script>
+    <script type="module" src="index.js"></script>
+
+</body>
+
+</html>

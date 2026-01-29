@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ROLLO Steuerung</title>
+    <link rel="stylesheet" href="views/rollo/rollo.css">
+    
+</head>
+
+<body>
+
+    <!-- ================= LCARS Top Bar ================= -->
+    <svg class="lcars-bow-ol02">
+        
+            <path d="M0.1644,80C0.0554,78.347,0,76.68,0,75C0,33.606,33.606,0,75,0H300V60C288.962,60,280,68.962,280,80H0.1644Z"
+                class="lcars-color-005" />
+    </svg>
+
+    <div class="lcars-rect-ub"></div>
+
+    <div class="top-bar">
+        <div class="lcars-rect-left"></div>
+        <div class="rollo-title">ROLLO</div>
+        <div class="lcars-rect-right"></div>
+    </div>
+
+    <!-- ================= View Rollo ================= -->
+    <div class="view-rollo">
+
+        <!-- ================= ROLLO 1 ================= -->
+        <div class="rollo-container" data-rollo-id="1">
+
+        <!-- Rollotitel -->
+        <div class="lcars-rect-zb">
+         <span class="title-rollo">ROLLO TÜR</span>
+        </div>
+
+        <div class="lcars-rect-ru"></div>
+        <div class="lcars-rect-right-ru"></div>
+            
+        <div class="button-container">
+            <!-- AUF / AB Buttons -->
+            <button class="rollo-btn rollo-up">
+                <div class="rollo-status-bg"></div>
+                <div class="rollo-status"></div>
+                <span>AUF</span>
+            </button>
+
+            <button class="rollo-btn rollo-down">
+                <div class="rollo-status-bg"></div>
+                <div class="rollo-status"></div>
+                <span>AB</span>
+            </button>
+
+            <!-- Prozent Buttons 2x2 -->
+            <div class="rollo-container-percent-grid">
+                <div class="rollo-column">
+                    <button class="rollo-btn-percent" data-key="1">
+                        <div class="rollo-status-bg-percent"></div>
+                        <div class="rollo-status-percent">
+                            <span class="rollo-status-percent-text">25</span>
+                        </div>
+                        <span>POSITION</span>
+                    </button>
+                    <button class="rollo-btn-percent" data-key="2">
+                        <div class="rollo-status-bg-percent"></div>
+                        <div class="rollo-status-percent">
+                            <span class="rollo-status-percent-text">50</span>
+                        </div>
+                        <span>POSITION</span>
+                    </button>
+                </div>
+                <div class="rollo-column">
+                  
+                    <button class="rollo-btn-auto" data-key="auto">
+                        <div class="rollo-status-bg-auto"></div>
+                        <div class="rollo-status-auto">
+                            <span class="rollo-status-auto-text">ON</span>
+                        </div>
+                        <span>AUTO</span>
+                    </button>
+
+                    <button class="standard-btn" data-key="settings" >
+                        <div class="standard-status">
+                        </div>
+                        <span>EINSTELLUNGEN</span>
+                    </button>
+        </div>
+
+                    
+                </div>
+            </div>
+
+            
+        </div>
+
+        <!-- ================= ROLLO 2 ================= -->
+        <div class="rollo-container" data-rollo-id="2">
+
+<!-- Rollotitel rechts -->
+<div class="lcars-rect-zb">
+    <span class="title-rollo">ROLLO FENSTER</span>
+</div>
+
+<div class="lcars-rect-ru"></div>
+<div class="lcars-rect-right-ru"></div>
+
+
+
+<div class="button-container">
+            <!-- AUF / AB Buttons -->
+            <button class="rollo-btn rollo-up">
+                <div class="rollo-status-bg"></div>
+                <div class="rollo-status"></div>
+                <span>AUF</span>
+            </button>
+
+            <button class="rollo-btn rollo-down">
+                <div class="rollo-status-bg"></div>
+                <div class="rollo-status"></div>
+                <span>AB</span>
+            </button>
+
+            <!-- Prozent Buttons 2x2 -->
+            <div class="rollo-container-percent-grid">
+                <div class="rollo-column">
+                    <button class="rollo-btn-percent" data-key="1">
+                                    <div class="rollo-status-bg-percent"></div>
+                                    <div class="rollo-status-percent">
+                                        <span class="rollo-status-percent-text">25</span>
+                                    </div>
+                                    <span>POSITION</span>
+                                </button>
+                    <button class="rollo-btn-percent" data-key="2">
+                                    <div class="rollo-status-bg-percent"></div>
+                                    <div class="rollo-status-percent">
+                                        <span class="rollo-status-percent-text">50</span>
+                                    </div>
+                                    <span>POSITION</span>
+                                </button>
+                </div>
+                <div class="rollo-column">
+                    <button class="rollo-btn-auto" data-key="auto">
+                                            <div class="rollo-status-bg-auto"></div>
+                                            <div class="rollo-status-auto">
+                                                <span class="rollo-status-auto-text">ON</span>
+                                            </div>
+                                            <span>AUTO</span>
+                                        </button>
+                    
+                    <button class="standard-btn" data-key="settings" >
+                                            <div class="standard-status">
+                                            </div>
+                                            <span>EINSTELLUNGEN</span>
+                                        </button>
+                </div>
+            </div>
+</div>
+
+           
+        </div>
+
+    </div> <!-- /.view-rollo -->
+
+</body>
+
+</html>

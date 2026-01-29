@@ -1,0 +1,437 @@
+/* ========================================================= WICHTIG --------------------------------------------------------- KEIN globales button-reset! AUF/AB Buttons bleiben unverändert ========================================================= */
+/* ================= SUBBUTTON CONTAINER ================= */
+#subbuttons-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* ================= SUBBUTTONS ================= */
+.subbtn {
+    font-family: HelveticaUC, Arial, sans-serif;
+    font-size: 48px;
+    width: 210px;
+    height: 85px;
+    background-color: #3358ff;
+    color: #000;
+    border: none;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding: 0 10px 0px 0;
+    cursor: pointer;
+    user-select: none;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    appearance: none;
+    -webkit-appearance: none;
+    border-radius: 0;
+    transition: background-color 0.1s linear, opacity 0.25s ease;
+}
+
+.subbtn.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.subbtn.is-active {
+    background-color: #ff9900;
+}
+
+.subbtn.is-pressed {
+    background-color: #00ccff;
+}
+
+/* ================= MENÜ BUTTON ================= */
+#menu-button-container {
+    width: 210px;
+    height: 100px;
+}
+
+.menu-btn {
+    width: 100%;
+    height: 100%;
+    font-family: HelveticaUC, Arial, sans-serif;
+    font-size: 56px;
+    background-color: #734efc;
+    color: #000;
+    border: none;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding: 0 10px 0px 0;
+    cursor: pointer;
+    user-select: none;
+    appearance: none;
+    -webkit-appearance: none;
+    border-radius: 0;
+    transition: background-color 0.1s linear;
+}
+
+.menu-btn.is-active {
+    background-color: #00ccff;
+}
+
+/* ================= ROLLO AUF / AB BUTTONS ================= */
+.rollo-btn {
+    position: relative;
+    width: 280px;
+    height: 80px;
+    border-radius: 40px;
+    border: none;
+    background: #6c87ff;
+    color: #000;
+    font-family: HelveticaUC, Arial, sans-serif;
+    font-size: 40px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding-right: 30px;
+    cursor: pointer;
+    user-select: none;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: background-color 0.1s linear;
+}
+
+.rollo-btn:active {
+    background-color: #bbc8ff;
+}
+
+/* Status Background */
+.rollo-status-bg {
+    position: absolute;
+    left: 70px;
+    top: 0;
+    width: 40px;
+    height: 100%;
+    background: #000;
+    pointer-events: none;
+    transition: background-color 0.1s linear;
+}
+
+/* Status Balken */
+.rollo-status {
+    position: absolute;
+    left: 80px;
+    top: 0;
+    width: 20px;
+    height: 100%;
+    background: #2a19c4;
+    pointer-events: none;
+    transition: background-color 0.1s linear;
+}
+
+/* Status aktiv */
+.rollo-status-bg.active,
+.rollo-status.active {
+    background-color: #ffffff;
+}
+
+
+
+/* ================= ROLLO AUF / AB BUTTONS ================= */
+.rollo-btn {
+    position: relative;
+    width: 280px;
+    height: 80px;
+    border-radius: 40px;
+    border: none;
+    background: #6c87ff;
+    color: #000;
+    font-family: HelveticaUC, Arial, sans-serif;
+    font-size: 40px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding-right: 30px;
+    cursor: pointer;
+    user-select: none;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: background-color 0.1s linear;
+}
+
+.rollo-btn:active {
+    background-color: #bbc8ff;
+}
+
+/* Status Background */
+.rollo-status-bg {
+    position: absolute;
+    left: 70px;
+    top: 0;
+    width: 40px;
+    height: 100%;
+    background: #000;
+    pointer-events: none;
+    transition: background-color 0.1s linear;
+}
+
+/* Status Balken */
+.rollo-status {
+    position: absolute;
+    left: 80px;
+    top: 0;
+    width: 20px;
+    height: 100%;
+    background: #2a19c4;
+    pointer-events: none;
+    transition: background-color 0.1s linear;
+}
+
+/* Status aktiv */
+.rollo-status-bg.active,
+.rollo-status.active {
+    background-color: #ffffff;
+}
+
+/* Abstand AUF ↔ AB */
+.rollo-container>.rollo-btn+.rollo-btn {
+    margin-top: 20px;
+}
+
+/* Abstand zwischen Rollos */
+.rollo-container {
+    position: relative;
+    display: block;
+    margin-bottom: 100px;
+}
+
+/* ========================================================= PROZENT BUTTONS – 2×2 MATRIX ========================================================= */
+/* ================= ROLLO BUTTONS ================= */
+.rollo-container-percent-grid {
+    position: absolute;
+    top: 0;
+    left: 350px;
+    display: flex;
+    gap: 10px;
+}
+
+.rollo-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.rollo-btn-percent {
+    width: 300px;
+    height: 80px;
+    border-radius: 40px;
+    border: none;
+    background: #6c87ff;
+    font-family: HelveticaUC, Arial, sans-serif;
+    font-size: 40px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding-right: 30px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.1s linear;
+}
+
+.rollo-btn-percent:active {
+    background-color: #bbc8ff;
+}
+
+.rollo-status-bg-percent {
+    position: absolute;
+    left: 50px;
+    top: 0;
+    width: 120px;
+    height: 100%;
+    background: #000;
+}
+
+.rollo-status-percent {
+    position: absolute;
+    left: 75px;
+    top: 0px;
+    width: 90px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: 6.9rem;
+    background: #000000;
+}
+
+.rollo-status-percent-text {
+    color: #18169e;
+    transform: translateY(2.5px);
+    transition: color 0.1s linear;
+}
+
+/* =================== RASPBERRY DISPLAY FEINTUNING =================== */
+@media (max-height: 720px) {
+    
+    .rollo-status-percent-text {
+        transform: translateY(6.5px);
+    }
+}
+
+
+
+.rollo-status-percent-text.active {
+    color: #ffffff;
+}
+
+/* Blink-Effekt für Preset-Update */
+.rollo-btn-percent.blink {
+    animation: blinkAnim 0.4s ease-in-out;
+}
+
+@keyframes blinkAnim {
+    0% {
+        background-color: #6c87ff;
+    }
+
+    50% {
+        background-color: #ff9900;
+    }
+
+    100% {
+        background-color: #6c87ff;
+    }
+}
+
+
+
+
+/*====== AUTO BUtton Rollo  =========== */
+
+
+.rollo-btn-auto {
+    width: 300px;
+    height: 80px;
+    border-radius: 40px;
+    border: none;
+    background: rgb(74, 161, 255);
+    font-family: HelveticaUC, Arial, sans-serif;
+    font-size: 40px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding-right: 30px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.1s linear;
+}
+
+.rollo-btn-auto:active {
+    background-color: #bbc8ff;
+}
+
+.rollo-status-bg-auto {
+    position: absolute;
+    left: 50px;
+    top: 0;
+    width: 120px;
+    height: 100%;
+    background: #000;
+}
+
+.rollo-status-auto {
+    position: absolute;
+    left: 75px;
+    top: 0px;
+    width: 90px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: 6.9rem;
+    background: #000000;
+}
+
+.rollo-status-auto-text {
+    color: #18169e;
+    transform: translateY(2.5px);
+    transition: color 0.1s linear;
+}
+
+/* =================== RASPBERRY DISPLAY FEINTUNING =================== */
+@media (max-height: 720px) {
+
+    .rollo-status-auto-text {
+        transform: translateY(6.5px);
+    }
+}
+
+
+
+.rollo-status-auto-text.active {
+    color: #ffffff;
+}
+
+/* Blink-Effekt für Preset-Update */
+.rollo-btn-auto.blink {
+    animation: blinkAnim 0.4s ease-in-out;
+}
+
+@keyframes blinkAnim {
+    0% {
+        background-color: #6c87ff;
+    }
+
+    50% {
+        background-color: #ff9900;
+    }
+
+    100% {
+        background-color: #6c87ff;
+    }
+}
+
+
+
+
+
+
+/* ================= standard BUTTONS ================= */
+.standard-btn {
+    position: relative;
+    width: 300px;
+    height: 80px;
+    border-radius: 40px;
+    border: none;
+    background: #3053c7;
+    color: #000000;
+    font-family: HelveticaUC, Arial, sans-serif;
+    font-size: 40px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding-right: 30px;
+    cursor: pointer;
+    user-select: none;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: background-color 0.1s linear;
+}
+
+.standard-btn:active {
+    background-color: #bbc8ff;
+}
+
+/* Status Background */
+.standard-status-bg {
+    position: absolute;
+    left: 70px;
+    top: 0;
+    width: 40px;
+    height: 100%;
+    background: #000;
+    pointer-events: none;
+    transition: background-color 0.1s linear;
+}
+
+
+
