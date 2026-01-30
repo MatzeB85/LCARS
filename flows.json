@@ -38,9 +38,29 @@
             "305f9ad8eeaf231d"
         ],
         "x": 134,
-        "y": 431.5,
+        "y": 291.5,
         "w": 692,
         "h": 177
+    },
+    {
+        "id": "ae43ed34035b754f",
+        "type": "group",
+        "z": "46d093f4cc5b1185",
+        "name": "Telegram",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "962acbf1f482f3d8",
+            "0c77cc8ad1306f48",
+            "7a1a445a0c59efa5",
+            "e7723a4e9877f2d5",
+            "290da3d13ab3c5a2"
+        ],
+        "x": 134,
+        "y": 111.5,
+        "w": 1012,
+        "h": 149.5
     },
     {
         "id": "03b8dbfbfab8bc9f",
@@ -644,6 +664,7 @@
         "id": "962acbf1f482f3d8",
         "type": "exec",
         "z": "46d093f4cc5b1185",
+        "g": "ae43ed34035b754f",
         "command": "/home/matze/node-red-backup.sh",
         "addpay": "payload",
         "append": "",
@@ -652,7 +673,7 @@
         "winHide": false,
         "oldrc": false,
         "name": "",
-        "x": 500,
+        "x": 720,
         "y": 160,
         "wires": [
             [],
@@ -666,11 +687,9 @@
         "id": "0c77cc8ad1306f48",
         "type": "inject",
         "z": "46d093f4cc5b1185",
-        "name": "",
+        "g": "ae43ed34035b754f",
+        "name": "Man. Trigger Backup",
         "props": [
-            {
-                "p": "payload"
-            },
             {
                 "p": "topic",
                 "vt": "str"
@@ -681,10 +700,8 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 240,
-        "y": 260,
+        "x": 270,
+        "y": 220,
         "wires": [
             [
                 "962acbf1f482f3d8"
@@ -695,7 +712,8 @@
         "id": "7a1a445a0c59efa5",
         "type": "telegram command",
         "z": "46d093f4cc5b1185",
-        "name": "",
+        "g": "ae43ed34035b754f",
+        "name": "BackupTelegram",
         "command": "/backup",
         "description": "",
         "registercommand": false,
@@ -707,7 +725,7 @@
         "useregex": false,
         "removeregexcommand": false,
         "outputs": 2,
-        "x": 150,
+        "x": 240,
         "y": 160,
         "wires": [
             [
@@ -720,6 +738,7 @@
         "id": "e7723a4e9877f2d5",
         "type": "function",
         "z": "46d093f4cc5b1185",
+        "g": "ae43ed34035b754f",
         "name": "function 3",
         "func": "// Prüfen, ob das Backup erfolgreich war\nlet statusText;\nif (msg.payload.code === 0) {\n    // Erfolg\n    statusText = \"✅ Backup erfolgreich erstellt!\";\n} else {\n    // Fehler\n    statusText = \"❌ Backup fehlgeschlagen!\";\n}\n\n// Optional: Ausgabe des Skripts mit in Telegram schicken\nlet output = msg.payload.stdout || \"\";\nif (output) {\n    statusText += `\\n\\nDetails:\\n${output}`;\n}\n\n// Telegram Nachricht vorbereiten\nmsg.payload = {\n    type: \"message\",\n    chatId: 599846758,  // Hier deine Chat-ID eintragen\n    content: statusText\n};\n\nreturn msg;\n",
         "outputs": 1,
@@ -728,8 +747,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 800,
-        "y": 180,
+        "x": 640,
+        "y": 220,
         "wires": [
             [
                 "290da3d13ab3c5a2"
@@ -740,12 +759,13 @@
         "id": "290da3d13ab3c5a2",
         "type": "telegram sender",
         "z": "46d093f4cc5b1185",
+        "g": "ae43ed34035b754f",
         "name": "",
         "bot": "4f4ed0cc81a764ca",
         "haserroroutput": false,
         "outputs": 1,
         "x": 1030,
-        "y": 160,
+        "y": 220,
         "wires": [
             []
         ]
@@ -764,7 +784,7 @@
         "oldrc": false,
         "name": "",
         "x": 590,
-        "y": 480,
+        "y": 340,
         "wires": [
             [],
             [],
@@ -789,7 +809,7 @@
         "onceDelay": "1",
         "topic": "",
         "x": 230,
-        "y": 480,
+        "y": 340,
         "wires": [
             [
                 "eca9e1dc01079b29"
@@ -810,7 +830,7 @@
         "oldrc": false,
         "name": "Git Push",
         "x": 440,
-        "y": 560,
+        "y": 420,
         "wires": [
             [],
             [],
@@ -836,7 +856,7 @@
         "payload": "",
         "payloadType": "str",
         "x": 230,
-        "y": 560,
+        "y": 420,
         "wires": [
             [
                 "exec_git_push"

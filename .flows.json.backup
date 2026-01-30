@@ -822,14 +822,10 @@
         "type": "inject",
         "z": "46d093f4cc5b1185",
         "g": "2414f8e304a8ac92",
-        "name": "",
+        "name": "Push",
         "props": [
             {
                 "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
             }
         ],
         "repeat": "",
@@ -838,8 +834,8 @@
         "onceDelay": 0.1,
         "topic": "",
         "payload": "",
-        "payloadType": "date",
-        "x": 240,
+        "payloadType": "str",
+        "x": 230,
         "y": 560,
         "wires": [
             [
