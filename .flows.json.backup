@@ -24,6 +24,25 @@
         "env": []
     },
     {
+        "id": "2414f8e304a8ac92",
+        "type": "group",
+        "z": "46d093f4cc5b1185",
+        "name": "GitHub",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "eca9e1dc01079b29",
+            "d8b813bb5a7be347",
+            "exec_git_push",
+            "305f9ad8eeaf231d"
+        ],
+        "x": 134,
+        "y": 431.5,
+        "w": 692,
+        "h": 177
+    },
+    {
         "id": "03b8dbfbfab8bc9f",
         "type": "junction",
         "z": "1e3b1a6193c2b0c3",
@@ -735,6 +754,7 @@
         "id": "eca9e1dc01079b29",
         "type": "exec",
         "z": "46d093f4cc5b1185",
+        "g": "2414f8e304a8ac92",
         "command": "/home/matze/.node-red/projects/LCARS/git-autocommit.sh",
         "addpay": "",
         "append": "",
@@ -743,36 +763,19 @@
         "winHide": false,
         "oldrc": false,
         "name": "",
-        "x": 570,
-        "y": 460,
+        "x": 590,
+        "y": 480,
         "wires": [
             [],
             [],
-            [
-                "56cc5c607288b19d"
-            ]
+            []
         ]
-    },
-    {
-        "id": "56cc5c607288b19d",
-        "type": "debug",
-        "z": "46d093f4cc5b1185",
-        "name": "debug 5",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1000,
-        "y": 460,
-        "wires": []
     },
     {
         "id": "d8b813bb5a7be347",
         "type": "inject",
         "z": "46d093f4cc5b1185",
+        "g": "2414f8e304a8ac92",
         "name": "",
         "props": [
             {
@@ -785,8 +788,8 @@
         "once": true,
         "onceDelay": "1",
         "topic": "",
-        "x": 210,
-        "y": 460,
+        "x": 230,
+        "y": 480,
         "wires": [
             [
                 "eca9e1dc01079b29"
@@ -797,6 +800,7 @@
         "id": "exec_git_push",
         "type": "exec",
         "z": "46d093f4cc5b1185",
+        "g": "2414f8e304a8ac92",
         "command": "cd /home/matze/.node-red/projects/LCARS && git push origin master",
         "addpay": false,
         "append": "",
@@ -805,35 +809,19 @@
         "winHide": false,
         "oldrc": false,
         "name": "Git Push",
-        "x": 770,
-        "y": 660,
+        "x": 440,
+        "y": 560,
         "wires": [
             [],
             [],
-            [
-                "debug_git_push"
-            ]
+            []
         ]
-    },
-    {
-        "id": "debug_git_push",
-        "type": "debug",
-        "z": "46d093f4cc5b1185",
-        "name": "Git Push Output",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "x": 1020,
-        "y": 660,
-        "wires": []
     },
     {
         "id": "305f9ad8eeaf231d",
         "type": "inject",
         "z": "46d093f4cc5b1185",
+        "g": "2414f8e304a8ac92",
         "name": "",
         "props": [
             {
@@ -851,8 +839,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 580,
-        "y": 660,
+        "x": 240,
+        "y": 560,
         "wires": [
             [
                 "exec_git_push"
