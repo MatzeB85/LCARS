@@ -67,7 +67,7 @@
         "type": "junction",
         "z": "1e3b1a6193c2b0c3",
         "x": 520,
-        "y": 80,
+        "y": 100,
         "wires": [
             [
                 "7ac61214f2a9bf45"
@@ -474,8 +474,8 @@
         "passthrough": true,
         "return": false,
         "outputs": 1,
-        "x": 680,
-        "y": 80,
+        "x": 660,
+        "y": 100,
         "wires": [
             [
                 "7f8e15e4623dc93e"
@@ -528,7 +528,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 960,
-        "y": 80,
+        "y": 100,
         "wires": []
     },
     {
