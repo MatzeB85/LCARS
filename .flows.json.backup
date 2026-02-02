@@ -24,6 +24,39 @@
         "env": []
     },
     {
+        "id": "229842addebeccb8",
+        "type": "tab",
+        "label": "test",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "776cbcab809a4f68",
+        "type": "subflow",
+        "name": "Subflow 1",
+        "info": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 140,
+                "wires": []
+            }
+        ],
+        "out": [
+            {
+                "x": 280,
+                "y": 140,
+                "wires": [
+                    {
+                        "id": "776cbcab809a4f68",
+                        "port": 0
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "id": "2414f8e304a8ac92",
         "type": "group",
         "z": "46d093f4cc5b1185",
