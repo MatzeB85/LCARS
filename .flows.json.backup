@@ -929,9 +929,6 @@
         "name": "",
         "props": [
             {
-                "p": "payload"
-            },
-            {
                 "p": "topic",
                 "vt": "str"
             }
@@ -941,9 +938,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "1",
-        "payload": "",
-        "payloadType": "date",
-        "x": 270,
+        "x": 250,
         "y": 180,
         "wires": [
             [
@@ -990,9 +985,6 @@
         "name": "",
         "props": [
             {
-                "p": "payload"
-            },
-            {
                 "p": "topic",
                 "vt": "str"
             }
@@ -1002,9 +994,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "2",
-        "payload": "",
-        "payloadType": "date",
-        "x": 270,
+        "x": 250,
         "y": 260,
         "wires": [
             [
