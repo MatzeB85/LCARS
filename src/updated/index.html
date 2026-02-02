@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <title>LCARS</title>
+
+    <link rel="stylesheet" href="/styles/reset.css">
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/fonts.css">
+</head>
+<body class="text-space-white bg-dark"
+      id="lcars-body">
+
+    <!-- Header -->
+    <header class="lcars-header">
+        <div class="lcars-header-frame lcars-frame lcars-frame--bottom-left bg-midnight">
+
+        </div>
+        <div class="lcars-header-content">
+            <div>
+                <h2 id="lcars-clock">
+                    00:00:00
+                </h2>
+                <h3 id="lcars-date">
+                    Sonntag 01.02.2026
+                </h3>
+            </div>
+            <div class="text-right">
+                <h3 id="lcars-room">
+                    Wohnzimmer
+                </h3>
+                <h4 id="lcars-temp-1">
+                    --°C
+                </h4>
+            </div>
+        </div>
+        <div class="lcars-header-footer">
+            <div class="bg-midnight lcars-frame lcars-frame--outer-top-left"></div>
+            <div class="bg-moonlit-violet"></div>
+            <div class="bg-bluey"></div>
+            <div class="bg-midnight"></div>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main class="lcars-main">
+        <div class="lcars-main--header">
+            <div class="bg-midnight lcars-frame lcars-frame--outer-bottom-left"></div>
+            <div class="bg-moonlit-violet"></div>
+            <div class="bg-bluey"></div>
+            <div class="bg-midnight"></div>
+        </div>
+        <nav class="lcars-main--nav">
+            <div class="lcars-frame lcars-frame--top-left bg-midnight mb-xs"></div>
+            <ul>
+                <li>
+                    <a href="#"
+                       class="lcars-button lcars-button--nav-link">
+                        Licht
+                    </a>
+                </li>
+                <li>
+                    <a href="#"
+                       class="lcars-button lcars-button--nav-link">
+                        Rollo
+                    </a>
+                </li>
+                <li>
+                    <a href="#"
+                       class="lcars-button lcars-button--nav-link">
+                        Heizung
+                    </a>
+                </li>
+                <li>
+                    <a href="#"
+                       class="lcars-button lcars-button--nav-link">
+                        Sonstiges
+                    </a>
+                </li>
+            </ul>
+            <button id="lcars-menu-btn"
+                    class="lcars-button lcars-button--menu">
+                Menü
+            </button>
+            <div class="lcars-frame lcars-frame--bottom-left bg-midnight"></div>
+        </nav>
+        <div class="lcars-main--content">
+
+        </div>
+        <div class="lcars-main--footer bg-midnight lcars-frame lcars-frame--outer-top-left">
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+
+    </footer>
+
+    <script src="/vendor/anime.min.js"></script>
+    <script type="module" src="/scripts/main.js"></script>
+</body>
+</html>

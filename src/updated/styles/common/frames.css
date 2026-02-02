@@ -1,0 +1,60 @@
+.lcars-frame {
+    position: relative;
+    overflow: visible;
+}
+.lcars-frame--top-left {
+    border-top-left-radius: 100px;
+}
+.lcars-frame--top-right {
+    border-top-right-radius: 100px;
+}
+.lcars-frame--bottom-left {
+    border-bottom-left-radius: 100px;
+}
+.lcars-frame--bottom-right {
+    border-bottom-right-radius: 100px;
+}
+
+.lcars-frame--outer-top-left,
+.lcars-frame--outer-top-right,
+.lcars-frame--outer-bottom-left,
+.lcars-frame--outer-bottom-right {
+    &:before {
+        pointer-events: none;
+        background-color: var(--bg-color);
+        content: "";
+        position: absolute;
+        width: var(--bar-height);
+        height: var(--bar-height);
+        z-index: -1;
+    }
+}
+
+.lcars-frame--outer-top-left {
+    &:before {
+        clip-path: path("M0 0C0 33.1371 26.8629 60 60 60H0V0Z");
+        top: calc(var(--bar-height) * -1);
+        left: 0;
+    }
+}
+.lcars-frame--outer-top-right {
+    &:before {
+        clip-path: path("M0 60C33.1371 60 60 33.1371 60 0L60 60L0 60Z");
+        top: calc(var(--bar-height) * -1);
+        right: 0;
+    }
+}
+.lcars-frame--outer-bottom-left {
+    &:before {
+        clip-path: path("M60 0C26.8629 0 0 26.8629 0 60L0 0L60 0Z");
+        bottom: calc(var(--bar-height) * -1);
+        left: 0;
+    }
+}
+.lcars-frame--outer-bottom-right {
+    &:before {
+        clip-path: path("M60 60C60 26.8629 33.1371 0 0 0L60 0L60 60Z");
+        bottom: calc(var(--bar-height) * -1);
+        right: 0;
+    }
+}
