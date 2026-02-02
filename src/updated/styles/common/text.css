@@ -1,0 +1,210 @@
+/** Alignment */
+.text-center {
+    text-align: center;
+}
+.text-left {
+    text-align: left;
+}
+.text-right {
+    text-align: right;
+}
+
+/** Weights */
+.text-normal {
+    font-weight: 400;
+}
+.text-bold {
+    font-weight: 700;
+}
+
+/** Colors */
+.text-ice {
+    color: var(--color-ice);
+
+    --text-color: var(--color-ice);
+}
+.text-ghost {
+    color: var(--color-ghost);
+
+    --text-color: var(--color-ghost);
+}
+.text-bluey {
+    color: var(--color-bluey);
+
+    --text-color: var(--color-bluey);
+}
+.text-cool {
+    color: var(--color-cool);
+
+    --text-color: var(--color-cool);
+}
+.text-blue {
+    color: var(--color-blue);
+
+    --text-color: var(--color-blue);
+}
+.text-evening {
+    color: var(--color-evening);
+
+    --text-color: var(--color-evening);
+}
+.text-midnight {
+    color: var(--color-midnight);
+
+    --text-color: var(--color-midnight);
+}
+.text-lilac {
+    color: var(--color-lilac);
+
+    --text-color: var(--color-lilac);
+}
+.text-african-violet {
+    color: var(--color-african-violet);
+
+    --text-color: var(--color-african-violet);
+}
+.text-violet-creme {
+    color: var(--color-violet-creme);
+
+    --text-color: var(--color-violet-creme);
+}
+.text-sky {
+    color: var(--color-sky);
+
+    --text-color: var(--color-sky);
+}
+.text-moonlit-violet {
+    color: var(--color-moonlit-violet);
+
+    --text-color: var(--color-moonlit-violet);
+}
+.text-pumpkinshade {
+    color: var(--color-pumpkinshade);
+
+    --text-color: var(--color-pumpkinshade);
+}
+.text-orange {
+    color: var(--color-orange);
+
+    --text-color: var(--color-orange);
+}
+.text-tangerine {
+    color: var(--color-tangerine);
+
+    --text-color: var(--color-tangerine);
+}
+.text-peach {
+    color: var(--color-peach);
+
+    --text-color: var(--color-peach);
+}
+.text-butterscotch {
+    color: var(--color-butterscotch);
+
+    --text-color: var(--color-butterscotch);
+}
+.text-almond {
+    color: var(--color-almond);
+
+    --text-color: var(--color-almond);
+}
+.text-almond-creme {
+    color: var(--color-almond-creme);
+
+    --text-color: var(--color-almond-creme);
+}
+.text-gold {
+    color: var(--color-gold);
+
+    --text-color: var(--color-gold);
+}
+.text-golden-orange {
+    color: var(--color-golden-orange);
+
+    --text-color: var(--color-golden-orange);
+}
+.text-honey {
+    color: var(--color-honey);
+
+    --text-color: var(--color-honey);
+}
+.text-sunflower {
+    color: var(--color-sunflower);
+
+    --text-color: var(--color-sunflower);
+}
+.text-wheat {
+    color: var(--color-wheat);
+
+    --text-color: var(--color-wheat);
+}
+.text-gray {
+    color: var(--color-gray);
+
+    --text-color: var(--color-gray);
+}
+.text-green {
+    color: var(--color-green);
+
+    --text-color: var(--color-green);
+}
+.text-lawn {
+    color: var(--color-lawn);
+
+    --text-color: var(--color-lawn);
+}
+.text-martian {
+    color: var(--color-martian);
+
+    --text-color: var(--color-martian);
+}
+.text-lima-bean {
+    color: var(--color-lima-bean);
+
+    --text-color: var(--color-lima-bean);
+}
+.text-magenta {
+    color: var(--color-magenta);
+
+    --text-color: var(--color-magenta);
+}
+.text-mars {
+    color: var(--color-mars);
+
+    --text-color: var(--color-mars);
+}
+.text-tomato {
+    color: var(--color-tomato);
+
+    --text-color: var(--color-tomato);
+}
+.text-rosebush {
+    color: var(--color-rosebush);
+
+    --text-color: var(--color-rosebush);
+}
+.text-red {
+    color: var(--color-red);
+
+    --text-color: var(--color-red);
+}
+.text-cardinal {
+    color: var(--color-cardinal);
+
+    --text-color: var(--color-cardinal);
+}
+.text-space-white {
+    color: var(--color-space-white);
+
+    --text-color: var(--color-space-white);
+}
+.text-moonbeam {
+    color: var(--color-moonbeam);
+
+    --text-color: var(--color-moonbeam);
+}
+.text-dark {
+    color: var(--color-dark);
+
+    --text-color: var(--color-dark);
+}

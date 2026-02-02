@@ -1,0 +1,19 @@
+:root {
+    --spacing-xs: .25rem;
+    --spacing-s: .5rem;
+    --spacing-sm: .75rem;
+    --spacing-md: 1rem;
+    --spacing-content: 2rem;
+
+    --bar-height: 60px;
+    --bar-small-width: 30px;
+    --bar-large-width: 100px;
+
+    --sidebar-min-width: 80px;
+    --sidebar-max-width: 120px;
+
+    --content-min-width: 200px;
+    --content-max-width: 1fr;
+
+    --frame-bar-height: 16px;
+}

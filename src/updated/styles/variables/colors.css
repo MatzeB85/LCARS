@@ -1,0 +1,43 @@
+/** Taken from https://www.thelcars.com/colors.php */
+:root {
+    --color-ice: #99ccff;
+    --color-ghost: #88bbff;
+    --color-bluey: #8899ff;
+    --color-cool: #6699ff;
+    --color-blue: #5566ff;
+    --color-evening: #2266ff;
+    --color-midnight: #2233ff;
+    --color-lilac: #cc55ff;
+    --color-grape: #9966cc;
+    --color-african-violet: #cc99ff;
+    --color-violet-creme: #ddbbff;
+    --color-sky: #aaaaff;
+    --color-moonlit-violet: #9966ff;
+    --color-pumpkinshade: #ff7744;
+    --color-orange: #ff8800;
+    --color-tangerine: #ff8833;
+    --color-peach: #ff8866;
+    --color-butterscotch: #ff9966;
+    --color-almond: #ffaa90;
+    --color-almond-creme: #ffbbaa;
+    --color-gold: #ffaa00;
+    --color-golden-orange: #ff9900;
+    --color-honey: #ffcc99;
+    --color-sunflower: #ffcc99;
+    --color-wheat: #ccaa88;
+    --color-gray: #666688;
+    --color-galaxy-gray: #52526a;
+    --color-green: #999933;
+    --color-lawn: #99aa22;
+    --color-martian: #99cc33;
+    --color-lima-bean: #cccc66;
+    --color-magenta: #cc5599;
+    --color-mars: #ff2200;
+    --color-tomato: #ff5555;
+    --color-rosebush: #cc6666;
+    --color-red: #cc4444;
+    --color-cardinal: #cc2233;
+    --color-space-white: #f5f6fa;
+    --color-moonbeam: #ebf0ff;
+    --color-dark: #000;
+}
