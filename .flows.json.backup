@@ -34,8 +34,9 @@
     {
         "id": "776cbcab809a4f68",
         "type": "subflow",
-        "name": "Subflow 1",
+        "name": "Testsub",
         "info": "",
+        "category": "",
         "in": [
             {
                 "x": 60,
@@ -54,7 +55,20 @@
                     }
                 ]
             }
-        ]
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99",
+        "status": {
+            "x": 280,
+            "y": 220,
+            "wires": [
+                {
+                    "id": "776cbcab809a4f68",
+                    "port": 0
+                }
+            ]
+        }
     },
     {
         "id": "2414f8e304a8ac92",

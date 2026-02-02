@@ -915,8 +915,8 @@
         "type": "subflow:776cbcab809a4f68",
         "z": "229842addebeccb8",
         "name": "",
-        "x": 480,
-        "y": 180,
+        "x": 470,
+        "y": 160,
         "wires": [
             [
                 "5fa4694b8bb4a2b7"
@@ -928,7 +928,7 @@
         "type": "subflow:776cbcab809a4f68",
         "z": "229842addebeccb8",
         "name": "",
-        "x": 480,
+        "x": 470,
         "y": 260,
         "wires": [
             [
