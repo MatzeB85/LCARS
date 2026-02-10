@@ -511,7 +511,7 @@
         "id": "f1c632c77a5b407e",
         "type": "pca9685-light",
         "z": "4b460709d174f300",
-        "name": "",
+        "name": "Regal",
         "pca": "3130d72d420bd60c",
         "chR": "0",
         "chG": "1",
@@ -523,8 +523,8 @@
         "ctMax": 6500,
         "singleChannel": "",
         "singleUnit": "percent",
-        "x": 990,
-        "y": 240,
+        "x": 970,
+        "y": 180,
         "wires": [
             []
         ]

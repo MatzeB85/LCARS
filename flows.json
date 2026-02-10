@@ -524,7 +524,7 @@
         "singleChannel": "",
         "singleUnit": "percent",
         "x": 970,
-        "y": 180,
+        "y": 260,
         "wires": [
             []
         ]
