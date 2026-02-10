@@ -530,47 +530,6 @@
         ]
     },
     {
-        "id": "f1c632c77a5b407e",
-        "type": "pca9685-light",
-        "z": "4b460709d174f300",
-        "name": "Regal",
-        "pca": "3130d72d420bd60c",
-        "chR": "0",
-        "chG": "1",
-        "chB": "2",
-        "chWW": "3",
-        "chKW": "4",
-        "gamma": 2.2,
-        "ctMin": 2700,
-        "ctMax": 6500,
-        "fps": "100",
-        "singleChannel": "",
-        "singleUnit": "percent",
-        "x": 1130,
-        "y": 260,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "519c2eecfd94f92a",
-        "type": "function",
-        "z": "4b460709d174f300",
-        "name": "function 4",
-        "func": "\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 840,
-        "y": 260,
-        "wires": [
-            []
-        ]
-    },
-    {
         "id": "7ac61214f2a9bf45",
         "type": "uib-sender",
         "z": "1e3b1a6193c2b0c3",

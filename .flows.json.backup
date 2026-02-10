@@ -40,6 +40,13 @@
         "env": []
     },
     {
+        "id": "f3f6c2b7f2a1a111",
+        "type": "tab",
+        "label": "PCA9685 LED Test",
+        "disabled": false,
+        "info": ""
+    },
+    {
         "id": "776cbcab809a4f68",
         "type": "subflow",
         "name": "Testsub",
@@ -169,6 +176,13 @@
         "busNo": 1,
         "address": "0x40",
         "freqHz": 1000
+    },
+    {
+        "id": "b0f7b2a1c5b9e222",
+        "type": "pca9685-config",
+        "busNo": "1",
+        "address": "0x40",
+        "freqHz": "1000"
     },
     {
         "id": "d1b8132041c373d2",
@@ -971,6 +985,148 @@
         "wires": [
             [
                 "b0650fc8656ca401"
+            ]
+        ]
+    },
+    {
+        "id": "a9a9b3b3d7d1c333",
+        "type": "pca9685-light",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "LED Strip (RGB+WW+KW)",
+        "pca": "b0f7b2a1c5b9e222",
+        "chR": "0",
+        "chG": "1",
+        "chB": "2",
+        "chWW": "3",
+        "chKW": "4",
+        "gamma": "2.2",
+        "ctMin": "2700",
+        "ctMax": "6500",
+        "fps": "50",
+        "singleChannel": "",
+        "singleUnit": "percent",
+        "x": 620,
+        "y": 120,
+        "wires": [
+            [
+                "d2d9c1a4a8f2d444"
+            ]
+        ]
+    },
+    {
+        "id": "d2d9c1a4a8f2d444",
+        "type": "debug",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "debug msg.pca9685",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "pca9685",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 980,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "5a3aa5b7d82ea555",
+        "type": "inject",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "Static: warm orange + white",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"rgb\":\"#ff8800\",\"ct\":3200,\"white\":0.35,\"brightness\":0.20}",
+        "payloadType": "json",
+        "x": 200,
+        "y": 120,
+        "wires": [
+            [
+                "a9a9b3b3d7d1c333"
+            ]
+        ]
+    },
+    {
+        "id": "a1f1d7c48b2ac666",
+        "type": "inject",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "Effect: Rainbow (20s loop)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"effect\":\"rainbow\",\"periodMs\":20000,\"brightness\":0.20,\"white\":0,\"ct\":4000}",
+        "payloadType": "json",
+        "x": 190,
+        "y": 180,
+        "wires": [
+            [
+                "a9a9b3b3d7d1c333"
+            ]
+        ]
+    },
+    {
+        "id": "9c5e1f0b6d0fd777",
+        "type": "inject",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "Effect: Fade Pingpong (smooth)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"effect\":\"fade\",\"colors\":[\"#ff0000\",\"#00ff00\",\"#0000ff\",\"#ffffff\"],\"order\":\"pingpong\",\"transitionMs\":3500,\"holdMs\":200,\"easing\":\"smooth\",\"brightness\":0.20,\"white\":0}",
+        "payloadType": "json",
+        "x": 210,
+        "y": 240,
+        "wires": [
+            [
+                "a9a9b3b3d7d1c333"
+            ]
+        ]
+    },
+    {
+        "id": "c0ad0d72a6dbf888",
+        "type": "inject",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "STOP effect",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"effect\":\"stop\"}",
+        "payloadType": "json",
+        "x": 150,
+        "y": 300,
+        "wires": [
+            [
+                "a9a9b3b3d7d1c333"
             ]
         ]
     }
