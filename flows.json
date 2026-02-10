@@ -149,6 +149,13 @@
         "verboselogging": false
     },
     {
+        "id": "8d6dca5434bd3954",
+        "type": "pca9685-config",
+        "busNo": 1,
+        "address": "0x40",
+        "freqHz": 50
+    },
+    {
         "id": "d1b8132041c373d2",
         "type": "uibuilder",
         "z": "4b460709d174f300",
@@ -491,6 +498,22 @@
             [
                 "49d34e4197def05c"
             ]
+        ]
+    },
+    {
+        "id": "ec7891d9bf530aec",
+        "type": "pca9685-out",
+        "z": "4b460709d174f300",
+        "name": "",
+        "pca": "8d6dca5434bd3954",
+        "channel": "1",
+        "unit": "percent",
+        "servoMinUs": 1000,
+        "servoMaxUs": 2000,
+        "x": 1000,
+        "y": 280,
+        "wires": [
+            []
         ]
     },
     {
