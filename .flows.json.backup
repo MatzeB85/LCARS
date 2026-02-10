@@ -32,14 +32,6 @@
         "env": []
     },
     {
-        "id": "579cf6663a5885ea",
-        "type": "tab",
-        "label": "lights",
-        "disabled": false,
-        "info": "",
-        "env": []
-    },
-    {
         "id": "f3f6c2b7f2a1a111",
         "type": "tab",
         "label": "PCA9685 LED Test",
@@ -993,7 +985,7 @@
         "payload": "{\"rgb\":\"#ff8800\",\"ct\":3200,\"white\":0.35,\"brightness\":0.20}",
         "payloadType": "json",
         "x": 200,
-        "y": 120,
+        "y": 180,
         "wires": [
             [
                 "a9a9b3b3d7d1c333"
@@ -1018,7 +1010,7 @@
         "payload": "{\"effect\":\"rainbow\",\"periodMs\":20000,\"brightness\":0.20,\"white\":0,\"ct\":4000}",
         "payloadType": "json",
         "x": 190,
-        "y": 180,
+        "y": 240,
         "wires": [
             [
                 "a9a9b3b3d7d1c333"
@@ -1043,7 +1035,7 @@
         "payload": "{\"effect\":\"fade\",\"colors\":[\"#ff0000\",\"#00ff00\",\"#0000ff\",\"#ffffff\"],\"order\":\"pingpong\",\"transitionMs\":3500,\"holdMs\":200,\"easing\":\"smooth\",\"brightness\":0.20,\"white\":0}",
         "payloadType": "json",
         "x": 210,
-        "y": 240,
+        "y": 120,
         "wires": [
             [
                 "a9a9b3b3d7d1c333"
