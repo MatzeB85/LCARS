@@ -153,7 +153,7 @@
         "type": "pca9685-config",
         "busNo": 1,
         "address": "0x40",
-        "freqHz": 50
+        "freqHz": "1000"
     },
     {
         "id": "d1b8132041c373d2",
