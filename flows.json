@@ -524,7 +524,7 @@
         "fps": "100",
         "singleChannel": "",
         "singleUnit": "percent",
-        "x": 970,
+        "x": 1130,
         "y": 260,
         "wires": [
             []
