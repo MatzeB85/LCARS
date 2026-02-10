@@ -156,6 +156,13 @@
         "freqHz": "1000"
     },
     {
+        "id": "3130d72d420bd60c",
+        "type": "pca9685-config",
+        "busNo": 1,
+        "address": "0x40",
+        "freqHz": 1000
+    },
+    {
         "id": "d1b8132041c373d2",
         "type": "uibuilder",
         "z": "4b460709d174f300",
@@ -498,6 +505,28 @@
             [
                 "49d34e4197def05c"
             ]
+        ]
+    },
+    {
+        "id": "f1c632c77a5b407e",
+        "type": "pca9685-light",
+        "z": "4b460709d174f300",
+        "name": "",
+        "pca": "3130d72d420bd60c",
+        "chR": "0",
+        "chG": "1",
+        "chB": "2",
+        "chWW": "3",
+        "chKW": "4",
+        "gamma": 2.2,
+        "ctMin": 2700,
+        "ctMax": 6500,
+        "singleChannel": "",
+        "singleUnit": "percent",
+        "x": 990,
+        "y": 240,
+        "wires": [
+            []
         ]
     },
     {
