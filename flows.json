@@ -521,6 +521,7 @@
         "gamma": 2.2,
         "ctMin": 2700,
         "ctMax": 6500,
+        "fps": "100",
         "singleChannel": "",
         "singleUnit": "percent",
         "x": 970,
