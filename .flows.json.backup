@@ -164,25 +164,11 @@
         "verboselogging": false
     },
     {
-        "id": "8d6dca5434bd3954",
-        "type": "pca9685-config",
-        "busNo": 1,
-        "address": "0x40",
-        "freqHz": "1000"
-    },
-    {
-        "id": "3130d72d420bd60c",
+        "id": "41402cc865566197",
         "type": "pca9685-config",
         "busNo": 1,
         "address": "0x40",
         "freqHz": 1000
-    },
-    {
-        "id": "b0f7b2a1c5b9e222",
-        "type": "pca9685-config",
-        "busNo": "1",
-        "address": "0x40",
-        "freqHz": "1000"
     },
     {
         "id": "d1b8132041c373d2",
@@ -952,7 +938,7 @@
         "type": "pca9685-light",
         "z": "f3f6c2b7f2a1a111",
         "name": "LED Strip (RGB+WW+KW)",
-        "pca": "b0f7b2a1c5b9e222",
+        "pca": "41402cc865566197",
         "chR": "8",
         "chG": "9",
         "chB": "10",
