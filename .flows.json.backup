@@ -32,6 +32,14 @@
         "env": []
     },
     {
+        "id": "579cf6663a5885ea",
+        "type": "tab",
+        "label": "lights",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "776cbcab809a4f68",
         "type": "subflow",
         "name": "Testsub",
@@ -525,6 +533,24 @@
         "singleChannel": "",
         "singleUnit": "percent",
         "x": 1130,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "519c2eecfd94f92a",
+        "type": "function",
+        "z": "4b460709d174f300",
+        "name": "function 4",
+        "func": "\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
         "y": 260,
         "wires": [
             []
