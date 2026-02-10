@@ -949,7 +949,7 @@
         "ctMax": "6500",
         "fps": "50",
         "singleChannel": "",
-        "singleUnit": "percent",
+        "singleUnit": "ticks",
         "x": 620,
         "y": 120,
         "wires": [
