@@ -1020,7 +1020,7 @@
         "id": "a1f1d7c48b2ac666",
         "type": "inject",
         "z": "f3f6c2b7f2a1a111",
-        "name": "Effect: Rainbow (20s loop)",
+        "name": "Effect: Rainbow (5s loop)",
         "props": [
             {
                 "p": "payload"
