@@ -1166,5 +1166,53 @@
                 "a9a9b3b3d7d1c333"
             ]
         ]
+    },
+    {
+        "id": "2e56ac3ab92564a0",
+        "type": "inject",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "kw",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{ \"white\": 1, \"ct\": 6500, \"brightness\": 1.0 }",
+        "payloadType": "json",
+        "x": 510,
+        "y": 700,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ad292e3d86e7a0ef",
+        "type": "inject",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "ww",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{ \"white\": 1, \"ct\": 2700, \"brightness\": 1.0 }",
+        "payloadType": "json",
+        "x": 510,
+        "y": 640,
+        "wires": [
+            [
+                "a9a9b3b3d7d1c333"
+            ]
+        ]
     }
 ]
