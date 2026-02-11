@@ -1020,7 +1020,7 @@
         "id": "a1f1d7c48b2ac666",
         "type": "inject",
         "z": "f3f6c2b7f2a1a111",
-        "name": "Effect: Rainbow (5s loop)",
+        "name": "Effect: Rainbow (60s loop)",
         "props": [
             {
                 "p": "payload"
@@ -1031,7 +1031,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"effect\":\"rainbow\",\"periodMs\":1000,\"brightness\":1.0,\"white\":0,\"ct\":4000}",
+        "payload": "{\"effect\":\"rainbow\",\"periodMs\":60000,\"brightness\":1.0,\"white\":0,\"ct\":4000}",
         "payloadType": "json",
         "x": 190,
         "y": 240,

@@ -1258,7 +1258,7 @@
         "topic": "",
         "payload": "{\"effect\":\"list\",\"log\":true}",
         "payloadType": "json",
-        "x": 750,
+        "x": 710,
         "y": 260,
         "wires": [
             [
