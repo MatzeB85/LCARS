@@ -1084,8 +1084,8 @@
         "topic": "",
         "payload": "{ \"rgb\":\"#ffffff\", \"brightness\": 1, \"white\": 0 }",
         "payloadType": "json",
-        "x": 180,
-        "y": 380,
+        "x": 200,
+        "y": 360,
         "wires": [
             [
                 "a9a9b3b3d7d1c333"
