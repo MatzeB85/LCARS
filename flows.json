@@ -950,23 +950,6 @@
         ]
     },
     {
-        "id": "d2d9c1a4a8f2d444",
-        "type": "debug",
-        "z": "f3f6c2b7f2a1a111",
-        "name": "debug msg.pca9685",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "pca9685",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1180,
-        "y": 120,
-        "wires": []
-    },
-    {
         "id": "5a3aa5b7d82ea555",
         "type": "inject",
         "z": "f3f6c2b7f2a1a111",
@@ -1258,7 +1241,6 @@
         "y": 120,
         "wires": [
             [
-                "d2d9c1a4a8f2d444",
                 "c2826630504bf2e9"
             ]
         ]
@@ -1276,8 +1258,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1200,
-        "y": 60,
+        "x": 1240,
+        "y": 120,
         "wires": []
     }
 ]
