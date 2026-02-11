@@ -587,10 +587,12 @@
                 "03b8dbfbfab8bc9f"
             ],
             [
-                "b18a0d80af9628cc"
+                "b18a0d80af9628cc",
+                "dc0288500fccb22c"
             ],
             [
-                "1b63d1168cc1b5b1"
+                "1b63d1168cc1b5b1",
+                "50d67da1890135bf"
             ]
         ],
         "outputLabels": [
@@ -650,6 +652,28 @@
         "bcm": true,
         "x": 650,
         "y": 320,
+        "wires": []
+    },
+    {
+        "id": "50d67da1890135bf",
+        "type": "link out",
+        "z": "1e3b1a6193c2b0c3",
+        "name": "link out 1",
+        "mode": "link",
+        "links": [],
+        "x": 905,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "dc0288500fccb22c",
+        "type": "link out",
+        "z": "1e3b1a6193c2b0c3",
+        "name": "link out 2",
+        "mode": "link",
+        "links": [],
+        "x": 925,
+        "y": 120,
         "wires": []
     },
     {
