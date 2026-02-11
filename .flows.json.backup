@@ -1107,7 +1107,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{ \"rgb\":\"#0000ff\", \"brightness\": 0.2, \"white\": 0 }",
+        "payload": "{ \"rgb\":\"#0000ff\", \"brightness\": 1.0, \"white\": 0 }",
         "payloadType": "json",
         "x": 510,
         "y": 580,
