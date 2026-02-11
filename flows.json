@@ -1066,8 +1066,8 @@
         "topic": "",
         "payload": "{ \"rgb\":\"#ffffff\", \"brightness\": 1, \"white\": 0 }",
         "payloadType": "json",
-        "x": 200,
-        "y": 360,
+        "x": 320,
+        "y": 400,
         "wires": [
             [
                 "dfcaeaf186595553"
@@ -1141,7 +1141,7 @@
         "topic": "",
         "payload": "{\"r\":1.0,\"g\":0,\"b\":0,\"ww\":0,\"kw\":0}",
         "payloadType": "json",
-        "x": 390,
+        "x": 250,
         "y": 460,
         "wires": [
             [
