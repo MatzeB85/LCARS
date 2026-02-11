@@ -1240,5 +1240,30 @@
                 "a9a9b3b3d7d1c333"
             ]
         ]
+    },
+    {
+        "id": "6fa5aec17d2e748c",
+        "type": "inject",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "list",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"effect\":\"list\",\"log\":true}",
+        "payloadType": "json",
+        "x": 750,
+        "y": 260,
+        "wires": [
+            [
+                "a9a9b3b3d7d1c333"
+            ]
+        ]
     }
 ]
