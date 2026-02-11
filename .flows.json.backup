@@ -1156,7 +1156,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"r\":200,\"g\":0,\"b\":100,\"ww\":0,\"kw\":0}",
+        "payload": "{\"r\":0.5,\"g\":0,\"b\":0.75,\"ww\":0,\"kw\":0}",
         "payloadType": "json",
         "x": 390,
         "y": 460,
