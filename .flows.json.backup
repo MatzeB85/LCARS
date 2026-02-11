@@ -1156,7 +1156,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{ \"rgb\":\"#ff0000\", \"brightness\": 1.0, \"white\": 0 }",
+        "payload": "{\"effect\":\"set\",\"rgb\":\"#ff0000\",\"brightness\":1,\"white\":0}",
         "payloadType": "json",
         "x": 390,
         "y": 460,
