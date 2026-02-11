@@ -1066,5 +1066,30 @@
                 "a9a9b3b3d7d1c333"
             ]
         ]
+    },
+    {
+        "id": "9243140d196a1743",
+        "type": "inject",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "Static: warm orange + white",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{ \"rgb\":\"#ffffff\", \"brightness\": 1, \"white\": 0 }",
+        "payloadType": "json",
+        "x": 180,
+        "y": 380,
+        "wires": [
+            [
+                "a9a9b3b3d7d1c333"
+            ]
+        ]
     }
 ]
