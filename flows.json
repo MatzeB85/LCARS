@@ -1109,8 +1109,8 @@
         "topic": "",
         "payload": "{ \"rgb\":\"#0000ff\", \"brightness\": 0.2, \"white\": 0 }",
         "payloadType": "json",
-        "x": 110,
-        "y": 600,
+        "x": 510,
+        "y": 580,
         "wires": [
             [
                 "a9a9b3b3d7d1c333"
@@ -1134,8 +1134,8 @@
         "topic": "",
         "payload": "{ \"rgb\":\"#00ff00\", \"brightness\": 0.2, \"white\": 0 }",
         "payloadType": "json",
-        "x": 110,
-        "y": 540,
+        "x": 510,
+        "y": 520,
         "wires": [
             [
                 "a9a9b3b3d7d1c333"
@@ -1159,8 +1159,8 @@
         "topic": "",
         "payload": "{ \"rgb\":\"#ff0000\", \"brightness\": 0.2, \"white\": 0 }",
         "payloadType": "json",
-        "x": 110,
-        "y": 480,
+        "x": 510,
+        "y": 460,
         "wires": [
             [
                 "a9a9b3b3d7d1c333"
