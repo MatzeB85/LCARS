@@ -1089,7 +1089,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"r\":0,\"g\":0,\"b\":1,\"ww\":0,\"kw\":0}",
+        "payload": "{\"r\":0.3,\"g\":0,\"b\":1,\"ww\":0,\"kw\":0}",
         "payloadType": "json",
         "x": 390,
         "y": 580,
