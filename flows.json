@@ -1302,7 +1302,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"r\":1,\"g\":0.5,\"b\":0,\"ww\":1,\"kw\":1}",
+        "payload": "{\"r\":1,\"g\":0.5,\"b\":0,\"ww\":1,\"kw\":0.5}",
         "payloadType": "json",
         "x": 675,
         "y": 531,
