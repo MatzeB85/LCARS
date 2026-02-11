@@ -1231,7 +1231,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{ \"white\": 1, \"ct\": 2700, \"brightness\": 1.0 }",
+        "payload": "{ \"white\": 1, \"ct\": 3400, \"brightness\": 1.0 }",
         "payloadType": "json",
         "x": 510,
         "y": 640,
