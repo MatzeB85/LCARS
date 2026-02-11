@@ -950,31 +950,6 @@
         ]
     },
     {
-        "id": "a9a9b3b3d7d1c333",
-        "type": "pca9685-light",
-        "z": "f3f6c2b7f2a1a111",
-        "name": "LED Strip (RGB+WW+KW)",
-        "pca": "41402cc865566197",
-        "chR": "8",
-        "chG": "10",
-        "chB": "9",
-        "chWW": "11",
-        "chKW": "12",
-        "gamma": "2.2",
-        "ctMin": "2700",
-        "ctMax": "6500",
-        "fps": "50",
-        "singleChannel": "",
-        "singleUnit": "percent",
-        "x": 620,
-        "y": 120,
-        "wires": [
-            [
-                "d2d9c1a4a8f2d444"
-            ]
-        ]
-    },
-    {
         "id": "d2d9c1a4a8f2d444",
         "type": "debug",
         "z": "f3f6c2b7f2a1a111",
@@ -1012,7 +987,7 @@
         "y": 180,
         "wires": [
             [
-                "a9a9b3b3d7d1c333"
+                "dfcaeaf186595553"
             ]
         ]
     },
@@ -1037,7 +1012,7 @@
         "y": 240,
         "wires": [
             [
-                "a9a9b3b3d7d1c333"
+                "dfcaeaf186595553"
             ]
         ]
     },
@@ -1062,7 +1037,7 @@
         "y": 120,
         "wires": [
             [
-                "a9a9b3b3d7d1c333"
+                "dfcaeaf186595553"
             ]
         ]
     },
@@ -1087,7 +1062,7 @@
         "y": 300,
         "wires": [
             [
-                "a9a9b3b3d7d1c333"
+                "dfcaeaf186595553"
             ]
         ]
     },
@@ -1112,7 +1087,7 @@
         "y": 360,
         "wires": [
             [
-                "a9a9b3b3d7d1c333"
+                "dfcaeaf186595553"
             ]
         ]
     },
@@ -1133,11 +1108,11 @@
         "topic": "",
         "payload": "{ \"rgb\":\"#0000ff\", \"brightness\": 1.0, \"white\": 0 }",
         "payloadType": "json",
-        "x": 510,
+        "x": 390,
         "y": 580,
         "wires": [
             [
-                "a9a9b3b3d7d1c333"
+                "dfcaeaf186595553"
             ]
         ]
     },
@@ -1158,11 +1133,11 @@
         "topic": "",
         "payload": "{ \"rgb\":\"#00ff00\", \"brightness\": 1.0, \"white\": 0 }",
         "payloadType": "json",
-        "x": 510,
+        "x": 390,
         "y": 520,
         "wires": [
             [
-                "a9a9b3b3d7d1c333"
+                "dfcaeaf186595553"
             ]
         ]
     },
@@ -1183,11 +1158,11 @@
         "topic": "",
         "payload": "{ \"rgb\":\"#ff0000\", \"brightness\": 1.0, \"white\": 0 }",
         "payloadType": "json",
-        "x": 510,
+        "x": 390,
         "y": 460,
         "wires": [
             [
-                "a9a9b3b3d7d1c333"
+                "dfcaeaf186595553"
             ]
         ]
     },
@@ -1208,11 +1183,11 @@
         "topic": "",
         "payload": "{ \"white\": 1, \"ct\": 6500, \"brightness\": 1.0 }",
         "payloadType": "json",
-        "x": 510,
+        "x": 390,
         "y": 700,
         "wires": [
             [
-                "a9a9b3b3d7d1c333"
+                "dfcaeaf186595553"
             ]
         ]
     },
@@ -1233,11 +1208,11 @@
         "topic": "",
         "payload": "{ \"white\": 1, \"ct\": 2000, \"brightness\": 1.0 }",
         "payloadType": "json",
-        "x": 510,
+        "x": 390,
         "y": 640,
         "wires": [
             [
-                "a9a9b3b3d7d1c333"
+                "dfcaeaf186595553"
             ]
         ]
     },
@@ -1262,7 +1237,32 @@
         "y": 260,
         "wires": [
             [
-                "a9a9b3b3d7d1c333"
+                "dfcaeaf186595553"
+            ]
+        ]
+    },
+    {
+        "id": "dfcaeaf186595553",
+        "type": "pca9685-light",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "",
+        "pca": "41402cc865566197",
+        "chR": "0",
+        "chG": "1",
+        "chB": "2",
+        "chWW": "3",
+        "chKW": "4",
+        "gamma": 2.2,
+        "ctMin": 2700,
+        "ctMax": 6500,
+        "fps": 50,
+        "singleChannel": "",
+        "singleUnit": "percent",
+        "x": 690,
+        "y": 120,
+        "wires": [
+            [
+                "d2d9c1a4a8f2d444"
             ]
         ]
     }

@@ -962,7 +962,7 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1020,
+        "x": 1180,
         "y": 120,
         "wires": []
     },
