@@ -1031,7 +1031,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"effect\":\"rainbow\",\"periodMs\":5000,\"brightness\":1.0,\"white\":0,\"ct\":4000}",
+        "payload": "{\"effect\":\"rainbow\",\"periodMs\":1000,\"brightness\":1.0,\"white\":0,\"ct\":4000}",
         "payloadType": "json",
         "x": 190,
         "y": 240,
