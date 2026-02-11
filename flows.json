@@ -1091,5 +1091,74 @@
                 "a9a9b3b3d7d1c333"
             ]
         ]
+    },
+    {
+        "id": "ee6c95b54103138e",
+        "type": "inject",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "blue",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{ \"rgb\":\"#0000ff\", \"brightness\": 0.2, \"white\": 0 }",
+        "payloadType": "json",
+        "x": 110,
+        "y": 600,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8e6677a93ee69b95",
+        "type": "inject",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "green",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{ \"rgb\":\"#00ff00\", \"brightness\": 0.2, \"white\": 0 }",
+        "payloadType": "json",
+        "x": 110,
+        "y": 540,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6de2c8a22613bc0d",
+        "type": "inject",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "red",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{ \"rgb\":\"#ff0000\", \"brightness\": 0.2, \"white\": 0 }",
+        "payloadType": "json",
+        "x": 110,
+        "y": 480,
+        "wires": [
+            []
+        ]
     }
 ]
