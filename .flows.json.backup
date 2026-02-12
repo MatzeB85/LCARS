@@ -1361,5 +1361,30 @@
                 "dfcaeaf186595553"
             ]
         ]
+    },
+    {
+        "id": "83068b494bcebb82",
+        "type": "inject",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "fade in",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"effect\":\"pulse\",\"mode\":\"in\",\"rgb\":\"#ff0000\",\"brightness\":0.3,\"durationMs\":1500}",
+        "payloadType": "json",
+        "x": 1083,
+        "y": 256,
+        "wires": [
+            [
+                "dfcaeaf186595553"
+            ]
+        ]
     }
 ]
