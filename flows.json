@@ -1327,7 +1327,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"effect\":\"pulse\",\"mode\":\"out\",\"outFrom\":\"current\",\"durationMs\":1200}",
+        "payload": "{\"effect\":\"pulse\",\"mode\":\"out\",\"outFrom\":\"current\",\"durationMs\":2000}",
         "payloadType": "json",
         "x": 940,
         "y": 360,
