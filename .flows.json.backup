@@ -1352,7 +1352,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"effect\":\"pulse\",\"mode\":\"inout\",\"rgb\":\"#ff0000\",\"brightness\":1,\"holdMs\":200,\"durationMs\":500,\"loop\":true}",
+        "payload": "{\"effect\":\"pulse\",\"mode\":\"inout\",\"rgb\":\"#ff0000\",\"brightness\":1,\"holdMs\":100,\"durationMs\":500,\"loop\":true}",
         "payloadType": "json",
         "x": 930,
         "y": 480,
