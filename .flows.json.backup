@@ -1402,7 +1402,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"effect\":\"mix\",\"effectA\":\"pulse\",\"a\":{\"mode\":\"in\",\"rgb\":\"#000000\",\"brightness\":1,\"inFrom\":\"current\",\"white\":1,\"ct\":3000,\"durationMs\":500},\"effectB\":\"pulse\",\"b\":{\"mode\":\"inout\",\"rgb\":\"#ff0000\",\"white\":0,\"ct\":4000,\"brightness\":1,\"durationMs\":500,\"loop\":true},\"blend\":\"multiply\"}",
+        "payload": "{\"effect\":\"mix\",\"effectA\":\"set\",\"a\":{\"rgb\":\"#500175\",\"ct\":3000,\"white\":0,\"brightness\":1,\"ctMin\":2700,\"ctMax\":6500},\"effectB\":\"pulse\",\"b\":{\"mode\":\"inout\",\"rgb\":\"#ff0000\",\"white\":0,\"ct\":4000,\"brightness\":1,\"durationMs\":500,\"loop\":true},\"blend\":\"lerp\"}",
         "payloadType": "json",
         "x": 1210,
         "y": 480,
