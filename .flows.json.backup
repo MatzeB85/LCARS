@@ -1216,8 +1216,8 @@
         "topic": "",
         "payload": "{\"effect\":\"list\",\"log\":true}",
         "payloadType": "json",
-        "x": 670,
-        "y": 260,
+        "x": 470,
+        "y": 40,
         "wires": [
             [
                 "dfcaeaf186595553"
@@ -1279,8 +1279,8 @@
         "topic": "",
         "payload": "{\"effect\":\"set\",\"rgb\":\"#500175\",\"ct\":3000,\"white\":0,\"brightness\":1,\"ctMin\":2700,\"ctMax\":6500}",
         "payloadType": "json",
-        "x": 719,
-        "y": 417,
+        "x": 670,
+        "y": 480,
         "wires": [
             [
                 "dfcaeaf186595553"
@@ -1379,12 +1379,35 @@
         "topic": "",
         "payload": "{\"effect\":\"pulse\",\"mode\":\"in\",\"rgb\":\"#000000\",\"brightness\":1,\"inFrom\":\"current\",\"white\":1,\"ct\":3000,\"durationMs\":500}",
         "payloadType": "json",
-        "x": 1083,
-        "y": 256,
+        "x": 930,
+        "y": 300,
         "wires": [
             [
                 "dfcaeaf186595553"
             ]
+        ]
+    },
+    {
+        "id": "1c4c83c5e2a64881",
+        "type": "inject",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "fade in",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"effect\":\"mix\",\"effectA\":\"pulse\",\"a\":{\"mode\":\"in\",\"rgb\":\"#000000\",\"brightness\":1,\"inFrom\":\"current\",\"white\":1,\"ct\":3000,\"durationMs\":500},\"effectB\":\"pulse\",\"b\":{\"mode\":\"inout\",\"rgb\":\"#ff0000\",\"white\":0,\"ct\":4000,\"brightness\":1,\"durationMs\":500,\"loop\":true},\"blend\":\"max\"}",
+        "payloadType": "json",
+        "x": 930,
+        "y": 540,
+        "wires": [
+            []
         ]
     }
 ]
