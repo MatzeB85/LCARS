@@ -1427,7 +1427,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"effect\":\"alarm\",\"dim\":0.5,\"blinkHz\":2,\"blinkDuty\":0.5,\"red\":1}",
+        "payload": "{\"effect\":\"alarm\",\"dim\":0.2,\"blinkHz\":2,\"blinkDuty\":0.25,\"red\":1}",
         "payloadType": "json",
         "x": 930,
         "y": 580,
