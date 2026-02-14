@@ -1461,5 +1461,28 @@
                 "dfcaeaf186595553"
             ]
         ]
+    },
+    {
+        "id": "5fa410a29e06cb90",
+        "type": "inject",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "overlay on",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"overlay\":{\"enabled\":true,\"dim\":0.5,\"color\":\"#ff0000\",\"blinkHz\":2,\"wave\":\"sine\"}}",
+        "payloadType": "json",
+        "x": 1220,
+        "y": 640,
+        "wires": [
+            []
+        ]
     }
 ]
