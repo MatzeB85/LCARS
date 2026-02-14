@@ -1511,5 +1511,30 @@
                 "dfcaeaf186595553"
             ]
         ]
+    },
+    {
+        "id": "168ba809c85a4076",
+        "type": "inject",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "OFF",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"command\":\"all-off\"}",
+        "payloadType": "json",
+        "x": 150,
+        "y": 60,
+        "wires": [
+            [
+                "dfcaeaf186595553"
+            ]
+        ]
     }
 ]
