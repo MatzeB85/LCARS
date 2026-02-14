@@ -1486,5 +1486,28 @@
                 "dfcaeaf186595553"
             ]
         ]
+    },
+    {
+        "id": "4e7cc4d2c8f163c6",
+        "type": "inject",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "back",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"command\":\"back\"}",
+        "payloadType": "json",
+        "x": 670,
+        "y": 620,
+        "wires": [
+            []
+        ]
     }
 ]
