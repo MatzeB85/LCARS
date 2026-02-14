@@ -1452,7 +1452,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"effect\":\"overlay\",\"baseEffect\":\"set\",\"base\":{\"rgb\":\"#00ff00\",\"brightness\":0.3,\"white\":0},\"overlay\":{\"enabled\":false}}",
+        "payload": "{\"overlay\":{\"enabled\":true,\"dim\":0.5,\"color\":\"#ff0000\",\"blinkHz\":2,\"wave\":\"sine\"}}",
         "payloadType": "json",
         "x": 1210,
         "y": 580,
