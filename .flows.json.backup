@@ -1648,7 +1648,7 @@
         "type": "telegram command",
         "z": "8702112e953c7de5",
         "name": "red",
-        "command": "/red",
+        "command": "?red",
         "description": "",
         "registercommand": false,
         "language": "",
