@@ -1536,5 +1536,23 @@
                 "dfcaeaf186595553"
             ]
         ]
+    },
+    {
+        "id": "3799b7d8bbb9b909",
+        "type": "function",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "function 4",
+        "func": "msg.payload =\n\n{\n    \"r\": 1,\n    \"g\": 0,\n    \"b\": 0,\n    \"ww\": 0,\n    \"kw\": 0\n}\n\n;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 160,
+        "y": 560,
+        "wires": [
+            []
+        ]
     }
 ]
