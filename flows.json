@@ -1602,8 +1602,8 @@
         "links": [
             "7ac66bdad405c6e6"
         ],
-        "x": 315,
-        "y": 320,
+        "x": 335,
+        "y": 340,
         "wires": [
             [
                 "dfcaeaf186595553"
@@ -1622,5 +1622,48 @@
         "x": 695,
         "y": 260,
         "wires": []
+    },
+    {
+        "id": "d3714d604e67f1b0",
+        "type": "function",
+        "z": "8702112e953c7de5",
+        "name": "red",
+        "func": "msg.payload =\n\n{\n    \"r\": 1,\n    \"g\": 0,\n    \"b\": 0,\n    \"ww\": 0,\n    \"kw\": 0\n}\n\n;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 200,
+        "wires": [
+            [
+                "7ac66bdad405c6e6"
+            ]
+        ]
+    },
+    {
+        "id": "ef384237489a0f66",
+        "type": "telegram command",
+        "z": "8702112e953c7de5",
+        "name": "red",
+        "command": "red",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "4f4ed0cc81a764ca",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 190,
+        "y": 200,
+        "wires": [
+            [],
+            []
+        ]
     }
 ]

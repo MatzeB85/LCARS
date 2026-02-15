@@ -39,6 +39,14 @@
         "info": ""
     },
     {
+        "id": "8702112e953c7de5",
+        "type": "tab",
+        "label": "Licht",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "776cbcab809a4f68",
         "type": "subflow",
         "name": "Testsub",
@@ -1585,5 +1593,34 @@
                 "3799b7d8bbb9b909"
             ]
         ]
+    },
+    {
+        "id": "7245dca1904c0ddb",
+        "type": "link in",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "link in 1",
+        "links": [
+            "7ac66bdad405c6e6"
+        ],
+        "x": 315,
+        "y": 320,
+        "wires": [
+            [
+                "dfcaeaf186595553"
+            ]
+        ]
+    },
+    {
+        "id": "7ac66bdad405c6e6",
+        "type": "link out",
+        "z": "8702112e953c7de5",
+        "name": "link out 3",
+        "mode": "link",
+        "links": [
+            "7245dca1904c0ddb"
+        ],
+        "x": 695,
+        "y": 260,
+        "wires": []
     }
 ]
