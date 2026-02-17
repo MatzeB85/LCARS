@@ -1625,10 +1625,10 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"command\":\"dim\",\"factor\":0.99}",
+        "payload": "{\"command\":\"dim\",\"factor\": -0.9}",
         "payloadType": "json",
-        "x": 845,
-        "y": 707,
+        "x": 910,
+        "y": 640,
         "wires": [
             [
                 "dfcaeaf186595553"
