@@ -1625,7 +1625,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"command\":\"dim\",\"factor\":0.9}",
+        "payload": "{\"command\":\"dim\",\"factor\":0.99}",
         "payloadType": "json",
         "x": 845,
         "y": 707,
