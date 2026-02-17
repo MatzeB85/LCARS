@@ -1650,12 +1650,14 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"command\":\"dim\",\"factor\":0.9}",
+        "payload": "{\"effect\":\"brightness\",\"level\":0.2,\"transitionMs\":1000}",
         "payloadType": "json",
         "x": 660,
         "y": 700,
         "wires": [
-            []
+            [
+                "dfcaeaf186595553"
+            ]
         ]
     },
     {

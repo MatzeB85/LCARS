@@ -1639,7 +1639,7 @@
         "id": "dbcc2e56e1b26579",
         "type": "inject",
         "z": "f3f6c2b7f2a1a111",
-        "name": "brightnes",
+        "name": "brightnes 0.2",
         "props": [
             {
                 "p": "payload"
@@ -1652,8 +1652,33 @@
         "topic": "",
         "payload": "{\"effect\":\"brightness\",\"level\":0.2,\"transitionMs\":1000}",
         "payloadType": "json",
-        "x": 660,
+        "x": 670,
         "y": 700,
+        "wires": [
+            [
+                "dfcaeaf186595553"
+            ]
+        ]
+    },
+    {
+        "id": "df233c750319b3c0",
+        "type": "inject",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "brightnes 1.0",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"effect\":\"brightness\",\"level\":1.0,\"transitionMs\":1000}",
+        "payloadType": "json",
+        "x": 670,
+        "y": 760,
         "wires": [
             [
                 "dfcaeaf186595553"
