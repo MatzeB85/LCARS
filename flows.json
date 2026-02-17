@@ -1636,6 +1636,29 @@
         ]
     },
     {
+        "id": "dbcc2e56e1b26579",
+        "type": "inject",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "brightnes",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"command\":\"dim\",\"factor\":0.9}",
+        "payloadType": "json",
+        "x": 660,
+        "y": 700,
+        "wires": [
+            []
+        ]
+    },
+    {
         "id": "7ac66bdad405c6e6",
         "type": "link out",
         "z": "8702112e953c7de5",
