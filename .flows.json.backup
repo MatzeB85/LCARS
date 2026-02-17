@@ -1625,7 +1625,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"command\":\"dim\",\"factor\": -0.9}",
+        "payload": "{\"command\":\"dim\",\"factor\": 0.9}",
         "payloadType": "json",
         "x": 910,
         "y": 640,
@@ -1683,6 +1683,29 @@
             [
                 "dfcaeaf186595553"
             ]
+        ]
+    },
+    {
+        "id": "5f60d7a7bc72f061",
+        "type": "inject",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "dim+",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"command\":\"dim-set\",\"value\":1}",
+        "payloadType": "json",
+        "x": 910,
+        "y": 700,
+        "wires": [
+            []
         ]
     },
     {
