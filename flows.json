@@ -1611,6 +1611,31 @@
         ]
     },
     {
+        "id": "19163379162f0114",
+        "type": "inject",
+        "z": "f3f6c2b7f2a1a111",
+        "name": "dim",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"command\":\"dim\",\"factor\":0.5}",
+        "payloadType": "json",
+        "x": 845,
+        "y": 707,
+        "wires": [
+            [
+                "dfcaeaf186595553"
+            ]
+        ]
+    },
+    {
         "id": "7ac66bdad405c6e6",
         "type": "link out",
         "z": "8702112e953c7de5",
