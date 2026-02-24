@@ -47,6 +47,14 @@
         "env": []
     },
     {
+        "id": "71041d5f570c07d3",
+        "type": "tab",
+        "label": "max",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "776cbcab809a4f68",
         "type": "subflow",
         "name": "Testsub",
@@ -1901,6 +1909,44 @@
             [
                 "7ac66bdad405c6e6"
             ]
+        ]
+    },
+    {
+        "id": "2c653e89daaa6cb1",
+        "type": "max7219-raw",
+        "z": "71041d5f570c07d3",
+        "name": "",
+        "bus": 0,
+        "device": 0,
+        "cascaded": 4,
+        "intensity": 4,
+        "reverse": true,
+        "rotate": 0,
+        "x": 600,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "ee3f6709640dee39",
+        "type": "inject",
+        "z": "71041d5f570c07d3",
+        "name": "lila",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"scroll\":\"NODE RED\",\"speedMs\":60}",
+        "payloadType": "json",
+        "x": 330,
+        "y": 220,
+        "wires": [
+            []
         ]
     }
 ]
