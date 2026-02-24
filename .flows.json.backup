@@ -1949,7 +1949,7 @@
         "mirrorX": true,
         "reverseOrder": false,
         "rotate180": false,
-        "defaultMode": "marquee",
+        "defaultMode": "wrap",
         "defaultSpeedMs": "",
         "defaultDwellMs": "",
         "defaultGap": "",
