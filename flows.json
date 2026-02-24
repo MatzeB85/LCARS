@@ -1968,7 +1968,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"bitmap\":[[200,0,0,0],[129,0,0,0],[129,0,0,0],[255,0,0,0],[129,0,0,0],[129,0,0,0],[255,0,0,0],[0,0,0,0]]}",
+        "payload": "{\"queue\":[\"TEMP 21°C\",{\"scroll\":\"WIFI OK\",\"mode\":\"wrap\",\"gap\":10},{\"anim\":{\"name\":\"sparkle\",\"durationMs\":2000}},\"FERTIG\"],\"opts\":{\"mode\":\"marquee\",\"speedMs\":70,\"dwellMs\":250,\"loop\":false}}",
         "payloadType": "json",
         "x": 230,
         "y": 340,
