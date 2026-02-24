@@ -1977,5 +1977,54 @@
                 "53d608bc11ebcd80"
             ]
         ]
+    },
+    {
+        "id": "f3abe60c1b799b24",
+        "type": "function",
+        "z": "71041d5f570c07d3",
+        "name": "function 5",
+        "func": "msg.payload = { anim: \"sparkle\" };\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 240,
+        "y": 440,
+        "wires": [
+            [
+                "53d608bc11ebcd80"
+            ]
+        ]
+    },
+    {
+        "id": "60fb9e095d25fdb1",
+        "type": "inject",
+        "z": "71041d5f570c07d3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 440,
+        "wires": [
+            [
+                "f3abe60c1b799b24"
+            ]
+        ]
     }
 ]
