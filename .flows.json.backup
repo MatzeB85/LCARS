@@ -1949,14 +1949,31 @@
         "mirrorX": true,
         "reverseOrder": false,
         "rotate180": false,
-        "defaultMode": "wrap",
-        "defaultDirection": "left",
-        "defaultSpeedMs": "",
-        "defaultDwellMs": "",
-        "defaultGap": "50",
-        "defaultLoop": true,
         "x": 520,
         "y": 220,
         "wires": []
+    },
+    {
+        "id": "8c6b92bf0a56186b",
+        "type": "inject",
+        "z": "71041d5f570c07d3",
+        "name": "sparkle",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"anim\":\"sparkle\"}",
+        "payloadType": "json",
+        "x": 230,
+        "y": 340,
+        "wires": [
+            []
+        ]
     }
 ]
