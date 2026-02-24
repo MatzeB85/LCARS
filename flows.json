@@ -2068,5 +2068,30 @@
                 "53d608bc11ebcd80"
             ]
         ]
+    },
+    {
+        "id": "8fc5c393d0723808",
+        "type": "inject",
+        "z": "71041d5f570c07d3",
+        "name": "rain",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"anim\":{\"name\":\"rain\",\"speedMs\":60,\"durationMs\":8000,\"density\":4}}",
+        "payloadType": "json",
+        "x": 230,
+        "y": 280,
+        "wires": [
+            [
+                "53d608bc11ebcd80"
+            ]
+        ]
     }
 ]
