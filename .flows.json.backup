@@ -1920,8 +1920,8 @@
         "device": 0,
         "cascaded": 4,
         "intensity": 4,
-        "reverse": true,
-        "rotate": "180",
+        "reverse": false,
+        "rotate": "0",
         "x": 600,
         "y": 220,
         "wires": []
