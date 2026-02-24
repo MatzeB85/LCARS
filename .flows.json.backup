@@ -1944,7 +1944,7 @@
         "bus": 0,
         "device": 0,
         "cascaded": 4,
-        "intensity": 4,
+        "intensity": "15",
         "reverse": true,
         "rotate": 0,
         "x": 620,
