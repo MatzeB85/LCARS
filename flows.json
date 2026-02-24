@@ -1931,7 +1931,26 @@
         "x": 240,
         "y": 220,
         "wires": [
-            []
+            [
+                "53d608bc11ebcd80"
+            ]
         ]
+    },
+    {
+        "id": "53d608bc11ebcd80",
+        "type": "max7219-raw",
+        "z": "71041d5f570c07d3",
+        "name": "",
+        "bus": 0,
+        "device": 0,
+        "cascaded": 4,
+        "speedHz": 1000000,
+        "intensity": 6,
+        "mirrorX": true,
+        "reverseOrder": false,
+        "rotate180": false,
+        "x": 520,
+        "y": 220,
+        "wires": []
     }
 ]

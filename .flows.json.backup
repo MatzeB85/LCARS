@@ -1931,24 +1931,7 @@
         "x": 240,
         "y": 220,
         "wires": [
-            [
-                "4b8729d6d366c28d"
-            ]
+            []
         ]
-    },
-    {
-        "id": "4b8729d6d366c28d",
-        "type": "max7219-raw",
-        "z": "71041d5f570c07d3",
-        "name": "",
-        "bus": 0,
-        "device": 0,
-        "cascaded": 4,
-        "intensity": "15",
-        "reverse": true,
-        "rotate": 0,
-        "x": 540,
-        "y": 220,
-        "wires": []
     }
 ]
