@@ -1968,7 +1968,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"anim\":{\"name\":\"sparkle\",\"speedMs\":5,\"durationMs\":60000,\"count\":20}}",
+        "payload": "{\"anim\":{\"name\":\"sparkle\",\"speedMs\":50,\"durationMs\":60000,\"count\":20}}",
         "payloadType": "json",
         "x": 230,
         "y": 340,
