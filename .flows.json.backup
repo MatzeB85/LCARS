@@ -1926,7 +1926,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"scroll\":\"Hallo Anton ?!*&% 1234567890 °  # = / ( ) § $ € ß ` ´ ^ < > -_ :.; ,\",\"speedMs\":100}",
+        "payload": "{\"scroll\":\"___--------__  ........\",\"speedMs\":60}",
         "payloadType": "json",
         "x": 240,
         "y": 220,
