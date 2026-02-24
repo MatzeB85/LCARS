@@ -1953,7 +1953,7 @@
         "defaultDirection": "left",
         "defaultSpeedMs": "",
         "defaultDwellMs": "",
-        "defaultGap": "10",
+        "defaultGap": "50",
         "defaultLoop": true,
         "x": 520,
         "y": 220,
