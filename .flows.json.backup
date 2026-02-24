@@ -1926,7 +1926,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"scroll\":\"NODE RED\",\"speedMs\":60}",
+        "payload": "{\"scroll\":\"NODE RED\",\"speedMs\":120}",
         "payloadType": "json",
         "x": 240,
         "y": 220,
