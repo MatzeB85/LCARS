@@ -1921,7 +1921,7 @@
         "cascaded": 4,
         "intensity": 4,
         "reverse": false,
-        "rotate": "180",
+        "rotate": "0",
         "x": 600,
         "y": 220,
         "wires": []
