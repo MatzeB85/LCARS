@@ -1912,21 +1912,6 @@
         ]
     },
     {
-        "id": "2c653e89daaa6cb1",
-        "type": "max7219-raw",
-        "z": "71041d5f570c07d3",
-        "name": "",
-        "bus": 0,
-        "device": 0,
-        "cascaded": 4,
-        "intensity": 4,
-        "reverse": false,
-        "rotate": "0",
-        "x": 600,
-        "y": 220,
-        "wires": []
-    },
-    {
         "id": "ee3f6709640dee39",
         "type": "inject",
         "z": "71041d5f570c07d3",
@@ -1947,8 +1932,23 @@
         "y": 220,
         "wires": [
             [
-                "2c653e89daaa6cb1"
+                "4b8729d6d366c28d"
             ]
         ]
+    },
+    {
+        "id": "4b8729d6d366c28d",
+        "type": "max7219-raw",
+        "z": "71041d5f570c07d3",
+        "name": "",
+        "bus": 0,
+        "device": 0,
+        "cascaded": 4,
+        "intensity": 4,
+        "reverse": true,
+        "rotate": 0,
+        "x": 620,
+        "y": 220,
+        "wires": []
     }
 ]

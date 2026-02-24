@@ -46,6 +46,7 @@
         "node-red-contrib-rollo": "1.0.0",
         "node-red-contrib-telegrambot": "17.0.5",
         "node-red-contrib-uibuilder": "7.5.0",
-        "node-red-node-pi-gpio": "2.0.6"
+        "node-red-node-pi-gpio": "2.0.6",
+        "node-red-contrib-max7219-raw": "0.1.0"
     }
 }
