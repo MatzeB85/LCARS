@@ -2093,5 +2093,28 @@
                 "53d608bc11ebcd80"
             ]
         ]
+    },
+    {
+        "id": "45585c033bfb4c86",
+        "type": "inject",
+        "z": "71041d5f570c07d3",
+        "name": "rain",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"anim\":{\"name\":\"snake\",\"speedMs\":60,\"durationMs\":120000,\"len\":5}}",
+        "payloadType": "json",
+        "x": 490,
+        "y": 80,
+        "wires": [
+            []
+        ]
     }
 ]
