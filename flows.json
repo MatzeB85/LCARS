@@ -1949,6 +1949,11 @@
         "mirrorX": true,
         "reverseOrder": false,
         "rotate180": false,
+        "defaultMode": "marquee",
+        "defaultSpeedMs": "",
+        "defaultDwellMs": "",
+        "defaultGap": "",
+        "defaultLoop": false,
         "x": 520,
         "y": 220,
         "wires": []
