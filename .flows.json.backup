@@ -1930,7 +1930,7 @@
         "id": "ee3f6709640dee39",
         "type": "inject",
         "z": "71041d5f570c07d3",
-        "name": "lila",
+        "name": "node red",
         "props": [
             {
                 "p": "payload"
@@ -1943,7 +1943,7 @@
         "topic": "",
         "payload": "{\"scroll\":\"NODE RED\",\"speedMs\":60}",
         "payloadType": "json",
-        "x": 330,
+        "x": 340,
         "y": 220,
         "wires": [
             [
