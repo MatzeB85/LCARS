@@ -1945,7 +1945,7 @@
         "device": 0,
         "cascaded": 4,
         "speedHz": 1000000,
-        "intensity": 6,
+        "intensity": "15",
         "mirrorX": true,
         "reverseOrder": false,
         "rotate180": false,
