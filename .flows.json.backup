@@ -2159,7 +2159,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"anim\":{\"name\":\"pacman\",\"ghosts\":2,\"ghostGap\":20,\"speedMs\":100}}",
+        "payload": "{\"anim\":{\"name\":\"pacman\",\"ghosts\":2,\"ghostGap\":20,\"dotGap\":7,\"speedMs\":100}}",
         "payloadType": "json",
         "x": 1030,
         "y": 80,
