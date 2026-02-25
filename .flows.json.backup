@@ -2118,5 +2118,30 @@
                 "53d608bc11ebcd80"
             ]
         ]
+    },
+    {
+        "id": "62973abd965bf56d",
+        "type": "inject",
+        "z": "71041d5f570c07d3",
+        "name": "rain",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"anim\":{\"name\":\"snakehunt\",\"speedMs\":80,\"dwellMs\":700,\"wrap\":true}}",
+        "payloadType": "json",
+        "x": 790,
+        "y": 80,
+        "wires": [
+            [
+                "53d608bc11ebcd80"
+            ]
+        ]
     }
 ]
