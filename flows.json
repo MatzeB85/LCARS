@@ -2084,7 +2084,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"anim\":{\"name\":\"rain\",\"speedMs\":60,\"durationMs\":120000,\"density\":5}}",
+        "payload": "{\"anim\":{\"name\":\"rain\",\"speedMs\":60,\"durationMs\":120000000,\"density\":5}}",
         "payloadType": "json",
         "x": 230,
         "y": 280,
