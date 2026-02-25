@@ -2134,7 +2134,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"anim\":{\"name\":\"snakehunt\",\"speedMs\":1}}",
+        "payload": "{\"anim\":{\"name\":\"snakehunt\",\"speedMs\":100}}",
         "payloadType": "json",
         "x": 790,
         "y": 80,
