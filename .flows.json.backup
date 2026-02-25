@@ -1926,7 +1926,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"scroll\":\"___--------__  ........\",\"speedMs\":10}",
+        "payload": "{\"scroll\":\"Hallo Anton\",\"speedMs\":100}",
         "payloadType": "json",
         "x": 240,
         "y": 220,
