@@ -2143,5 +2143,28 @@
                 "53d608bc11ebcd80"
             ]
         ]
+    },
+    {
+        "id": "f7967ec64c5b8e93",
+        "type": "inject",
+        "z": "71041d5f570c07d3",
+        "name": "pacman",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"anim\":{\"name\":\"pacman\",\"direction\":\"left\",\"ghosts\":3,\"dots\":false,\"speedMs\":50}}",
+        "payloadType": "json",
+        "x": 1030,
+        "y": 80,
+        "wires": [
+            []
+        ]
     }
 ]
