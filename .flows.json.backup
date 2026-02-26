@@ -2168,5 +2168,28 @@
                 "53d608bc11ebcd80"
             ]
         ]
+    },
+    {
+        "id": "422e83a903daabd3",
+        "type": "inject",
+        "z": "71041d5f570c07d3",
+        "name": "snakelearn",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"anim\":{\"name\":\"snakelearn\",\"speedMs\":50}}",
+        "payloadType": "json",
+        "x": 980,
+        "y": 300,
+        "wires": [
+            []
+        ]
     }
 ]
