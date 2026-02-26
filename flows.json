@@ -2268,5 +2268,28 @@
                 "53d608bc11ebcd80"
             ]
         ]
+    },
+    {
+        "id": "7f336d41cb1f2e90",
+        "type": "inject",
+        "z": "71041d5f570c07d3",
+        "name": "wand hart",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"cmd\":\"snakeLearnSet\",\"value\":{\"rWallDie\":-25,\"rSelfDie\":-10}}",
+        "payloadType": "json",
+        "x": 980,
+        "y": 540,
+        "wires": [
+            []
+        ]
     }
 ]

@@ -2209,7 +2209,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"anim\":{\"name\":\"snakelearn\",\"speedMs\":40,\"learning\":false}}",
+        "payload": "{\"anim\":{\"name\":\"snakelearn\",\"speedMs\":100,\"learning\":false}}",
         "payloadType": "json",
         "x": 990,
         "y": 360,
