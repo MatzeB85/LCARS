@@ -2293,5 +2293,30 @@
                 "53d608bc11ebcd80"
             ]
         ]
+    },
+    {
+        "id": "370665abdaaa9ff7",
+        "type": "inject",
+        "z": "71041d5f570c07d3",
+        "name": "learn reset",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"cmd\":\"snakeLearnReset\"}",
+        "payloadType": "json",
+        "x": 660,
+        "y": 560,
+        "wires": [
+            [
+                "53d608bc11ebcd80"
+            ]
+        ]
     }
 ]
