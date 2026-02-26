@@ -2193,5 +2193,30 @@
                 "53d608bc11ebcd80"
             ]
         ]
+    },
+    {
+        "id": "cb49ce1a0e38247c",
+        "type": "inject",
+        "z": "71041d5f570c07d3",
+        "name": "snakelearn off",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"anim\":{\"name\":\"snakelearn\",\"speedMs\":40,\"learning\":false}}",
+        "payloadType": "json",
+        "x": 990,
+        "y": 360,
+        "wires": [
+            [
+                "53d608bc11ebcd80"
+            ]
+        ]
     }
 ]
