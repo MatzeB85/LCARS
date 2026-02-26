@@ -2218,5 +2218,30 @@
                 "53d608bc11ebcd80"
             ]
         ]
+    },
+    {
+        "id": "59e2627a1756eb7a",
+        "type": "inject",
+        "z": "71041d5f570c07d3",
+        "name": "weniger loop",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"cmd\":\"snakeLearnSet\",\"value\":{\"rLoop\":-0.6,\"loopWindow\":64}}",
+        "payloadType": "json",
+        "x": 990,
+        "y": 420,
+        "wires": [
+            [
+                "53d608bc11ebcd80"
+            ]
+        ]
     }
 ]
