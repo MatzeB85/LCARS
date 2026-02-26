@@ -2184,7 +2184,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"anim\":{\"name\":\"snakelearn\",\"speedMs\":50}}",
+        "payload": "{\"anim\":{\"name\":\"snakelearn\",\"speedMs\":5}}",
         "payloadType": "json",
         "x": 980,
         "y": 300,
