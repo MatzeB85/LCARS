@@ -2243,5 +2243,30 @@
                 "53d608bc11ebcd80"
             ]
         ]
+    },
+    {
+        "id": "c3d581fa61f01517",
+        "type": "inject",
+        "z": "71041d5f570c07d3",
+        "name": "mehr food",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"cmd\":\"snakeLearnSet\",\"value\":{\"rProgress\":0.1}}",
+        "payloadType": "json",
+        "x": 980,
+        "y": 480,
+        "wires": [
+            [
+                "53d608bc11ebcd80"
+            ]
+        ]
     }
 ]
