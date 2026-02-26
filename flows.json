@@ -2161,7 +2161,7 @@
         "topic": "",
         "payload": "{\"anim\":{\"name\":\"pacman\",\"ghosts\":20,\"ghostGap\":10,\"dotGap\":7,\"speedMs\":100}}",
         "payloadType": "json",
-        "x": 1030,
+        "x": 1050,
         "y": 80,
         "wires": [
             [
