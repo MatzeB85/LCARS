@@ -2368,5 +2368,34 @@
                 "53d608bc11ebcd80"
             ]
         ]
+    },
+    {
+        "id": "0efd07f4539ec1e0",
+        "type": "uibuilder",
+        "z": "71041d5f570c07d3",
+        "name": "",
+        "topic": "",
+        "url": "display",
+        "okToGo": true,
+        "fwdInMessages": false,
+        "allowScripts": false,
+        "allowStyles": false,
+        "copyIndex": true,
+        "templateFolder": "blank",
+        "extTemplate": "",
+        "showfolder": false,
+        "reload": false,
+        "sourceFolder": "src",
+        "deployedVersion": "7.5.0",
+        "showMsgUib": false,
+        "title": "",
+        "descr": "",
+        "editurl": "",
+        "x": 980,
+        "y": 640,
+        "wires": [
+            [],
+            []
+        ]
     }
 ]
