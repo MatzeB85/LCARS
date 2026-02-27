@@ -2318,5 +2318,30 @@
                 "53d608bc11ebcd80"
             ]
         ]
+    },
+    {
+        "id": "35451a6fca64f34b",
+        "type": "inject",
+        "z": "71041d5f570c07d3",
+        "name": "learn",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"cmd\":\"snakeLearnSet\",\"value\":{\"epsilon\":0.1,\"epsilonDecay\":0.999,\"epsilonMin\":0.02,\"alpha\":0.25}}",
+        "payloadType": "json",
+        "x": 330,
+        "y": 560,
+        "wires": [
+            [
+                "53d608bc11ebcd80"
+            ]
+        ]
     }
 ]
