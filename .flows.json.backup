@@ -2403,22 +2403,6 @@
         ]
     },
     {
-        "id": "6848eaef7e3d11aa",
-        "type": "debug",
-        "z": "71041d5f570c07d3",
-        "name": "debug 3",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 980,
-        "y": 160,
-        "wires": []
-    },
-    {
         "id": "f8a493e36579018c",
         "type": "exec",
         "z": "0e584f7610b443dd",
