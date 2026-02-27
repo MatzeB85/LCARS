@@ -2570,7 +2570,7 @@
         "cascaded": 4,
         "speedHz": 1000000,
         "intensity": 6,
-        "mirrorX": true,
+        "mirrorX": false,
         "reverseOrder": false,
         "rotate180": false,
         "x": 1220,
