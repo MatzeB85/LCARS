@@ -99,11 +99,10 @@ function drawFrame(frame, stats) {
     ctx.fillRect(frame.head.x * scale, frame.head.y * scale, scale, scale);
   }
 
-  // Info overlay: live stats + progress + pipeline health
+  // Info overlay
   if (info) {
     const lagMs = Date.now() - (frame?.ts || Date.now());
 
-    // Pipeline stats (may be missing depending on runner)
     const pending = stats?.pendingIPC;
     const dropped = stats?.droppedIPC;
     const pipeTxt =
@@ -113,18 +112,42 @@ function drawFrame(frame, stats) {
 
     const sinceEatTxt = Number.isFinite(stats?.sinceEat) ? ` sinceEat=${fmtInt(stats.sinceEat)}` : "";
 
+    // --- NEW: top3 feature debug (if provided by runner) ---
+    const spaceF = stats?.spaceF;
+    const spaceL = stats?.spaceL;
+    const spaceR = stats?.spaceR;
+    const foodDist = stats?.foodDist;
+    const tailReach = stats?.tailReach;
+
+    let featTxt = "";
+    if (
+      Number.isFinite(spaceF) ||
+      Number.isFinite(spaceL) ||
+      Number.isFinite(spaceR) ||
+      Number.isFinite(foodDist) ||
+      Number.isFinite(tailReach)
+    ) {
+      const sf = Number.isFinite(spaceF) ? spaceF.toFixed(3) : "n/a";
+      const sl = Number.isFinite(spaceL) ? spaceL.toFixed(3) : "n/a";
+      const sr = Number.isFinite(spaceR) ? spaceR.toFixed(3) : "n/a";
+      const fd = Number.isFinite(foodDist) ? foodDist.toFixed(3) : "n/a";
+      const tr = Number.isFinite(tailReach) ? String(tailReach | 0) : "n/a";
+      featTxt = ` space(F/L/R)=${sf}/${sl}/${sr} foodDist=${fd} tailReach=${tr}`;
+    }
+
     const live = stats
       ? `ep=${stats.episode} steps=${stats.totalSteps} eps=${stats.eps} ` +
-      `len=${stats.len} bestLen=${stats.bestLen} score=${stats.score} ` +
-      `ret=${fmt(stats.epReturn, 2)} lag=${lagMs}ms` +
-      sinceEatTxt +
-      pipeTxt
+        `len=${stats.len} bestLen=${stats.bestLen} score=${stats.score} ` +
+        `ret=${fmt(stats.epReturn, 2)} lag=${lagMs}ms` +
+        sinceEatTxt +
+        pipeTxt +
+        featTxt
       : `lag=${lagMs}ms`;
 
     const progress =
       hist.len.length
         ? ` | avg(${WIN}) len=${fmt(avg(hist.len), 2)} score=${fmt(avg(hist.score), 2)} ret=${fmt(avg(hist.ret), 2)} ` +
-        `best len=${best.len} score=${best.score} ret=${fmt(best.ret, 2)}`
+          `best len=${best.len} score=${best.score} ret=${fmt(best.ret, 2)}`
         : "";
 
     info.textContent = live + progress;
@@ -135,7 +158,7 @@ function drawFrame(frame, stats) {
 function unwrap(msg) {
   if (!msg) return null;
 
-  // Direct format: {topic, payload(frame), stats}
+  // Direct format
   if (msg.topic === "max7219/frame" && msg.payload?.rows) {
     return { topic: msg.topic, frame: msg.payload, stats: msg.stats };
   }
@@ -146,7 +169,7 @@ function unwrap(msg) {
     return { topic: msg.topic, payload: msg.payload };
   }
 
-  // Exec->JSON (Node-RED json node output): payload is the emitted object
+  // Wrapped format (payload is emitted object)
   const o = msg.payload;
   if (o?.topic === "max7219/frame" && o?.payload?.rows) {
     return { topic: o.topic, frame: o.payload, stats: o.stats };
@@ -166,12 +189,10 @@ let lastEpisodeSeen = null;
 function handleInfo(payload) {
   if (!payload) return;
 
-  // Runner sends: { topic:"snake/info", payload:{ msg:"runner_start", ... } }
   if (payload.msg === "runner_start") {
     resetProgress("runner_start");
     lastEpisodeSeen = null;
 
-    // If no frame yet, show a small status
     if (info && !latestFrame) {
       info.textContent = "Runner gestartet – Progress zurückgesetzt.";
     }
@@ -181,7 +202,6 @@ function handleInfo(payload) {
 function handleEpisode(ep) {
   if (!ep) return;
 
-  // If episodes jump backwards, we likely restarted without getting runner_start (or page stayed open)
   if (Number.isFinite(ep.episode)) {
     if (lastEpisodeSeen !== null && ep.episode < lastEpisodeSeen) {
       resetProgress("episode counter went backwards");
@@ -197,7 +217,6 @@ function handleEpisode(ep) {
   if (Number.isFinite(ep.score)) pushHist(hist.score, ep.score);
   if (Number.isFinite(ep.epReturn)) pushHist(hist.ret, ep.epReturn);
 
-  // If we currently have no frame, still show progress text
   if (info && !latestFrame) {
     info.textContent =
       `ep=${ep.episode} steps=${ep.totalSteps} eps=${ep.eps} len=${ep.len} bestLen=${ep.bestLen} score=${ep.score} ret=${fmt(ep.epReturn, 2)}` +
@@ -245,7 +264,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (u.topic === "snake/info") {
       handleInfo(u.payload);
       if (latestFrame) scheduleDraw();
-      return;
     }
   });
 });
