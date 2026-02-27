@@ -112,27 +112,41 @@ function drawFrame(frame, stats) {
 
     const sinceEatTxt = Number.isFinite(stats?.sinceEat) ? ` sinceEat=${fmtInt(stats.sinceEat)}` : "";
 
-    // --- NEW: top3 feature debug (if provided by runner) ---
+    // --- feature debug (if provided by runner) ---
     const spaceF = stats?.spaceF;
     const spaceL = stats?.spaceL;
     const spaceR = stats?.spaceR;
     const foodDist = stats?.foodDist;
     const tailReach = stats?.tailReach;
 
+    const foodReachF = stats?.foodReachF;
+    const foodReachL = stats?.foodReachL;
+    const foodReachR = stats?.foodReachR;
+
     let featTxt = "";
-    if (
-      Number.isFinite(spaceF) ||
-      Number.isFinite(spaceL) ||
-      Number.isFinite(spaceR) ||
-      Number.isFinite(foodDist) ||
-      Number.isFinite(tailReach)
-    ) {
+
+    const hasSpace =
+      Number.isFinite(spaceF) || Number.isFinite(spaceL) || Number.isFinite(spaceR);
+    const hasFoodDist = Number.isFinite(foodDist);
+    const hasTailReach = Number.isFinite(tailReach);
+    const hasFoodReach =
+      Number.isFinite(foodReachF) || Number.isFinite(foodReachL) || Number.isFinite(foodReachR);
+
+    if (hasSpace || hasFoodDist || hasTailReach || hasFoodReach) {
       const sf = Number.isFinite(spaceF) ? spaceF.toFixed(3) : "n/a";
       const sl = Number.isFinite(spaceL) ? spaceL.toFixed(3) : "n/a";
       const sr = Number.isFinite(spaceR) ? spaceR.toFixed(3) : "n/a";
       const fd = Number.isFinite(foodDist) ? foodDist.toFixed(3) : "n/a";
       const tr = Number.isFinite(tailReach) ? String(tailReach | 0) : "n/a";
-      featTxt = ` space(F/L/R)=${sf}/${sl}/${sr} foodDist=${fd} tailReach=${tr}`;
+
+      featTxt += ` space(F/L/R)=${sf}/${sl}/${sr} foodDist=${fd} tailReach=${tr}`;
+
+      if (hasFoodReach) {
+        const frf = Number.isFinite(foodReachF) ? String(foodReachF | 0) : "n/a";
+        const frl = Number.isFinite(foodReachL) ? String(foodReachL | 0) : "n/a";
+        const frr = Number.isFinite(foodReachR) ? String(foodReachR | 0) : "n/a";
+        featTxt += ` foodReach(F/L/R)=${frf}/${frl}/${frr}`;
+      }
     }
 
     const live = stats
@@ -141,7 +155,7 @@ function drawFrame(frame, stats) {
         `ret=${fmt(stats.epReturn, 2)} lag=${lagMs}ms` +
         sinceEatTxt +
         pipeTxt +
-        featTxt
+        (featTxt ? ` ${featTxt}` : "")
       : `lag=${lagMs}ms`;
 
     const progress =
@@ -169,7 +183,7 @@ function unwrap(msg) {
     return { topic: msg.topic, payload: msg.payload };
   }
 
-  // Wrapped format (payload is emitted object)
+  // Wrapped format
   const o = msg.payload;
   if (o?.topic === "max7219/frame" && o?.payload?.rows) {
     return { topic: o.topic, frame: o.payload, stats: o.stats };
