@@ -2748,7 +2748,7 @@
         "id": "dbd6a8e7f5f301b6",
         "type": "exec",
         "z": "0e584f7610b443dd",
-        "command": "node /home/matze/.node-red/snake-dqn.js --play",
+        "command": "node /home/matze/.node-red/snake-dqn.js --stepms 10 --emitms 33",
         "addpay": "",
         "append": "",
         "useSpawn": "true",
@@ -2756,7 +2756,7 @@
         "winHide": false,
         "oldrc": false,
         "name": "",
-        "x": 460,
+        "x": 520,
         "y": 500,
         "wires": [
             [],
@@ -2768,7 +2768,7 @@
         "id": "18552c7b717a34f6",
         "type": "inject",
         "z": "0e584f7610b443dd",
-        "name": "play",
+        "name": "schneller",
         "props": [
             {
                 "p": "topic",
@@ -2780,7 +2780,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "x": 110,
+        "x": 120,
         "y": 500,
         "wires": [
             [
