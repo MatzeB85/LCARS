@@ -55,6 +55,14 @@
         "env": []
     },
     {
+        "id": "0e584f7610b443dd",
+        "type": "tab",
+        "label": "snake dqn",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "776cbcab809a4f68",
         "type": "subflow",
         "name": "Testsub",
@@ -1953,7 +1961,6 @@
         "y": 220,
         "wires": [
             [
-                "0efd07f4539ec1e0",
                 "6848eaef7e3d11aa"
             ]
         ]
@@ -2375,35 +2382,6 @@
         ]
     },
     {
-        "id": "0efd07f4539ec1e0",
-        "type": "uibuilder",
-        "z": "71041d5f570c07d3",
-        "name": "",
-        "topic": "",
-        "url": "display",
-        "okToGo": true,
-        "fwdInMessages": false,
-        "allowScripts": false,
-        "allowStyles": false,
-        "copyIndex": true,
-        "templateFolder": "blank",
-        "extTemplate": "",
-        "showfolder": false,
-        "reload": false,
-        "sourceFolder": "src",
-        "deployedVersion": "7.5.0",
-        "showMsgUib": false,
-        "title": "",
-        "descr": "",
-        "editurl": "",
-        "x": 1120,
-        "y": 220,
-        "wires": [
-            [],
-            []
-        ]
-    },
-    {
         "id": "170c2d2cda70dfb8",
         "type": "inject",
         "z": "71041d5f570c07d3",
@@ -2443,5 +2421,121 @@
         "x": 980,
         "y": 160,
         "wires": []
+    },
+    {
+        "id": "f8a493e36579018c",
+        "type": "exec",
+        "z": "0e584f7610b443dd",
+        "command": "node /home/matze/.node-red/snake-dqn.js",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 480,
+        "y": 160,
+        "wires": [
+            [
+                "57df4fd69aa0d9b2"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "452fcc2ea71bcecc",
+        "type": "inject",
+        "z": "0e584f7610b443dd",
+        "name": "start",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 90,
+        "y": 160,
+        "wires": [
+            [
+                "f8a493e36579018c"
+            ]
+        ]
+    },
+    {
+        "id": "57df4fd69aa0d9b2",
+        "type": "json",
+        "z": "0e584f7610b443dd",
+        "name": "",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 790,
+        "y": 140,
+        "wires": [
+            [
+                "b2df0734e5ad4dba"
+            ]
+        ]
+    },
+    {
+        "id": "b2df0734e5ad4dba",
+        "type": "switch",
+        "z": "0e584f7610b443dd",
+        "name": "",
+        "property": "payload.topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "max7219/frame",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 990,
+        "y": 140,
+        "wires": [
+            [
+                "38b7638ec98a565e"
+            ]
+        ]
+    },
+    {
+        "id": "38b7638ec98a565e",
+        "type": "uibuilder",
+        "z": "0e584f7610b443dd",
+        "name": "",
+        "topic": "",
+        "url": "display",
+        "okToGo": false,
+        "fwdInMessages": false,
+        "allowScripts": false,
+        "allowStyles": false,
+        "copyIndex": true,
+        "templateFolder": "blank",
+        "extTemplate": "",
+        "showfolder": false,
+        "reload": false,
+        "sourceFolder": "src",
+        "deployedVersion": "7.5.0",
+        "showMsgUib": false,
+        "title": "",
+        "descr": "",
+        "editurl": "",
+        "x": 1220,
+        "y": 140,
+        "wires": [
+            [],
+            []
+        ]
     }
 ]
