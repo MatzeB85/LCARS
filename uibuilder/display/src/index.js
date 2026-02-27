@@ -21,6 +21,9 @@ function avg(arr) {
 function fmt(n, d = 2) {
   return Number.isFinite(n) ? n.toFixed(d) : "n/a";
 }
+function fmtInt(n) {
+  return Number.isFinite(n) ? String(Math.trunc(n)) : "n/a";
+}
 
 function resetProgress(reason = "") {
   hist.len.length = 0;
@@ -31,7 +34,6 @@ function resetProgress(reason = "") {
   best.score = 0;
   best.ret = -Infinity;
 
-  // Optional: visible hint in console
   if (reason) console.log(`Progress reset: ${reason}`);
 }
 
@@ -97,20 +99,32 @@ function drawFrame(frame, stats) {
     ctx.fillRect(frame.head.x * scale, frame.head.y * scale, scale, scale);
   }
 
-  // Info overlay: live stats + progress
+  // Info overlay: live stats + progress + pipeline health
   if (info) {
     const lagMs = Date.now() - (frame?.ts || Date.now());
 
+    // Pipeline stats (may be missing depending on runner)
+    const pending = stats?.pendingIPC;
+    const dropped = stats?.droppedIPC;
+    const pipeTxt =
+      (Number.isFinite(pending) || Number.isFinite(dropped))
+        ? ` pend=${fmtInt(pending)} drop=${fmtInt(dropped)}`
+        : "";
+
+    const sinceEatTxt = Number.isFinite(stats?.sinceEat) ? ` sinceEat=${fmtInt(stats.sinceEat)}` : "";
+
     const live = stats
       ? `ep=${stats.episode} steps=${stats.totalSteps} eps=${stats.eps} ` +
-        `len=${stats.len} bestLen=${stats.bestLen} score=${stats.score} ` +
-        `ret=${fmt(stats.epReturn, 2)} lag=${lagMs}ms`
+      `len=${stats.len} bestLen=${stats.bestLen} score=${stats.score} ` +
+      `ret=${fmt(stats.epReturn, 2)} lag=${lagMs}ms` +
+      sinceEatTxt +
+      pipeTxt
       : `lag=${lagMs}ms`;
 
     const progress =
       hist.len.length
         ? ` | avg(${WIN}) len=${fmt(avg(hist.len), 2)} score=${fmt(avg(hist.score), 2)} ret=${fmt(avg(hist.ret), 2)} ` +
-          `best len=${best.len} score=${best.score} ret=${fmt(best.ret, 2)}`
+        `best len=${best.len} score=${best.score} ret=${fmt(best.ret, 2)}`
         : "";
 
     info.textContent = live + progress;
@@ -118,8 +132,6 @@ function drawFrame(frame, stats) {
 }
 
 // ------- message unwrap (super robust) -------
-// Your Node-RED setup typically sends to uibuilder:
-// msg.payload = { topic:"max7219/frame", payload:{...frame...}, stats:{...} }
 function unwrap(msg) {
   if (!msg) return null;
 
@@ -135,7 +147,6 @@ function unwrap(msg) {
   }
 
   // Exec->JSON (Node-RED json node output): payload is the emitted object
-  // { payload: { topic, payload: frame, stats } }
   const o = msg.payload;
   if (o?.topic === "max7219/frame" && o?.payload?.rows) {
     return { topic: o.topic, frame: o.payload, stats: o.stats };
@@ -159,7 +170,8 @@ function handleInfo(payload) {
   if (payload.msg === "runner_start") {
     resetProgress("runner_start");
     lastEpisodeSeen = null;
-    // if no frame yet, show a small status
+
+    // If no frame yet, show a small status
     if (info && !latestFrame) {
       info.textContent = "Runner gestartet – Progress zurückgesetzt.";
     }
@@ -232,7 +244,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (u.topic === "snake/info") {
       handleInfo(u.payload);
-      // refresh overlay if we have a frame
       if (latestFrame) scheduleDraw();
       return;
     }
