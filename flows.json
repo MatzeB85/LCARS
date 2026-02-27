@@ -2518,7 +2518,7 @@
         "descr": "",
         "editurl": "vscode://vscode-remote/ssh-remote+192.168.2.107/home/matze/.node-red/projects/LCARS/uibuilder/display/?windowId=_blank",
         "x": 1280,
-        "y": 100,
+        "y": 80,
         "wires": [
             [],
             []
