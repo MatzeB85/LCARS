@@ -1951,7 +1951,11 @@
         "rotate180": false,
         "x": 680,
         "y": 220,
-        "wires": []
+        "wires": [
+            [
+                "0efd07f4539ec1e0"
+            ]
+        ]
     },
     {
         "id": "8c6b92bf0a56186b",
@@ -2391,11 +2395,36 @@
         "title": "",
         "descr": "",
         "editurl": "",
-        "x": 980,
-        "y": 640,
+        "x": 1000,
+        "y": 220,
         "wires": [
             [],
             []
+        ]
+    },
+    {
+        "id": "170c2d2cda70dfb8",
+        "type": "inject",
+        "z": "71041d5f570c07d3",
+        "name": "stream ON",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"cmd\":\"streamOn\"}",
+        "payloadType": "json",
+        "x": 180,
+        "y": 60,
+        "wires": [
+            [
+                "53d608bc11ebcd80"
+            ]
         ]
     }
 ]
