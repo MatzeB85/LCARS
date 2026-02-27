@@ -1949,16 +1949,12 @@
         "type": "max7219-raw",
         "z": "71041d5f570c07d3",
         "name": "",
+        "speedHz": 1000000,
         "intensity": "15",
         "mirrorX": true,
-        "speedHz": 1000000,
         "x": 680,
         "y": 220,
-        "wires": [
-            [
-                "6848eaef7e3d11aa"
-            ]
-        ]
+        "wires": []
     },
     {
         "id": "8c6b92bf0a56186b",
@@ -2563,14 +2559,17 @@
         "type": "max7219-raw",
         "z": "0e584f7610b443dd",
         "name": "",
-        "intensity": 6,
-        "mirrorX": false,
+        "bus": "0",
+        "device": "0",
+        "cascaded": "4",
         "speedHz": 1000000,
+        "intensity": 6,
+        "reverseOrder": false,
+        "mirrorX": false,
+        "rotate180": false,
         "x": 1270,
         "y": 260,
-        "wires": [
-            []
-        ]
+        "wires": []
     },
     {
         "id": "2f9755857a854e2e",
