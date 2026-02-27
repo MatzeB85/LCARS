@@ -2334,10 +2334,35 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"cmd\":\"snakeLearnSet\",\"value\":{\"epsilon\":0.1,\"epsilonDecay\":0.999,\"epsilonMin\":0.02,\"alpha\":0.25}}",
+        "payload": "{\"cmd\":\"snakeLearnSet\",\"value\":{\"epsilon\":0.05,\"epsilonMin\":0.01,\"epsilonDecay\":0.9995,\"alpha\":0.3,\"gamma\":0.95,\"learning\":true}}",
         "payloadType": "json",
         "x": 330,
         "y": 560,
+        "wires": [
+            [
+                "53d608bc11ebcd80"
+            ]
+        ]
+    },
+    {
+        "id": "feb011b8854e76aa",
+        "type": "inject",
+        "z": "71041d5f570c07d3",
+        "name": "learn",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"cmd\":\"snakeLearnSet\",\"value\":{\"maxSteps\":1500,\"rTimeout\":-1,\"rStep\":-0.03}}",
+        "payloadType": "json",
+        "x": 330,
+        "y": 620,
         "wires": [
             [
                 "53d608bc11ebcd80"
