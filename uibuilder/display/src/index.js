@@ -1,18 +1,22 @@
 /* global uibuilder */
+"use strict";
+
 uibuilder.start();
 
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
 const info = document.getElementById("info");
-
 const scale = 12;
 
 function setSize(w, h) {
+  if (!canvas) return;
   canvas.width = w * scale;
   canvas.height = h * scale;
 }
 
 function drawFrame(frame, stats) {
+  if (!canvas || !ctx) return;
+
   const w = frame?.w ?? 32;
   const h = frame?.h ?? 8;
   const rows = frame?.rows;
@@ -22,10 +26,12 @@ function drawFrame(frame, stats) {
   setSize(w, h);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Snake+Food (alles erstmal grün)
+  // Snake (green): draw all bits from rows
   ctx.fillStyle = "#00ff66";
   for (let y = 0; y < h; y++) {
     const row = rows[y];
+    if (!Array.isArray(row)) continue;
+
     for (let m = 0; m < row.length; m++) {
       const b = row[m] & 0xff;
       for (let bit = 0; bit < 8; bit++) {
@@ -37,43 +43,74 @@ function drawFrame(frame, stats) {
     }
   }
 
-  // Food rot (wenn vorhanden)
+  // Food (red)
   if (frame.food && Number.isInteger(frame.food.x) && Number.isInteger(frame.food.y)) {
     ctx.fillStyle = "#ff3355";
     ctx.fillRect(frame.food.x * scale, frame.food.y * scale, scale, scale);
   }
 
-  // Head blau (wenn vorhanden)
+  // Head (blue)
   if (frame.head && Number.isInteger(frame.head.x) && Number.isInteger(frame.head.y)) {
     ctx.fillStyle = "#00aaff";
     ctx.fillRect(frame.head.x * scale, frame.head.y * scale, scale, scale);
   }
 
-  if (info && stats) {
-    info.textContent =
-      `ep=${stats.episode} steps=${stats.totalSteps} eps=${stats.eps} ` +
-      `len=${stats.len} best=${stats.bestLen} score=${stats.score}`;
+  // Info overlay
+  if (info) {
+    const lagMs = Date.now() - (frame?.ts || Date.now());
+    if (stats) {
+      info.textContent =
+        `ep=${stats.episode} steps=${stats.totalSteps} eps=${stats.eps} ` +
+        `len=${stats.len} best=${stats.bestLen} score=${stats.score} ` +
+        `lag=${lagMs}ms`;
+    } else {
+      info.textContent = `lag=${lagMs}ms`;
+    }
   }
 }
 
-uibuilder.onChange("msg", (msg) => {
-  if (!msg) return;
-
-  // Fall 1: du sendest direkt msg.topic / msg.payload
-  if (msg.topic === "max7219/frame" && msg.payload?.rows) {
-    drawFrame(msg.payload, msg.stats || msg.payload?.stats);
-    return;
+/**
+ * Supports both message formats:
+ * 1) Direct: msg.topic === "max7219/frame", msg.payload = frame, msg.stats = stats
+ * 2) Exec->JSON: msg.payload = { topic, payload: frame, stats }
+ */
+function unwrap(msg) {
+  // Direct format
+  if (msg?.topic === "max7219/frame" && msg?.payload?.rows) {
+    return { frame: msg.payload, stats: msg.stats };
   }
 
-  // Fall 2: exec -> json: Objekt steckt in msg.payload
-  const obj = msg.payload;
+  // Exec->JSON format
+  const obj = msg?.payload;
   if (obj?.topic === "max7219/frame" && obj?.payload?.rows) {
-    drawFrame(obj.payload, obj.stats);
-    return;
+    return { frame: obj.payload, stats: obj.stats };
   }
 
-  // Optional: Episode summaries
-  if (obj?.topic === "snake/episode") {
-    // console.log("episode", obj.payload);
-  }
+  return null;
+}
+
+// --- Smooth rendering: keep only the latest frame and draw via requestAnimationFrame ---
+let latest = null;
+let scheduled = false;
+
+function scheduleDraw() {
+  if (scheduled) return;
+  scheduled = true;
+
+  requestAnimationFrame(() => {
+    scheduled = false;
+    if (!latest) return;
+    drawFrame(latest.frame, latest.stats);
+  });
+}
+
+uibuilder.onChange("msg", (msg) => {
+  const u = unwrap(msg);
+  if (!u) return;
+
+  // "latest wins": overwrite any older pending frame
+  latest = u;
+
+  // draw at most once per animation frame
+  scheduleDraw();
 });
