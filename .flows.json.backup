@@ -2610,7 +2610,7 @@
         "type": "debug",
         "z": "0e584f7610b443dd",
         "name": "debug 4",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
