@@ -2743,5 +2743,49 @@
                 "51c602a6127efeae"
             ]
         ]
+    },
+    {
+        "id": "dbd6a8e7f5f301b6",
+        "type": "exec",
+        "z": "0e584f7610b443dd",
+        "command": "node /home/matze/.node-red/snake-dqn.js --play",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 460,
+        "y": 500,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "18552c7b717a34f6",
+        "type": "inject",
+        "z": "0e584f7610b443dd",
+        "name": "play",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 110,
+        "y": 500,
+        "wires": [
+            [
+                "dbd6a8e7f5f301b6"
+            ]
+        ]
     }
 ]
