@@ -2364,7 +2364,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"cmd\":\"snakeLearnSet\",\"value\":{\"maxSteps\":15000,\"rTimeout\":-1,\"rStep\":-0.03}}",
+        "payload": "{\"cmd\":\"snakeLearnSet\",\"value\":{\"maxSteps\":6000,\"rTimeout\":-1,\"rStep\":-0.03}}",
         "payloadType": "json",
         "x": 330,
         "y": 620,
