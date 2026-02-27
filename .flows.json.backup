@@ -2516,7 +2516,7 @@
         "name": "",
         "topic": "",
         "url": "display",
-        "okToGo": false,
+        "okToGo": true,
         "fwdInMessages": false,
         "allowScripts": false,
         "allowStyles": false,

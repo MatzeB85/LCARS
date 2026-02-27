@@ -2505,7 +2505,8 @@
         "y": 140,
         "wires": [
             [
-                "38b7638ec98a565e"
+                "38b7638ec98a565e",
+                "fe94baf1ad115901"
             ]
         ]
     },
@@ -2535,6 +2536,45 @@
         "y": 140,
         "wires": [
             [],
+            []
+        ]
+    },
+    {
+        "id": "fe94baf1ad115901",
+        "type": "function",
+        "z": "0e584f7610b443dd",
+        "name": "function 6",
+        "func": "// msg.payload kommt vom JSON node und ist ein Objekt:\n// { topic:\"max7219/frame\", payload:{rows:[8][4], w:32, h:8}, stats:{...} }\n\nfunction reverseByte(b) {\n    b &= 0xFF;\n    b = ((b & 0xF0) >> 4) | ((b & 0x0F) << 4);\n    b = ((b & 0xCC) >> 2) | ((b & 0x33) << 2);\n    b = ((b & 0xAA) >> 1) | ((b & 0x55) << 1);\n    return b & 0xFF;\n}\n\nconst obj = msg.payload;\nif (!obj || obj.topic !== \"max7219/frame\" || !obj.payload || !obj.payload.rows) return null;\n\nconst rows = obj.payload.rows;\n\n// Du hast MirrorX=true am max7219-raw.\n// Der Treiber spiegelt beim Flush (reverseByte). Damit das Bild normal bleibt,\n// drehen wir hier jedes Byte einmal um.\nconst bitmap = rows.map(r => r.map(b => reverseByte(b)));\n\nreturn {\n    payload: { bitmap },\n    topic: \"bitmap\",\n    stats: obj.stats\n};\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1000,
+        "y": 240,
+        "wires": [
+            [
+                "dbb8c7914a78fabc"
+            ]
+        ]
+    },
+    {
+        "id": "dbb8c7914a78fabc",
+        "type": "max7219-raw",
+        "z": "0e584f7610b443dd",
+        "name": "",
+        "bus": 0,
+        "device": 0,
+        "cascaded": 4,
+        "speedHz": 1000000,
+        "intensity": 6,
+        "mirrorX": true,
+        "reverseOrder": false,
+        "rotate180": false,
+        "x": 1220,
+        "y": 240,
+        "wires": [
             []
         ]
     }
