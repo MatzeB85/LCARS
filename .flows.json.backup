@@ -2426,7 +2426,7 @@
         "id": "f8a493e36579018c",
         "type": "exec",
         "z": "0e584f7610b443dd",
-        "command": "node /home/matze/.node-red/snake-dqn.js",
+        "command": "node /home/matze/.node-red/snake-dqn.js --stepms 25 --emitms 120 --emitevery 2 --batch 32 --trainevery 10 --trainps 6 --guardms 8",
         "addpay": "",
         "append": "",
         "useSpawn": "true",
@@ -2434,7 +2434,7 @@
         "winHide": false,
         "oldrc": false,
         "name": "",
-        "x": 440,
+        "x": 720,
         "y": 160,
         "wires": [
             [
