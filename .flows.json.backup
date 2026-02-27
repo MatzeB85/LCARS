@@ -2438,7 +2438,7 @@
         "y": 160,
         "wires": [
             [
-                "57df4fd69aa0d9b2"
+                "b187ff21444315df"
             ],
             [],
             []
@@ -2619,5 +2619,25 @@
         "x": 1000,
         "y": 360,
         "wires": []
+    },
+    {
+        "id": "b187ff21444315df",
+        "type": "split",
+        "z": "0e584f7610b443dd",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "property": "payload",
+        "x": 670,
+        "y": 60,
+        "wires": [
+            [
+                "57df4fd69aa0d9b2"
+            ]
+        ]
     }
 ]
