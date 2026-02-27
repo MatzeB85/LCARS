@@ -2656,14 +2656,13 @@
         "randomUnits": "seconds",
         "drop": true,
         "allowrate": false,
-        "outputs": 2,
+        "outputs": 1,
         "x": 1180,
         "y": 100,
         "wires": [
             [
                 "38b7638ec98a565e"
-            ],
-            []
+            ]
         ]
     }
 ]
