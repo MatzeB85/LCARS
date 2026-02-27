@@ -22,7 +22,7 @@ function fmt(n, d = 2) {
   return Number.isFinite(n) ? n.toFixed(d) : "n/a";
 }
 
-// ------- DOM (init after DOMContentLoaded to avoid null errors) -------
+// ------- DOM init -------
 let canvas, ctx, info;
 const scale = 12;
 
@@ -49,13 +49,12 @@ function drawFrame(frame, stats) {
   const w = frame?.w ?? 32;
   const h = frame?.h ?? 8;
   const rows = frame?.rows;
-
   if (!Array.isArray(rows) || rows.length < h) return;
 
   setSize(w, h);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Snake (green): draw all bits from rows
+  // Snake (green)
   ctx.fillStyle = "#00ff66";
   for (let y = 0; y < h; y++) {
     const row = rows[y];
@@ -84,7 +83,7 @@ function drawFrame(frame, stats) {
     ctx.fillRect(frame.head.x * scale, frame.head.y * scale, scale, scale);
   }
 
-  // Info overlay: live stats + progress
+  // Overlay
   if (info) {
     const lagMs = Date.now() - (frame?.ts || Date.now());
 
@@ -104,28 +103,24 @@ function drawFrame(frame, stats) {
   }
 }
 
-// ------- message unwrap (super robust) -------
-// Your Node-RED setup typically sends to uibuilder:
+// ------- robust extraction -------
+// Your typical uibuilder message from exec->split->json is:
 // msg.payload = { topic:"max7219/frame", payload:{...frame...}, stats:{...} }
-function unwrap(msg) {
+function extract(msg) {
   if (!msg) return null;
 
-  // Direct format: {topic, payload(frame), stats}
-  if (msg.topic === "max7219/frame" && msg.payload?.rows) {
-    return { topic: msg.topic, frame: msg.payload, stats: msg.stats };
-  }
-  if (msg.topic === "snake/episode" && msg.payload) {
-    return { topic: msg.topic, payload: msg.payload };
+  // Try direct
+  if (msg.topic && msg.payload) {
+    // stats might be msg.stats or msg.payload.stats (rare)
+    const stats = msg.stats ?? msg.payload?.stats ?? null;
+    return { topic: msg.topic, payload: msg.payload, stats };
   }
 
-  // Exec->JSON (Node-RED json node output): payload is the emitted object
-  // { payload: { topic, payload: frame, stats } }
+  // Exec->JSON wrapped in msg.payload
   const o = msg.payload;
-  if (o?.topic === "max7219/frame" && o?.payload?.rows) {
-    return { topic: o.topic, frame: o.payload, stats: o.stats };
-  }
-  if (o?.topic === "snake/episode" && o?.payload) {
-    return { topic: o.topic, payload: o.payload };
+  if (o?.topic) {
+    const stats = o.stats ?? o.payload?.stats ?? msg.stats ?? null;
+    return { topic: o.topic, payload: o.payload, stats, raw: o };
   }
 
   return null;
@@ -142,7 +137,7 @@ function handleEpisode(ep) {
   if (Number.isFinite(ep.score)) pushHist(hist.score, ep.score);
   if (Number.isFinite(ep.epReturn)) pushHist(hist.ret, ep.epReturn);
 
-  // If we currently have no frame, still show progress text
+  // If no frame yet, still show something
   if (info && !latestFrame) {
     info.textContent =
       `ep=${ep.episode} steps=${ep.totalSteps} eps=${ep.eps} len=${ep.len} bestLen=${ep.bestLen} score=${ep.score} ret=${fmt(ep.epReturn, 2)}` +
@@ -151,7 +146,7 @@ function handleEpisode(ep) {
   }
 }
 
-// ------- smooth rendering: latest wins + requestAnimationFrame -------
+// ------- smooth render: latest wins -------
 let latestFrame = null;
 let scheduled = false;
 
@@ -165,27 +160,24 @@ function scheduleDraw() {
   });
 }
 
-// ------- start after DOM is ready -------
 document.addEventListener("DOMContentLoaded", () => {
   if (!initDom()) return;
 
-  // Optional: comment out after first successful test
-  console.log("UI ready: waiting for messages…");
-
   uibuilder.onChange("msg", (msg) => {
-    const u = unwrap(msg);
-    if (!u) return;
+    const m = extract(msg);
+    if (!m) return;
 
-    if (u.topic === "max7219/frame") {
-      latestFrame = { frame: u.frame, stats: u.stats };
+    if (m.topic === "max7219/frame" && m.payload?.rows) {
+      latestFrame = { frame: m.payload, stats: m.stats };
       scheduleDraw();
       return;
     }
 
-    if (u.topic === "snake/episode") {
-      handleEpisode(u.payload);
-      // refresh overlay on next draw if we have a frame
+    if (m.topic === "snake/episode") {
+      // IMPORTANT: snake/episode payload is the episode object itself
+      handleEpisode(m.payload);
       if (latestFrame) scheduleDraw();
+      return;
     }
   });
 });
