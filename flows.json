@@ -2510,8 +2510,7 @@
         "y": 160,
         "wires": [
             [
-                "fe94baf1ad115901",
-                "38b7638ec98a565e"
+                "7737e9fc03c56cd1"
             ]
         ]
     },
@@ -2556,7 +2555,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1000,
+        "x": 1060,
         "y": 260,
         "wires": [
             [
@@ -2577,7 +2576,7 @@
         "mirrorX": false,
         "reverseOrder": false,
         "rotate180": false,
-        "x": 1220,
+        "x": 1260,
         "y": 260,
         "wires": [
             []
@@ -2653,7 +2652,7 @@
         "pauseType": "rate",
         "timeout": "5",
         "timeoutUnits": "seconds",
-        "rate": "5",
+        "rate": "15",
         "nbRateUnits": "1",
         "rateUnits": "second",
         "randomFirst": "1",
@@ -2665,7 +2664,10 @@
         "x": 1200,
         "y": 80,
         "wires": [
-            []
+            [
+                "38b7638ec98a565e",
+                "fe94baf1ad115901"
+            ]
         ]
     },
     {
