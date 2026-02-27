@@ -2652,7 +2652,7 @@
         "pauseType": "rate",
         "timeout": "5",
         "timeoutUnits": "seconds",
-        "rate": "15",
+        "rate": "30",
         "nbRateUnits": "1",
         "rateUnits": "second",
         "randomFirst": "1",
