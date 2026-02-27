@@ -8,6 +8,37 @@ const ctx = canvas.getContext("2d");
 const info = document.getElementById("info");
 const scale = 12;
 
+// ------- progress tracking -------
+const WIN = 50; // rolling window size
+const hist = {
+  len: [],
+  score: [],
+  ret: [],
+};
+const best = {
+  len: 0,
+  score: 0,
+  ret: -Infinity,
+};
+let lastEpisode = null; // last episode payload
+
+function pushHist(arr, v) {
+  arr.push(v);
+  if (arr.length > WIN) arr.shift();
+}
+
+function avg(arr) {
+  if (!arr.length) return 0;
+  let s = 0;
+  for (const v of arr) s += v;
+  return s / arr.length;
+}
+
+function fmt(n, d = 2) {
+  return Number.isFinite(n) ? n.toFixed(d) : "n/a";
+}
+
+// ------- rendering -------
 function setSize(w, h) {
   if (!canvas) return;
   canvas.width = w * scale;
@@ -20,13 +51,12 @@ function drawFrame(frame, stats) {
   const w = frame?.w ?? 32;
   const h = frame?.h ?? 8;
   const rows = frame?.rows;
-
   if (!Array.isArray(rows) || rows.length < h) return;
 
   setSize(w, h);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Snake (green): draw all bits from rows
+  // Snake (green) from rows bits
   ctx.fillStyle = "#00ff66";
   for (let y = 0; y < h; y++) {
     const row = rows[y];
@@ -55,42 +85,40 @@ function drawFrame(frame, stats) {
     ctx.fillRect(frame.head.x * scale, frame.head.y * scale, scale, scale);
   }
 
-  // Info overlay
+  // Overlay text (frame stats + progress)
   if (info) {
     const lagMs = Date.now() - (frame?.ts || Date.now());
-    if (stats) {
-      info.textContent =
-        `ep=${stats.episode} steps=${stats.totalSteps} eps=${stats.eps} ` +
-        `len=${stats.len} best=${stats.bestLen} score=${stats.score} ` +
-        `lag=${lagMs}ms`;
-    } else {
-      info.textContent = `lag=${lagMs}ms`;
-    }
+
+    const live = stats
+      ? `ep=${stats.episode} steps=${stats.totalSteps} eps=${stats.eps} len=${stats.len} bestLen=${stats.bestLen} score=${stats.score} ret=${fmt(stats.epReturn, 2)} lag=${lagMs}ms`
+      : `lag=${lagMs}ms`;
+
+    const progress =
+      hist.len.length
+        ? ` | avg(${WIN}) len=${fmt(avg(hist.len), 2)} score=${fmt(avg(hist.score), 2)} ret=${fmt(avg(hist.ret), 2)} ` +
+          `best len=${best.len} score=${best.score} ret=${fmt(best.ret, 2)}`
+        : "";
+
+    info.textContent = live + progress;
   }
 }
 
-/**
- * Supports both message formats:
- * 1) Direct: msg.topic === "max7219/frame", msg.payload = frame, msg.stats = stats
- * 2) Exec->JSON: msg.payload = { topic, payload: frame, stats }
- */
+// ------- message unwrap (supports both formats) -------
 function unwrap(msg) {
   // Direct format
-  if (msg?.topic === "max7219/frame" && msg?.payload?.rows) {
-    return { frame: msg.payload, stats: msg.stats };
-  }
+  if (msg?.topic && msg?.payload) return { topic: msg.topic, payload: msg.payload, stats: msg.stats };
 
   // Exec->JSON format
-  const obj = msg?.payload;
-  if (obj?.topic === "max7219/frame" && obj?.payload?.rows) {
-    return { frame: obj.payload, stats: obj.stats };
-  }
+  if (msg?.payload?.topic && msg?.payload?.payload) return { topic: msg.payload.topic, payload: msg.payload.payload, stats: msg.payload.stats };
+
+  // Some nodes may send only {payload:{topic,...}} without payload.payload
+  if (msg?.payload?.topic && msg?.payload) return { topic: msg.payload.topic, payload: msg.payload.payload, stats: msg.payload.stats };
 
   return null;
 }
 
-// --- Smooth rendering: keep only the latest frame and draw via requestAnimationFrame ---
-let latest = null;
+// ------- smooth rendering: latest wins + requestAnimationFrame -------
+let latestFrame = null;
 let scheduled = false;
 
 function scheduleDraw() {
@@ -99,18 +127,51 @@ function scheduleDraw() {
 
   requestAnimationFrame(() => {
     scheduled = false;
-    if (!latest) return;
-    drawFrame(latest.frame, latest.stats);
+    if (!latestFrame) return;
+    drawFrame(latestFrame.frame, latestFrame.stats);
   });
+}
+
+function handleEpisode(ep) {
+  if (!ep) return;
+  lastEpisode = ep;
+
+  // update bests
+  if (Number.isFinite(ep.len)) best.len = Math.max(best.len, ep.len);
+  if (Number.isFinite(ep.score)) best.score = Math.max(best.score, ep.score);
+  if (Number.isFinite(ep.epReturn)) best.ret = Math.max(best.ret, ep.epReturn);
+
+  // update rolling window
+  if (Number.isFinite(ep.len)) pushHist(hist.len, ep.len);
+  if (Number.isFinite(ep.score)) pushHist(hist.score, ep.score);
+  if (Number.isFinite(ep.epReturn)) pushHist(hist.ret, ep.epReturn);
+
+  // If no frames are coming (or paused), still update the info box
+  if (info && !latestFrame) {
+    info.textContent =
+      `ep=${ep.episode} steps=${ep.totalSteps} eps=${ep.eps} len=${ep.len} bestLen=${ep.bestLen} score=${ep.score} ret=${fmt(ep.epReturn, 2)}` +
+      ` | avg(${WIN}) len=${fmt(avg(hist.len), 2)} score=${fmt(avg(hist.score), 2)} ret=${fmt(avg(hist.ret), 2)} ` +
+      `best len=${best.len} score=${best.score} ret=${fmt(best.ret, 2)}`;
+  }
 }
 
 uibuilder.onChange("msg", (msg) => {
   const u = unwrap(msg);
   if (!u) return;
 
-  // "latest wins": overwrite any older pending frame
-  latest = u;
+  // frames
+  if (u.topic === "max7219/frame" && u.payload?.rows) {
+    latestFrame = { frame: u.payload, stats: u.stats };
+    scheduleDraw();
+    return;
+  }
 
-  // draw at most once per animation frame
-  scheduleDraw();
+  // episode summaries
+  if (u.topic === "snake/episode") {
+    // episode payload is directly u.payload (because snake-dqn emits {topic, payload:{...}})
+    handleEpisode(u.payload);
+    // also redraw overlay if we have a frame already
+    if (latestFrame) scheduleDraw();
+    return;
+  }
 });
