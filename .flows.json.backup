@@ -2452,7 +2452,7 @@
         "id": "452fcc2ea71bcecc",
         "type": "inject",
         "z": "0e584f7610b443dd",
-        "name": "start",
+        "name": "learn",
         "props": [
             {
                 "p": "topic",
@@ -2637,8 +2637,8 @@
         "stream": true,
         "addname": "topic",
         "property": "payload",
-        "x": 690,
-        "y": 60,
+        "x": 790,
+        "y": 80,
         "wires": [
             [
                 "57df4fd69aa0d9b2"
@@ -2699,5 +2699,49 @@
         "x": 620,
         "y": 400,
         "wires": []
+    },
+    {
+        "id": "51c602a6127efeae",
+        "type": "exec",
+        "z": "0e584f7610b443dd",
+        "command": "node /home/matze/.node-red/snake-dqn.js --play",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 460,
+        "y": 80,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "10b6962d8cdfc749",
+        "type": "inject",
+        "z": "0e584f7610b443dd",
+        "name": "play",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 110,
+        "y": 80,
+        "wires": [
+            [
+                "51c602a6127efeae"
+            ]
+        ]
     }
 ]
