@@ -3,21 +3,7 @@
 
 uibuilder.start();
 
-/**
- * index.js (UIBuilder front-end)
- *
- * Shows:
- *  - Matrix canvas (snake + food + head)
- *  - Info line with live stats + progress avg(50) + best + MEM + adapt
- *  - HUD cards in HTML (your IDs match):
- *      System:  sysCpuVal/sysCpuBar, sysMemVal/sysMemMB/sysMemBar, sysTempVal/sysTempBar, sysAge/sysDot/sysStatus
- *      Trainer: memTfTensorsVal, memTfMemVal/memTfBar, memHeapVal/memHeapBar, memRssVal/memRssBar, memAge/memDot/memStatus
- *
- * IMPORTANT FIX:
- *  - HUD updates are no longer tied to drawFrame() only.
- *  - We update HUD immediately on sys/mem/adapt messages + periodic refresh for age/dots.
- */
-
+// ------- progress tracking -------
 const WIN = 50;
 const hist = { len: [], score: [], ret: [] };
 const best = { len: 0, score: 0, ret: -Infinity };
@@ -49,10 +35,10 @@ function fmtAge(ms) {
 let canvas, ctx, info;
 const scale = 12;
 
-// System HUD (your HTML IDs)
+// System HUD (matches your HTML)
 let elSysAge, elSysDot, elSysStatus, elSysCpuVal, elSysCpuBar, elSysMemVal, elSysMemMB, elSysMemBar, elSysTempVal, elSysTempBar;
 
-// Trainer Memory HUD (your HTML IDs)
+// Trainer Memory HUD (matches your HTML)
 let elTfTensorsVal, elTfMemVal, elHeapVal, elRssVal, elTfBar, elHeapBar, elRssBar;
 let elMemAge, elMemDot, elMemStatus;
 
@@ -105,12 +91,11 @@ function setSize(w, h) {
 
 // ------- state -------
 let latestFrame = null;   // {frame, stats}
-let latestEp = null;      // episode end payload
-let latestMem = null;     // trainer mem payload (normalized)
-let latestAdapt = null;   // trainer adapt payload (normalized)
-let latestSys = null;     // system stats payload (normalized)
+let latestMem = null;     // {tfT, tfMB, heapMB, rssMB, replay, ts}
+let latestAdapt = null;   // {dynMaxTrainsPerSec, procCpuPct, memUsedPct, tempC, ts}
+let latestSys = null;     // {cpuPct, memPct, memUsedMB, memTotalMB, tempC, ts}
 
-// ------- bars / HUD helpers -------
+// ------- HUD helpers -------
 function setBar(el, frac01, level /* "ok"|"warn"|"bad"|null */) {
   if (!el) return;
   const w = Math.round(100 * clamp01(frac01));
@@ -159,7 +144,7 @@ function updateSysHud() {
   if (elSysTempVal) elSysTempVal.textContent = Number.isFinite(latestSys.tempC) ? `${latestSys.tempC.toFixed(1)}°C` : "—";
   if (elSysTempBar) {
     const t = latestSys.tempC;
-    const t01 = Number.isFinite(t) ? clamp01((t - 30) / 60) : 0; // map 30..90 to 0..1
+    const t01 = Number.isFinite(t) ? clamp01((t - 30) / 60) : 0; // 30..90 -> 0..1
     const lvl = !Number.isFinite(t) ? "ok" : t < 70 ? "ok" : t < 80 ? "warn" : "bad";
     setBar(elSysTempBar, t01, stale ? null : lvl);
   }
@@ -181,7 +166,7 @@ function updateMemHud() {
   if (elHeapVal) elHeapVal.textContent = Number.isFinite(latestMem.heapMB) ? `${latestMem.heapMB.toFixed(1)}MB` : "—";
   if (elRssVal) elRssVal.textContent = Number.isFinite(latestMem.rssMB) ? `${latestMem.rssMB.toFixed(1)}MB` : "—";
 
-  // Bars are relative scales (HUD only)
+  // HUD bar scales
   const tf01 = Number.isFinite(latestMem.tfMB) ? clamp01(latestMem.tfMB / 800) : 0;
   const heap01 = Number.isFinite(latestMem.heapMB) ? clamp01(latestMem.heapMB / 1000) : 0;
   const rss01 = Number.isFinite(latestMem.rssMB) ? clamp01(latestMem.rssMB / 2000) : 0;
@@ -193,12 +178,6 @@ function updateMemHud() {
   setBar(elTfBar, tf01, stale ? null : tfLvl);
   setBar(elHeapBar, heap01, stale ? null : heapLvl);
   setBar(elRssBar, rss01, stale ? null : rssLvl);
-}
-
-function refreshHudOnly() {
-  // Periodic refresh so Age/Dots update even if no frames arrive
-  updateSysHud();
-  updateMemHud();
 }
 
 // ------- drawing -------
@@ -214,7 +193,7 @@ function drawFrame(frame, stats) {
   setSize(w, h);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Snake (green): draw all bits from rows
+  // Snake (green)
   ctx.fillStyle = "#00ff66";
   for (let y = 0; y < h; y++) {
     const row = rows[y];
@@ -242,9 +221,6 @@ function drawFrame(frame, stats) {
     ctx.fillStyle = "#00aaff";
     ctx.fillRect(frame.head.x * scale, frame.head.y * scale, scale, scale);
   }
-
-  // ALSO refresh HUD here (but not only here)
-  refreshHudOnly();
 
   // Info overlay: live stats + progress + mem + adapt
   if (info) {
@@ -287,7 +263,7 @@ function drawFrame(frame, stats) {
       const cpu = Number.isFinite(latestAdapt.procCpuPct) ? latestAdapt.procCpuPct.toFixed(1) : "n/a";
       const mem = Number.isFinite(latestAdapt.memUsedPct) ? latestAdapt.memUsedPct.toFixed(1) : "n/a";
       const tmp = Number.isFinite(latestAdapt.tempC) ? latestAdapt.tempC.toFixed(1) : "n/a";
-      adaptTxt = `adapt tps=${tps} cpu=${cpu}% mem=${mem}% temp=${tmp}°C`;
+      adaptTxt = ` | adapt tps=${tps} cpu=${cpu}% mem=${mem}% temp=${tmp}°C`;
     }
 
     const progress =
@@ -296,7 +272,7 @@ function drawFrame(frame, stats) {
         `best len=${best.len} score=${best.score} ret=${fmt(best.ret, 2)}`
         : "";
 
-    info.textContent = live + memTxt + (adaptTxt ? ` | ${adaptTxt}` : "") + progress;
+    info.textContent = live + memTxt + adaptTxt + progress;
   }
 }
 
@@ -307,40 +283,24 @@ function unwrap(msg) {
   const topic = msg.topic;
   const payload = msg.payload;
 
-  if (topic === "max7219/frame" && payload?.rows) {
-    return { topic, frame: payload, stats: msg.stats };
-  }
-  if (topic === "snake/episode" && payload) {
-    return { topic, payload };
-  }
-  if (topic === "snake/info" && payload) {
-    return { topic, payload };
-  }
-  if ((topic === "sys/stats" || topic === "system/stats" || topic === "host/stats") && payload) {
-    return { topic: "sys/stats", payload };
-  }
+  // Direct
+  if (topic === "max7219/frame" && payload?.rows) return { topic, frame: payload, stats: msg.stats };
+  if (topic === "snake/episode" && payload) return { topic, payload };
+  if (topic === "snake/info" && payload) return { topic, payload };
+  if ((topic === "sys/stats" || topic === "system/stats" || topic === "host/stats") && payload) return { topic: "sys/stats", payload };
 
-  // Nested
+  // Nested (json node etc.)
   const o = payload;
-  if (o?.topic === "max7219/frame" && o?.payload?.rows) {
-    return { topic: o.topic, frame: o.payload, stats: o.stats };
-  }
-  if (o?.topic === "snake/episode" && o?.payload) {
-    return { topic: o.topic, payload: o.payload };
-  }
-  if (o?.topic === "snake/info" && o?.payload) {
-    return { topic: o.topic, payload: o.payload };
-  }
-  if ((o?.topic === "sys/stats" || o?.topic === "system/stats" || o?.topic === "host/stats") && o?.payload) {
-    return { topic: "sys/stats", payload: o.payload };
-  }
+  if (o?.topic === "max7219/frame" && o?.payload?.rows) return { topic: o.topic, frame: o.payload, stats: o.stats };
+  if (o?.topic === "snake/episode" && o?.payload) return { topic: o.topic, payload: o.payload };
+  if (o?.topic === "snake/info" && o?.payload) return { topic: o.topic, payload: o.payload };
+  if ((o?.topic === "sys/stats" || o?.topic === "system/stats" || o?.topic === "host/stats") && o?.payload) return { topic: "sys/stats", payload: o.payload };
 
   return null;
 }
 
 function handleEpisode(ep) {
   if (!ep) return;
-  latestEp = ep;
 
   if (Number.isFinite(ep.len)) best.len = Math.max(best.len, ep.len);
   if (Number.isFinite(ep.score)) best.score = Math.max(best.score, ep.score);
@@ -350,6 +310,7 @@ function handleEpisode(ep) {
   if (Number.isFinite(ep.score)) pushHist(hist.score, ep.score);
   if (Number.isFinite(ep.epReturn)) pushHist(hist.ret, ep.epReturn);
 
+  // If we currently have no frame, still show progress text
   if (info && !latestFrame) {
     info.textContent =
       `ep=${ep.episode} steps=${ep.totalSteps} eps=${ep.eps} len=${ep.len} bestLen=${ep.bestLen} score=${ep.score} ret=${fmt(ep.epReturn, 2)}` +
@@ -359,7 +320,7 @@ function handleEpisode(ep) {
 }
 
 function normalizeTrainerMem(p) {
-  const tfT = p.tfNumTensors ?? p.tfT ?? p.tfTensors ?? p.tfNumT ?? null;
+  const tfT = p.tfNumTensors ?? p.tfT ?? p.tfTensors ?? null;
   const tfMB = p.tfNumBytesMB ?? p.tfMB ?? p.tfMemMB ?? null;
   const heapMB = p.heapUsedMB ?? p.heapMB ?? null;
   const rssMB = p.rssMB ?? p.rss ?? null;
@@ -381,8 +342,8 @@ function handleInfoPayload(p) {
 
   if (p.msg === "mem") {
     latestMem = normalizeTrainerMem(p);
-    updateMemHud();        // <-- immediate
-    scheduleDraw();        // <-- keep canvas/info fresh
+    updateMemHud(); // IMPORTANT: update container immediately (old behavior)
+    if (latestFrame) scheduleDraw();
     return;
   }
 
@@ -394,16 +355,15 @@ function handleInfoPayload(p) {
       tempC: Number.isFinite(p.tempC) ? p.tempC : null,
       ts: Date.now(),
     };
-    scheduleDraw();
+    if (latestFrame) scheduleDraw();
     return;
   }
 
-  // Sometimes mem may be sent without msg==="mem"
+  // Fallback: direct mem fields without msg==="mem"
   if (Number.isFinite(p.tfNumTensors) || Number.isFinite(p.tfNumBytesMB)) {
     latestMem = normalizeTrainerMem(p);
-    updateMemHud();        // <-- immediate
-    scheduleDraw();
-    return;
+    updateMemHud(); // IMPORTANT
+    if (latestFrame) scheduleDraw();
   }
 }
 
@@ -426,8 +386,8 @@ function handleSysStatsPayload(p) {
     tempC: Number.isFinite(tempC) ? tempC : null,
   };
 
-  updateSysHud();          // <-- immediate
-  scheduleDraw();
+  // IMPORTANT: update container immediately (this is the "older working" behavior)
+  updateSysHud();
 }
 
 // ------- smooth rendering: latest wins + requestAnimationFrame -------
@@ -438,11 +398,7 @@ function scheduleDraw() {
   scheduled = true;
   requestAnimationFrame(() => {
     scheduled = false;
-    if (!latestFrame) {
-      // Even without frames, keep HUD fresh
-      refreshHudOnly();
-      return;
-    }
+    if (!latestFrame) return;
     drawFrame(latestFrame.frame, latestFrame.stats);
   });
 }
@@ -453,10 +409,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   console.log("UI ready: waiting for messages…");
 
-  // Periodic HUD refresh so age/dots remain alive even when no messages
+  // Optional: keeps age/dot ticking even when messages pause (lightweight)
   setInterval(() => {
-    refreshHudOnly();
-  }, 250);
+    updateSysHud();
+    updateMemHud();
+  }, 500);
 
   uibuilder.onChange("msg", (msg) => {
     const u = unwrap(msg);
@@ -470,7 +427,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (u.topic === "snake/episode") {
       handleEpisode(u.payload);
-      scheduleDraw();
+      if (latestFrame) scheduleDraw();
       return;
     }
 
