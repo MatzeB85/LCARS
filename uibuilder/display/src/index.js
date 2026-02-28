@@ -62,6 +62,11 @@ let elTfTensorsVal,
   elHeapBar,
   elRssBar;
 
+// Trainer Memory status / age
+let elMemAge,
+  elMemDot,
+  elMemStatus;
+
 // latest system metrics
 let latestSys = null; // {cpuPct, memUsedPct, memUsedMB, memTotalMB, tempC, ts}
 
@@ -100,6 +105,9 @@ function initDom() {
   elTfBar = document.getElementById("memTfBar");
   elHeapBar = document.getElementById("memHeapBar");
   elRssBar = document.getElementById("memRssBar");
+  elMemAge = document.getElementById("memAge");
+  elMemDot = document.getElementById("memDot");
+  elMemStatus = document.getElementById("memStatus");
 
   return true;
 }
@@ -209,6 +217,21 @@ function formatMemSummary() {
 
 function updateMemHud() {
   if (!latestMem) return;
+
+  // Age + live/stale status (Trainer Memory)
+  const now = Date.now();
+  const ageMs = Number.isFinite(latestMem.ts) ? now - latestMem.ts : Infinity;
+  const stale = ageMs > 30000;
+
+  if (elMemAge) {
+    elMemAge.textContent = ageMs < 1000 ? `${ageMs}ms` : `${(ageMs / 1000).toFixed(1)}s`;
+  }
+  if (elMemDot) {
+    elMemDot.style.backgroundColor = stale ? "var(--warn)" : "var(--ok)";
+  }
+  if (elMemStatus) {
+    elMemStatus.textContent = stale ? "daten alt" : "live";
+  }
 
   // Values
   if (elTfTensorsVal) elTfTensorsVal.textContent = Number.isFinite(latestMem.tfNumTensors) ? String(latestMem.tfNumTensors) : "—";
