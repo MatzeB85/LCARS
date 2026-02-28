@@ -2481,17 +2481,33 @@
                 "t": "eq",
                 "v": "max7219/frame",
                 "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "snake/info",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "snake/memory",
+                "vt": "str"
             }
         ],
         "checkall": "true",
         "repair": false,
-        "outputs": 1,
+        "outputs": 3,
         "x": 990,
         "y": 160,
         "wires": [
             [
                 "38b7638ec98a565e",
                 "fe94baf1ad115901"
+            ],
+            [
+                "38b7638ec98a565e"
+            ],
+            [
+                "38b7638ec98a565e"
             ]
         ]
     },
@@ -2615,8 +2631,8 @@
         "stream": true,
         "addname": "topic",
         "property": "payload",
-        "x": 790,
-        "y": 80,
+        "x": 590,
+        "y": 200,
         "wires": [
             [
                 "57df4fd69aa0d9b2"

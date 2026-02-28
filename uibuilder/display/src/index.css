@@ -97,13 +97,19 @@ body {
     white-space: pre-wrap;
 }
 
-/* HUD */
-.hud {
-    width: 280px;
+/* HUD stack (right side) */
+.hud-stack {
+    width: 300px;
     position: sticky;
     top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
     align-self: flex-start;
+}
 
+/* HUD base */
+.hud {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.05));
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -169,7 +175,7 @@ body {
     transition: width 180ms linear, background-color 180ms linear;
 }
 
-/* status dot */
+/* status row */
 .hud-foot {
     margin-top: 12px;
     display: flex;
@@ -187,13 +193,22 @@ body {
     box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
 }
 
+.hud-hint {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.10);
+    font-size: 11px;
+    line-height: 1.35;
+    color: var(--muted2);
+}
+
 /* Responsive */
 @media (max-width: 900px) {
     .content {
         flex-direction: column;
     }
 
-    .hud {
+    .hud-stack {
         width: 100%;
         position: relative;
         top: auto;

@@ -1,7 +1,6 @@
+
 <!doctype html>
-<html lang="en">
-
-
+<html lang="de">
 
 <head>
     <meta charset="utf-8" />
@@ -10,7 +9,7 @@
 
     <!-- uibuilder front-end -->
     <script src="../uibuilder/vendor/socket.io/socket.io.js"></script>
-    <script src="../uibuilder/uibuilder.iife.min.js"></script>
+<script src="../uibuilder/uibuilder.iife.min.js"></script>
 
     <link rel="stylesheet" href="./index.css" />
 </head>
@@ -30,44 +29,96 @@
                 <div id="info" class="info">Warte auf Daten…</div>
             </section>
 
-            <!-- HUD -->
-            <aside id="sysHud" class="hud" aria-label="Systemdaten">
-                <div class="hud-header">
-                    <div class="hud-title">System</div>
-                    <div id="sysAge" class="hud-age">—</div>
-                </div>
+            <!-- HUD stack -->
+            <aside class="hud-stack" aria-label="Statusanzeigen">
 
-                <div class="hud-row">
-                    <div class="hud-label">CPU</div>
-                    <div class="hud-value"><span id="sysCpuVal">—</span></div>
-                </div>
-                <div class="bar">
-                    <div id="sysCpuBar" class="bar-fill"></div>
-                </div>
-
-                <div class="hud-row">
-                    <div class="hud-label">RAM</div>
-                    <div class="hud-value">
-                        <span id="sysMemVal">—</span>
-                        <span id="sysMemMB" class="hud-value-dim">—</span>
+                <!-- System HUD -->
+                <section id="sysHud" class="hud" aria-label="Systemdaten">
+                    <div class="hud-header">
+                        <div class="hud-title">System</div>
+                        <div id="sysAge" class="hud-age">—</div>
                     </div>
-                </div>
-                <div class="bar">
-                    <div id="sysMemBar" class="bar-fill"></div>
-                </div>
 
-                <div class="hud-row">
-                    <div class="hud-label">Temp</div>
-                    <div class="hud-value"><span id="sysTempVal">—</span></div>
-                </div>
-                <div class="bar">
-                    <div id="sysTempBar" class="bar-fill"></div>
-                </div>
+                    <div class="hud-row">
+                        <div class="hud-label">CPU</div>
+                        <div class="hud-value"><span id="sysCpuVal">—</span></div>
+                    </div>
+                    <div class="bar">
+                        <div id="sysCpuBar" class="bar-fill"></div>
+                    </div>
 
-                <div class="hud-foot">
-                    <span class="dot" id="sysDot"></span>
-                    <span id="sysStatus">warte…</span>
-                </div>
+                    <div class="hud-row">
+                        <div class="hud-label">RAM</div>
+                        <div class="hud-value">
+                            <span id="sysMemVal">—</span>
+                            <span id="sysMemMB" class="hud-value-dim">—</span>
+                        </div>
+                    </div>
+                    <div class="bar">
+                        <div id="sysMemBar" class="bar-fill"></div>
+                    </div>
+
+                    <div class="hud-row">
+                        <div class="hud-label">Temp</div>
+                        <div class="hud-value"><span id="sysTempVal">—</span></div>
+                    </div>
+                    <div class="bar">
+                        <div id="sysTempBar" class="bar-fill"></div>
+                    </div>
+
+                    <div class="hud-foot">
+                        <span class="dot" id="sysDot"></span>
+                        <span id="sysStatus">warte…</span>
+                    </div>
+                </section>
+
+                <!-- Trainer Memory HUD -->
+                <section id="memHud" class="hud" aria-label="Trainer Speicher">
+                    <div class="hud-header">
+                        <div class="hud-title">Trainer Memory</div>
+                        <div class="hud-age" id="memAge">—</div>
+                    </div>
+
+                    <div class="hud-row">
+                        <div class="hud-label">TF Tensors</div>
+                        <div class="hud-value"><span id="memTfTensorsVal">—</span></div>
+                    </div>
+
+                    <div class="hud-row">
+                        <div class="hud-label">TF Memory</div>
+                        <div class="hud-value"><span id="memTfMemVal">—</span></div>
+                    </div>
+                    <div class="bar">
+                        <div id="memTfBar" class="bar-fill"></div>
+                    </div>
+
+                    <div class="hud-row">
+                        <div class="hud-label">JS Heap</div>
+                        <div class="hud-value"><span id="memHeapVal">—</span></div>
+                    </div>
+                    <div class="bar">
+                        <div id="memHeapBar" class="bar-fill"></div>
+                    </div>
+
+                    <div class="hud-row">
+                        <div class="hud-label">RSS</div>
+                        <div class="hud-value"><span id="memRssVal">—</span></div>
+                    </div>
+                    <div class="bar">
+                        <div id="memRssBar" class="bar-fill"></div>
+                    </div>
+
+                    <div class="hud-foot">
+                        <span class="dot" id="memDot"></span>
+                        <span id="memStatus">warte…</span>
+                    </div>
+
+                    <div class="hud-hint">
+                        Leak-Hinweis: Wenn <b>TF Tensors</b> oder <b>TF Memory</b> ohne Plateau steigt → Tensor-Leak.
+                        Wenn <b>JS Heap</b> steigt → JS-Leak. Nur <b>RSS</b> steigt → eher native/allocator/caching.
+                    </div>
+                </section>
+
             </aside>
         </main>
     </div>
