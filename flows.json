@@ -2406,7 +2406,7 @@
         "id": "f8a493e36579018c",
         "type": "exec",
         "z": "0e584f7610b443dd",
-        "command": "node /home/matze/.node-red/snake-runner.js \\   --tickms 10 \\   --emitevery 6 \\   --emitms 120 \\   --eps0 1.0 \\   --eps1 0.10 \\   --epsdecay 150000 \\   --maxpend 2000",
+        "command": "node /home/matze/.node-red/snake-runner.js \\   --tickms 10 \\    --emitms 30 \\   --eps0 1.0 \\   --eps1 0.10 \\   --epsdecay 150000 \\   --maxpend 2000",
         "addpay": "",
         "append": "",
         "useSpawn": "true",
@@ -2414,7 +2414,7 @@
         "winHide": false,
         "oldrc": false,
         "name": "",
-        "x": 790,
+        "x": 740,
         "y": 640,
         "wires": [
             [
