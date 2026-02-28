@@ -2742,5 +2742,49 @@
                 "dbd6a8e7f5f301b6"
             ]
         ]
+    },
+    {
+        "id": "3ae67f1a31737f09",
+        "type": "exec",
+        "z": "0e584f7610b443dd",
+        "command": "node /home/matze/.node-red/sys-metrics.js",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 450,
+        "y": 800,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "c4f6c11acb5fea95",
+        "type": "inject",
+        "z": "0e584f7610b443dd",
+        "name": "spawn",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 110,
+        "y": 800,
+        "wires": [
+            [
+                "3ae67f1a31737f09"
+            ]
+        ]
     }
 ]
