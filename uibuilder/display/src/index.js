@@ -264,9 +264,7 @@ function updateMemHud() {
     else if (latestMem.rssMB >= 1100) rssLevel = "warn";
   }
 
-  // Stale detection
-  const age = memAgeMs();
-  const stale = Number.isFinite(age) ? age > 30000 : true;
+ 
 
   setBar(elTfBar, tf01, stale ? null : tfLevel);
   setBar(elHeapBar, heap01, stale ? null : heapLevel);
