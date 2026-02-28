@@ -2414,7 +2414,7 @@
         "winHide": false,
         "oldrc": false,
         "name": "",
-        "x": 740,
+        "x": 720,
         "y": 640,
         "wires": [
             [
