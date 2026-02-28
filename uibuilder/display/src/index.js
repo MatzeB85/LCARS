@@ -37,9 +37,15 @@ function resetProgress(reason = "") {
   if (reason) console.log(`Progress reset: ${reason}`);
 }
 
-// ------- DOM (init after DOMContentLoaded to avoid null errors) -------
+// ------- DOM -------
 let canvas, ctx, info;
 const scale = 12;
+
+// HUD elements
+let elCpuVal, elMemVal, elMemMB, elTempVal, elCpuBar, elMemBar, elTempBar, elSysAge, elSysDot, elSysStatus;
+
+// latest system metrics
+let latestSys = null; // {cpuPct, memUsedPct, memUsedMB, memTotalMB, tempC, ts}
 
 function initDom() {
   canvas = document.getElementById("matrix");
@@ -50,12 +56,92 @@ function initDom() {
     return false;
   }
   ctx = canvas.getContext("2d");
+
+  // HUD elements
+  elCpuVal = document.getElementById("sysCpuVal");
+  elMemVal = document.getElementById("sysMemVal");
+  elMemMB = document.getElementById("sysMemMB");
+  elTempVal = document.getElementById("sysTempVal");
+  elCpuBar = document.getElementById("sysCpuBar");
+  elMemBar = document.getElementById("sysMemBar");
+  elTempBar = document.getElementById("sysTempBar");
+  elSysAge = document.getElementById("sysAge");
+  elSysDot = document.getElementById("sysDot");
+  elSysStatus = document.getElementById("sysStatus");
+
   return true;
 }
 
 function setSize(w, h) {
   canvas.width = w * scale;
   canvas.height = h * scale;
+}
+
+function clamp01(x) {
+  return Math.max(0, Math.min(1, x));
+}
+function setBar(el, pct01, level) {
+  if (!el) return;
+  const w = `${Math.round(clamp01(pct01) * 100)}%`;
+  el.style.width = w;
+
+  // levels -> colors via inline style (CSS vars)
+  if (level === "ok") el.style.backgroundColor = "var(--ok)";
+  else if (level === "warn") el.style.backgroundColor = "var(--warn)";
+  else if (level === "bad") el.style.backgroundColor = "var(--bad)";
+  else if (level === "cold") el.style.backgroundColor = "var(--cold)";
+  else el.style.backgroundColor = "var(--muted2)";
+}
+
+function updateHud() {
+  if (!latestSys) return;
+
+  const now = Date.now();
+  const ageMs = now - (latestSys.ts || now);
+  const ageTxt = ageMs < 1000 ? `${ageMs}ms` : `${(ageMs / 1000).toFixed(1)}s`;
+  if (elSysAge) elSysAge.textContent = `vor ${ageTxt}`;
+
+  const stale = ageMs > 3000;
+
+  // CPU
+  if (elCpuVal) elCpuVal.textContent = Number.isFinite(latestSys.cpuPct) ? `${latestSys.cpuPct.toFixed(1)}%` : "n/a";
+  const cpu01 = Number.isFinite(latestSys.cpuPct) ? latestSys.cpuPct / 100 : 0;
+  let cpuLevel = "ok";
+  if (latestSys.cpuPct >= 85) cpuLevel = "bad";
+  else if (latestSys.cpuPct >= 65) cpuLevel = "warn";
+  setBar(elCpuBar, cpu01, stale ? null : cpuLevel);
+
+  // MEM
+  if (elMemVal) elMemVal.textContent = Number.isFinite(latestSys.memUsedPct) ? `${latestSys.memUsedPct.toFixed(1)}%` : "n/a";
+  if (elMemMB) {
+    if (Number.isFinite(latestSys.memUsedMB) && Number.isFinite(latestSys.memTotalMB)) {
+      elMemMB.textContent = `${fmtInt(latestSys.memUsedMB)}/${fmtInt(latestSys.memTotalMB)}MB`;
+    } else {
+      elMemMB.textContent = "—";
+    }
+  }
+  const mem01 = Number.isFinite(latestSys.memUsedPct) ? latestSys.memUsedPct / 100 : 0;
+  let memLevel = "ok";
+  if (latestSys.memUsedPct >= 90) memLevel = "bad";
+  else if (latestSys.memUsedPct >= 75) memLevel = "warn";
+  setBar(elMemBar, mem01, stale ? null : memLevel);
+
+  // TEMP (mapped to 0..1 with 30..85°C)
+  const t = latestSys.tempC;
+  if (elTempVal) elTempVal.textContent = Number.isFinite(t) ? `${t.toFixed(1)}°C` : "n/a";
+  let temp01 = 0;
+  if (Number.isFinite(t)) temp01 = clamp01((t - 30) / (85 - 30));
+  let tempLevel = "cold";
+  if (Number.isFinite(t)) {
+    tempLevel = "ok";
+    if (t >= 80) tempLevel = "bad";
+    else if (t >= 70) tempLevel = "warn";
+  }
+  setBar(elTempBar, temp01, stale ? null : tempLevel);
+
+  // status dot/text
+  if (elSysDot) elSysDot.style.backgroundColor = stale ? "var(--warn)" : "var(--ok)";
+  if (elSysStatus) elSysStatus.textContent = stale ? "daten alt / prüfen" : "live";
 }
 
 function drawFrame(frame, stats) {
@@ -70,7 +156,7 @@ function drawFrame(frame, stats) {
   setSize(w, h);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Snake (green): draw all bits from rows
+  // Snake
   ctx.fillStyle = "#00ff66";
   for (let y = 0; y < h; y++) {
     const row = rows[y];
@@ -87,13 +173,13 @@ function drawFrame(frame, stats) {
     }
   }
 
-  // Food (red)
+  // Food
   if (frame.food && Number.isInteger(frame.food.x) && Number.isInteger(frame.food.y)) {
     ctx.fillStyle = "#ff3355";
     ctx.fillRect(frame.food.x * scale, frame.food.y * scale, scale, scale);
   }
 
-  // Head (blue)
+  // Head
   if (frame.head && Number.isInteger(frame.head.x) && Number.isInteger(frame.head.y)) {
     ctx.fillStyle = "#00aaff";
     ctx.fillRect(frame.head.x * scale, frame.head.y * scale, scale, scale);
@@ -112,7 +198,7 @@ function drawFrame(frame, stats) {
 
     const sinceEatTxt = Number.isFinite(stats?.sinceEat) ? ` sinceEat=${fmtInt(stats.sinceEat)}` : "";
 
-    // --- feature debug (if provided by runner) ---
+    // feature debug (if provided by runner)
     const spaceF = stats?.spaceF;
     const spaceL = stats?.spaceL;
     const spaceR = stats?.spaceR;
@@ -151,28 +237,28 @@ function drawFrame(frame, stats) {
 
     const live = stats
       ? `ep=${stats.episode} steps=${stats.totalSteps} eps=${stats.eps} ` +
-        `len=${stats.len} bestLen=${stats.bestLen} score=${stats.score} ` +
-        `ret=${fmt(stats.epReturn, 2)} lag=${lagMs}ms` +
-        sinceEatTxt +
-        pipeTxt +
-        (featTxt ? ` ${featTxt}` : "")
+      `len=${stats.len} bestLen=${stats.bestLen} score=${stats.score} ` +
+      `ret=${fmt(stats.epReturn, 2)} lag=${lagMs}ms` +
+      sinceEatTxt +
+      pipeTxt +
+      (featTxt ? ` ${featTxt}` : "")
       : `lag=${lagMs}ms`;
 
     const progress =
       hist.len.length
         ? ` | avg(${WIN}) len=${fmt(avg(hist.len), 2)} score=${fmt(avg(hist.score), 2)} ret=${fmt(avg(hist.ret), 2)} ` +
-          `best len=${best.len} score=${best.score} ret=${fmt(best.ret, 2)}`
+        `best len=${best.len} score=${best.score} ret=${fmt(best.ret, 2)}`
         : "";
 
     info.textContent = live + progress;
   }
 }
 
-// ------- message unwrap (super robust) -------
+// ------- message unwrap -------
 function unwrap(msg) {
   if (!msg) return null;
 
-  // Direct format
+  // Direct
   if (msg.topic === "max7219/frame" && msg.payload?.rows) {
     return { topic: msg.topic, frame: msg.payload, stats: msg.stats };
   }
@@ -182,8 +268,11 @@ function unwrap(msg) {
   if (msg.topic === "snake/info" && msg.payload) {
     return { topic: msg.topic, payload: msg.payload };
   }
+  if (msg.topic === "sys/metrics" && msg.payload) {
+    return { topic: msg.topic, payload: msg.payload };
+  }
 
-  // Wrapped format
+  // Wrapped
   const o = msg.payload;
   if (o?.topic === "max7219/frame" && o?.payload?.rows) {
     return { topic: o.topic, frame: o.payload, stats: o.stats };
@@ -192,6 +281,9 @@ function unwrap(msg) {
     return { topic: o.topic, payload: o.payload };
   }
   if (o?.topic === "snake/info" && o?.payload) {
+    return { topic: o.topic, payload: o.payload };
+  }
+  if (o?.topic === "sys/metrics" && o?.payload) {
     return { topic: o.topic, payload: o.payload };
   }
 
@@ -239,7 +331,25 @@ function handleEpisode(ep) {
   }
 }
 
-// ------- smooth rendering: latest wins + requestAnimationFrame -------
+function handleSys(payload) {
+  if (!payload) return;
+  latestSys = {
+    cpuPct: Number.isFinite(payload.cpuPct) ? payload.cpuPct : null,
+    memUsedPct: Number.isFinite(payload.memUsedPct) ? payload.memUsedPct : null,
+    memUsedMB: Number.isFinite(payload.memUsedMB) ? payload.memUsedMB : null,
+    memTotalMB: Number.isFinite(payload.memTotalMB) ? payload.memTotalMB : null,
+    tempC: Number.isFinite(payload.tempC) ? payload.tempC : null,
+    ts: Number.isFinite(payload.ts) ? payload.ts : Date.now(),
+  };
+  updateHud();
+}
+
+// Refresh HUD age/stale indicator even if no new sys messages
+setInterval(() => {
+  if (latestSys) updateHud();
+}, 500);
+
+// ------- smooth rendering -------
 let latestFrame = null;
 let scheduled = false;
 
@@ -253,7 +363,7 @@ function scheduleDraw() {
   });
 }
 
-// ------- start after DOM is ready -------
+// ------- start -------
 document.addEventListener("DOMContentLoaded", () => {
   if (!initDom()) return;
 
@@ -277,6 +387,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (u.topic === "snake/info") {
       handleInfo(u.payload);
+      if (latestFrame) scheduleDraw();
+      return;
+    }
+
+    if (u.topic === "sys/metrics") {
+      handleSys(u.payload);
+      // refresh overlay next draw if we have a frame
       if (latestFrame) scheduleDraw();
     }
   });

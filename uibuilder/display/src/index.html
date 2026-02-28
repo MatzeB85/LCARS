@@ -1,10 +1,78 @@
 <!doctype html>
-<html lang="en"><head>
+<html lang="en">
 
-</head><body>
-    
-<canvas id="matrix" style="border:1px solid #444; image-rendering: pixelated;"></canvas>
-<div id="info"></div>
-<script src="../uibuilder/uibuilder.iife.min.js"></script>
-<script src="./index.js"></script>
-</body></html>
+
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Snake RL Monitor</title>
+
+    <!-- uibuilder front-end -->
+    <script src="../uibuilder/vendor/socket.io/socket.io.js"></script>
+    <script src="../uibuilder/uibuilder.iife.min.js"></script>
+
+    <link rel="stylesheet" href="./index.css" />
+</head>
+
+<body>
+    <div class="page">
+        <header class="topbar">
+            <div class="title">
+                <div class="h1">Snake RL</div>
+                <div class="sub">Live Monitor</div>
+            </div>
+        </header>
+
+        <main class="content">
+            <section class="left">
+                <canvas id="matrix"></canvas>
+                <div id="info" class="info">Warte auf Daten…</div>
+            </section>
+
+            <!-- HUD -->
+            <aside id="sysHud" class="hud" aria-label="Systemdaten">
+                <div class="hud-header">
+                    <div class="hud-title">System</div>
+                    <div id="sysAge" class="hud-age">—</div>
+                </div>
+
+                <div class="hud-row">
+                    <div class="hud-label">CPU</div>
+                    <div class="hud-value"><span id="sysCpuVal">—</span></div>
+                </div>
+                <div class="bar">
+                    <div id="sysCpuBar" class="bar-fill"></div>
+                </div>
+
+                <div class="hud-row">
+                    <div class="hud-label">RAM</div>
+                    <div class="hud-value">
+                        <span id="sysMemVal">—</span>
+                        <span id="sysMemMB" class="hud-value-dim">—</span>
+                    </div>
+                </div>
+                <div class="bar">
+                    <div id="sysMemBar" class="bar-fill"></div>
+                </div>
+
+                <div class="hud-row">
+                    <div class="hud-label">Temp</div>
+                    <div class="hud-value"><span id="sysTempVal">—</span></div>
+                </div>
+                <div class="bar">
+                    <div id="sysTempBar" class="bar-fill"></div>
+                </div>
+
+                <div class="hud-foot">
+                    <span class="dot" id="sysDot"></span>
+                    <span id="sysStatus">warte…</span>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <script src="./index.js"></script>
+</body>
+
+</html>
