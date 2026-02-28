@@ -2758,7 +2758,9 @@
         "x": 450,
         "y": 800,
         "wires": [
-            [],
+            [
+                "c024a8132ea2f61c"
+            ],
             [],
             []
         ]
@@ -2784,6 +2786,22 @@
         "wires": [
             [
                 "3ae67f1a31737f09"
+            ]
+        ]
+    },
+    {
+        "id": "c024a8132ea2f61c",
+        "type": "json",
+        "z": "0e584f7610b443dd",
+        "name": "",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 770,
+        "y": 780,
+        "wires": [
+            [
+                "38b7638ec98a565e"
             ]
         ]
     }
