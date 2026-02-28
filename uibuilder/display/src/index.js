@@ -166,7 +166,6 @@ function updateMemHud() {
   if (elHeapVal) elHeapVal.textContent = Number.isFinite(latestMem.heapMB) ? `${latestMem.heapMB.toFixed(1)}MB` : "—";
   if (elRssVal) elRssVal.textContent = Number.isFinite(latestMem.rssMB) ? `${latestMem.rssMB.toFixed(1)}MB` : "—";
 
-  // HUD bar scales
   const tf01 = Number.isFinite(latestMem.tfMB) ? clamp01(latestMem.tfMB / 800) : 0;
   const heap01 = Number.isFinite(latestMem.heapMB) ? clamp01(latestMem.heapMB / 1000) : 0;
   const rss01 = Number.isFinite(latestMem.rssMB) ? clamp01(latestMem.rssMB / 2000) : 0;
@@ -222,7 +221,7 @@ function drawFrame(frame, stats) {
     ctx.fillRect(frame.head.x * scale, frame.head.y * scale, scale, scale);
   }
 
-  // Info overlay: live stats + progress + mem + adapt
+  // Info overlay
   if (info) {
     const lagMs = Math.max(0, Date.now() - (frame?.ts || Date.now()));
 
@@ -236,13 +235,13 @@ function drawFrame(frame, stats) {
 
     const live = stats
       ? `ep=${stats.episode} steps=${stats.totalSteps} eps=${stats.eps} ` +
-      `len=${stats.len} bestLen=${stats.bestLen} score=${stats.score} ` +
-      `ret=${fmt(stats.epReturn, 2)} lag=${lagMs}ms ` +
-      `sinceEat=${stats.sinceEat ?? "n/a"}` +
-      pendTxt + dropTxt + trainEveryTxt +
-      `  space(F/L/R)=${fmt(stats.spaceF, 3)}/${fmt(stats.spaceL, 3)}/${fmt(stats.spaceR, 3)} ` +
-      `foodDist=${fmt(stats.foodDist, 3)} tailReach=${stats.tailReach ?? "n/a"} ` +
-      `foodReach(F/L/R)=${stats.foodReachF ?? "n/a"}/${stats.foodReachL ?? "n/a"}/${stats.foodReachR ?? "n/a"}`
+        `len=${stats.len} bestLen=${stats.bestLen} score=${stats.score} ` +
+        `ret=${fmt(stats.epReturn, 2)} lag=${lagMs}ms ` +
+        `sinceEat=${stats.sinceEat ?? "n/a"}` +
+        pendTxt + dropTxt + trainEveryTxt +
+        `  space(F/L/R)=${fmt(stats.spaceF, 3)}/${fmt(stats.spaceL, 3)}/${fmt(stats.spaceR, 3)} ` +
+        `foodDist=${fmt(stats.foodDist, 3)} tailReach=${stats.tailReach ?? "n/a"} ` +
+        `foodReach(F/L/R)=${stats.foodReachF ?? "n/a"}/${stats.foodReachL ?? "n/a"}/${stats.foodReachR ?? "n/a"}`
       : `lag=${lagMs}ms`;
 
     // MEM summary (trainer)
@@ -269,36 +268,95 @@ function drawFrame(frame, stats) {
     const progress =
       hist.len.length
         ? ` | avg(${WIN}) len=${fmt(avg(hist.len), 2)} score=${fmt(avg(hist.score), 2)} ret=${fmt(avg(hist.ret), 2)} ` +
-        `best len=${best.len} score=${best.score} ret=${fmt(best.ret, 2)}`
+          `best len=${best.len} score=${best.score} ret=${fmt(best.ret, 2)}`
         : "";
 
     info.textContent = live + memTxt + adaptTxt + progress;
   }
 }
 
-// ------- message unwrap (robust) -------
+// ------- detect/parse system stats from unknown formats -------
+function looksLikeSysObj(o) {
+  if (!o || typeof o !== "object") return false;
+  return (
+    Number.isFinite(o.cpuPct) ||
+    Number.isFinite(o.memPct) ||
+    Number.isFinite(o.tempC) ||
+    Number.isFinite(o.memUsedMB) ||
+    Number.isFinite(o.memTotalMB)
+  );
+}
+
+function parseSysTextBlock(txt) {
+  // Accepts your multiline style:
+  // CPU\n53.1%\nRAM\n20.6% 1665/8063MB\nTemp\n84.8°C\n...
+  if (typeof txt !== "string") return null;
+  const t = txt.replace(/\r/g, "");
+
+  const cpuM = t.match(/CPU\s*[\n: ]\s*([0-9]+(?:\.[0-9]+)?)\s*%/i);
+  const ramPctM = t.match(/RAM\s*[\n: ]\s*([0-9]+(?:\.[0-9]+)?)\s*%/i);
+  const ramMbM = t.match(/([0-9]+(?:\.[0-9]+)?)\s*\/\s*([0-9]+(?:\.[0-9]+)?)\s*MB/i);
+  const tempM = t.match(/Temp\s*[\n: ]\s*([0-9]+(?:\.[0-9]+)?)\s*°?C/i);
+
+  if (!cpuM && !ramPctM && !ramMbM && !tempM) return null;
+
+  const cpuPct = cpuM ? parseFloat(cpuM[1]) : null;
+  const memPct = ramPctM ? parseFloat(ramPctM[1]) : null;
+  const memUsedMB = ramMbM ? parseFloat(ramMbM[1]) : null;
+  const memTotalMB = ramMbM ? parseFloat(ramMbM[2]) : null;
+  const tempC = tempM ? parseFloat(tempM[1]) : null;
+
+  return {
+    cpuPct: Number.isFinite(cpuPct) ? cpuPct : null,
+    memPct: Number.isFinite(memPct) ? memPct : null,
+    memUsedMB: Number.isFinite(memUsedMB) ? memUsedMB : null,
+    memTotalMB: Number.isFinite(memTotalMB) ? memTotalMB : null,
+    tempC: Number.isFinite(tempC) ? tempC : null,
+    ts: Date.now(),
+  };
+}
+
+// ------- message unwrap (super robust) -------
 function unwrap(msg) {
   if (!msg) return null;
 
-  const topic = msg.topic;
-  const payload = msg.payload;
+  // direct
+  if (msg.topic === "max7219/frame" && msg.payload?.rows) return { topic: "max7219/frame", frame: msg.payload, stats: msg.stats };
+  if (msg.topic === "snake/episode" && msg.payload) return { topic: "snake/episode", payload: msg.payload };
+  if (msg.topic === "snake/info" && msg.payload) return { topic: "snake/info", payload: msg.payload };
+  if ((msg.topic === "sys/stats" || msg.topic === "system/stats" || msg.topic === "host/stats") && msg.payload) {
+    return { topic: "sys/stats", payload: msg.payload };
+  }
 
-  // Direct
-  if (topic === "max7219/frame" && payload?.rows) return { topic, frame: payload, stats: msg.stats };
-  if (topic === "snake/episode" && payload) return { topic, payload };
-  if (topic === "snake/info" && payload) return { topic, payload };
-  if ((topic === "sys/stats" || topic === "system/stats" || topic === "host/stats") && payload) return { topic: "sys/stats", payload };
+  // nested object (common with json node)
+  const o = msg.payload;
+  if (o?.topic === "max7219/frame" && o?.payload?.rows) return { topic: "max7219/frame", frame: o.payload, stats: o.stats };
+  if (o?.topic === "snake/episode" && o?.payload) return { topic: "snake/episode", payload: o.payload };
+  if (o?.topic === "snake/info" && o?.payload) return { topic: "snake/info", payload: o.payload };
+  if ((o?.topic === "sys/stats" || o?.topic === "system/stats" || o?.topic === "host/stats") && o?.payload) {
+    return { topic: "sys/stats", payload: o.payload };
+  }
 
-  // Nested (json node etc.)
-  const o = payload;
-  if (o?.topic === "max7219/frame" && o?.payload?.rows) return { topic: o.topic, frame: o.payload, stats: o.stats };
-  if (o?.topic === "snake/episode" && o?.payload) return { topic: o.topic, payload: o.payload };
-  if (o?.topic === "snake/info" && o?.payload) return { topic: o.topic, payload: o.payload };
-  if ((o?.topic === "sys/stats" || o?.topic === "system/stats" || o?.topic === "host/stats") && o?.payload) return { topic: "sys/stats", payload: o.payload };
+  // --- AUTO DETECT SYSTEM STATS even if topic differs ---
+  // 1) object itself looks like sys
+  if (looksLikeSysObj(msg.payload)) return { topic: "sys/stats", payload: msg.payload };
+  if (looksLikeSysObj(o)) return { topic: "sys/stats", payload: o };
+
+  // 2) maybe payload contains a sys/system field
+  if (msg.payload?.sys && looksLikeSysObj(msg.payload.sys)) return { topic: "sys/stats", payload: msg.payload.sys };
+  if (msg.payload?.system && looksLikeSysObj(msg.payload.system)) return { topic: "sys/stats", payload: msg.payload.system };
+  if (o?.sys && looksLikeSysObj(o.sys)) return { topic: "sys/stats", payload: o.sys };
+  if (o?.system && looksLikeSysObj(o.system)) return { topic: "sys/stats", payload: o.system };
+
+  // 3) text block style
+  const txt = typeof msg.payload === "string" ? msg.payload : (typeof o === "string" ? o : null);
+  const parsed = txt ? parseSysTextBlock(txt) : null;
+  if (parsed) return { topic: "sys/stats", payload: parsed };
 
   return null;
 }
 
+// ------- handlers -------
 function handleEpisode(ep) {
   if (!ep) return;
 
@@ -310,7 +368,6 @@ function handleEpisode(ep) {
   if (Number.isFinite(ep.score)) pushHist(hist.score, ep.score);
   if (Number.isFinite(ep.epReturn)) pushHist(hist.ret, ep.epReturn);
 
-  // If we currently have no frame, still show progress text
   if (info && !latestFrame) {
     info.textContent =
       `ep=${ep.episode} steps=${ep.totalSteps} eps=${ep.eps} len=${ep.len} bestLen=${ep.bestLen} score=${ep.score} ret=${fmt(ep.epReturn, 2)}` +
@@ -340,10 +397,15 @@ function normalizeTrainerMem(p) {
 function handleInfoPayload(p) {
   if (!p) return;
 
+  // Some flows forward system stats in snake/info
+  if (p.msg === "sys" || p.msg === "system") {
+    handleSysStatsPayload(p);
+    return;
+  }
+
   if (p.msg === "mem") {
     latestMem = normalizeTrainerMem(p);
-    updateMemHud(); // IMPORTANT: update container immediately (old behavior)
-    if (latestFrame) scheduleDraw();
+    updateMemHud();
     return;
   }
 
@@ -355,15 +417,13 @@ function handleInfoPayload(p) {
       tempC: Number.isFinite(p.tempC) ? p.tempC : null,
       ts: Date.now(),
     };
-    if (latestFrame) scheduleDraw();
     return;
   }
 
   // Fallback: direct mem fields without msg==="mem"
   if (Number.isFinite(p.tfNumTensors) || Number.isFinite(p.tfNumBytesMB)) {
     latestMem = normalizeTrainerMem(p);
-    updateMemHud(); // IMPORTANT
-    if (latestFrame) scheduleDraw();
+    updateMemHud();
   }
 }
 
@@ -386,13 +446,12 @@ function handleSysStatsPayload(p) {
     tempC: Number.isFinite(tempC) ? tempC : null,
   };
 
-  // IMPORTANT: update container immediately (this is the "older working" behavior)
+  // CRITICAL: update container immediately
   updateSysHud();
 }
 
 // ------- smooth rendering: latest wins + requestAnimationFrame -------
 let scheduled = false;
-
 function scheduleDraw() {
   if (scheduled) return;
   scheduled = true;
@@ -403,19 +462,31 @@ function scheduleDraw() {
   });
 }
 
-// ------- start after DOM is ready -------
+// ------- tiny debug logging (throttled) -------
+let dbgCount = 0;
+let dbgLast = 0;
+function dbg(msg) {
+  const now = Date.now();
+  if (now - dbgLast < 1000) return;
+  dbgLast = now;
+  if (dbgCount++ < 20) console.log("[UI msg]", msg);
+}
+
+// ------- start -------
 document.addEventListener("DOMContentLoaded", () => {
   if (!initDom()) return;
 
   console.log("UI ready: waiting for messages…");
 
-  // Optional: keeps age/dot ticking even when messages pause (lightweight)
+  // keep age/dot ticking even when messages pause
   setInterval(() => {
     updateSysHud();
     updateMemHud();
   }, 500);
 
   uibuilder.onChange("msg", (msg) => {
+    dbg(msg);
+
     const u = unwrap(msg);
     if (!u) return;
 
@@ -433,11 +504,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (u.topic === "snake/info") {
       handleInfoPayload(u.payload);
+      // mem/adapt/sys might have updated; refresh canvas line if we have frame
+      if (latestFrame) scheduleDraw();
       return;
     }
 
     if (u.topic === "sys/stats") {
       handleSysStatsPayload(u.payload);
+      // not necessary, but keeps info line fresh if you want:
+      if (latestFrame) scheduleDraw();
       return;
     }
   });
