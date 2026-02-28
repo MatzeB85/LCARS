@@ -9,17 +9,13 @@ uibuilder.start();
  * Shows:
  *  - Matrix canvas (snake + food + head)
  *  - Info line with live stats + progress avg(50) + best + MEM + adapt
- *  - Optional HUD cards (if present in HTML):
- *      System:   #sysCpuVal/#sysCpuBar, #sysMemVal/#sysMemMB/#sysMemBar, #sysTempVal/#sysTempBar, #sysAge/#sysDot/#sysStatus
- *      Trainer:  #memTfTensorsVal, #memTfMemVal/#memTfBar, #memHeapVal/#memHeapBar, #memRssVal/#memRssBar, #memAge/#memDot/#memStatus
+ *  - HUD cards in HTML (your IDs match):
+ *      System:  sysCpuVal/sysCpuBar, sysMemVal/sysMemMB/sysMemBar, sysTempVal/sysTempBar, sysAge/sysDot/sysStatus
+ *      Trainer: memTfTensorsVal, memTfMemVal/memTfBar, memHeapVal/memHeapBar, memRssVal/memRssBar, memAge/memDot/memStatus
  *
- * Topics supported:
- *  - "max7219/frame"  payload: {w,h,rows,food,head,ts}  stats: {...}
- *  - "snake/episode"  payload: {episode,totalSteps,eps,len,bestLen,score,epReturn,...}
- *  - "snake/info"     payload: {from:"trainer", msg:"mem"| "adapt" | ... }
- *    mem:   tfNumTensors/tfNumBytesMB/heapUsedMB/rssMB/replayN/ts
- *    adapt: dynMaxTrainsPerSec/procCpuPct/memUsedPct/tempC
- *  - "sys/stats" or "system/stats" or "host/stats" (optional): cpuPct, memPct, memUsedMB/memTotalMB, tempC, ts
+ * IMPORTANT FIX:
+ *  - HUD updates are no longer tied to drawFrame() only.
+ *  - We update HUD immediately on sys/mem/adapt messages + periodic refresh for age/dots.
  */
 
 const WIN = 50;
@@ -53,7 +49,10 @@ function fmtAge(ms) {
 let canvas, ctx, info;
 const scale = 12;
 
+// System HUD (your HTML IDs)
 let elSysAge, elSysDot, elSysStatus, elSysCpuVal, elSysCpuBar, elSysMemVal, elSysMemMB, elSysMemBar, elSysTempVal, elSysTempBar;
+
+// Trainer Memory HUD (your HTML IDs)
 let elTfTensorsVal, elTfMemVal, elHeapVal, elRssVal, elTfBar, elHeapBar, elRssBar;
 let elMemAge, elMemDot, elMemStatus;
 
@@ -67,7 +66,7 @@ function initDom() {
   }
   ctx = canvas.getContext("2d");
 
-  // --- System HUD (optional) ---
+  // --- System HUD ---
   elSysAge = document.getElementById("sysAge");
   elSysDot = document.getElementById("sysDot");
   elSysStatus = document.getElementById("sysStatus");
@@ -82,7 +81,7 @@ function initDom() {
   elSysTempVal = document.getElementById("sysTempVal");
   elSysTempBar = document.getElementById("sysTempBar");
 
-  // --- Trainer Memory HUD (optional) ---
+  // --- Trainer Memory HUD ---
   elTfTensorsVal = document.getElementById("memTfTensorsVal");
   elTfMemVal = document.getElementById("memTfMemVal");
   elHeapVal = document.getElementById("memHeapVal");
@@ -182,8 +181,7 @@ function updateMemHud() {
   if (elHeapVal) elHeapVal.textContent = Number.isFinite(latestMem.heapMB) ? `${latestMem.heapMB.toFixed(1)}MB` : "—";
   if (elRssVal) elRssVal.textContent = Number.isFinite(latestMem.rssMB) ? `${latestMem.rssMB.toFixed(1)}MB` : "—";
 
-  // Bars are relative scales (not absolute "true"), good enough for a HUD
-  // TF: scale 0..800MB, Heap: 0..1000MB, RSS: 0..2000MB
+  // Bars are relative scales (HUD only)
   const tf01 = Number.isFinite(latestMem.tfMB) ? clamp01(latestMem.tfMB / 800) : 0;
   const heap01 = Number.isFinite(latestMem.heapMB) ? clamp01(latestMem.heapMB / 1000) : 0;
   const rss01 = Number.isFinite(latestMem.rssMB) ? clamp01(latestMem.rssMB / 2000) : 0;
@@ -195,6 +193,12 @@ function updateMemHud() {
   setBar(elTfBar, tf01, stale ? null : tfLvl);
   setBar(elHeapBar, heap01, stale ? null : heapLvl);
   setBar(elRssBar, rss01, stale ? null : rssLvl);
+}
+
+function refreshHudOnly() {
+  // Periodic refresh so Age/Dots update even if no frames arrive
+  updateSysHud();
+  updateMemHud();
 }
 
 // ------- drawing -------
@@ -239,9 +243,8 @@ function drawFrame(frame, stats) {
     ctx.fillRect(frame.head.x * scale, frame.head.y * scale, scale, scale);
   }
 
-  // Update HUDs (if present)
-  updateMemHud();
-  updateSysHud();
+  // ALSO refresh HUD here (but not only here)
+  refreshHudOnly();
 
   // Info overlay: live stats + progress + mem + adapt
   if (info) {
@@ -284,7 +287,7 @@ function drawFrame(frame, stats) {
       const cpu = Number.isFinite(latestAdapt.procCpuPct) ? latestAdapt.procCpuPct.toFixed(1) : "n/a";
       const mem = Number.isFinite(latestAdapt.memUsedPct) ? latestAdapt.memUsedPct.toFixed(1) : "n/a";
       const tmp = Number.isFinite(latestAdapt.tempC) ? latestAdapt.tempC.toFixed(1) : "n/a";
-      adaptTxt = `  adapt tps=${tps} cpu=${cpu}% mem=${mem}% temp=${tmp}°C`;
+      adaptTxt = `adapt tps=${tps} cpu=${cpu}% mem=${mem}% temp=${tmp}°C`;
     }
 
     const progress =
@@ -301,31 +304,23 @@ function drawFrame(frame, stats) {
 function unwrap(msg) {
   if (!msg) return null;
 
-  // uibuilder typical wrapper: msg.topic + msg.payload
   const topic = msg.topic;
   const payload = msg.payload;
 
-  // Direct frame
   if (topic === "max7219/frame" && payload?.rows) {
     return { topic, frame: payload, stats: msg.stats };
   }
-
-  // Direct episode
   if (topic === "snake/episode" && payload) {
     return { topic, payload };
   }
-
-  // Direct info
   if (topic === "snake/info" && payload) {
     return { topic, payload };
   }
-
-  // Optional system stats topics
   if ((topic === "sys/stats" || topic === "system/stats" || topic === "host/stats") && payload) {
     return { topic: "sys/stats", payload };
   }
 
-  // Nested: msg.payload = { topic, payload, stats }
+  // Nested
   const o = payload;
   if (o?.topic === "max7219/frame" && o?.payload?.rows) {
     return { topic: o.topic, frame: o.payload, stats: o.stats };
@@ -345,7 +340,6 @@ function unwrap(msg) {
 
 function handleEpisode(ep) {
   if (!ep) return;
-
   latestEp = ep;
 
   if (Number.isFinite(ep.len)) best.len = Math.max(best.len, ep.len);
@@ -356,7 +350,6 @@ function handleEpisode(ep) {
   if (Number.isFinite(ep.score)) pushHist(hist.score, ep.score);
   if (Number.isFinite(ep.epReturn)) pushHist(hist.ret, ep.epReturn);
 
-  // If we currently have no frame, still show progress text
   if (info && !latestFrame) {
     info.textContent =
       `ep=${ep.episode} steps=${ep.totalSteps} eps=${ep.eps} len=${ep.len} bestLen=${ep.bestLen} score=${ep.score} ret=${fmt(ep.epReturn, 2)}` +
@@ -366,8 +359,6 @@ function handleEpisode(ep) {
 }
 
 function normalizeTrainerMem(p) {
-  // Accept both "mem" channel shapes and direct ones
-  // Prefer: tfNumTensors, tfNumBytesMB, heapUsedMB, rssMB, replayN, ts
   const tfT = p.tfNumTensors ?? p.tfT ?? p.tfTensors ?? p.tfNumT ?? null;
   const tfMB = p.tfNumBytesMB ?? p.tfMB ?? p.tfMemMB ?? null;
   const heapMB = p.heapUsedMB ?? p.heapMB ?? null;
@@ -388,10 +379,10 @@ function normalizeTrainerMem(p) {
 function handleInfoPayload(p) {
   if (!p) return;
 
-  // trainer forwarded into snake/info: {from:"trainer", msg:"mem"/"adapt", ...}
   if (p.msg === "mem") {
     latestMem = normalizeTrainerMem(p);
-    if (latestFrame) scheduleDraw();
+    updateMemHud();        // <-- immediate
+    scheduleDraw();        // <-- keep canvas/info fresh
     return;
   }
 
@@ -403,14 +394,15 @@ function handleInfoPayload(p) {
       tempC: Number.isFinite(p.tempC) ? p.tempC : null,
       ts: Date.now(),
     };
-    if (latestFrame) scheduleDraw();
+    scheduleDraw();
     return;
   }
 
-  // Sometimes mem may be sent as a dedicated object without msg==="mem"
+  // Sometimes mem may be sent without msg==="mem"
   if (Number.isFinite(p.tfNumTensors) || Number.isFinite(p.tfNumBytesMB)) {
     latestMem = normalizeTrainerMem(p);
-    if (latestFrame) scheduleDraw();
+    updateMemHud();        // <-- immediate
+    scheduleDraw();
     return;
   }
 }
@@ -418,7 +410,6 @@ function handleInfoPayload(p) {
 function handleSysStatsPayload(p) {
   if (!p) return;
 
-  // Expect a flexible shape
   const ts = p.ts ?? Date.now();
   const cpuPct = p.cpuPct ?? p.cpu ?? p.cpu_percent ?? null;
   const memPct = p.memPct ?? p.mem ?? p.ramPct ?? null;
@@ -435,7 +426,8 @@ function handleSysStatsPayload(p) {
     tempC: Number.isFinite(tempC) ? tempC : null,
   };
 
-  if (latestFrame) scheduleDraw();
+  updateSysHud();          // <-- immediate
+  scheduleDraw();
 }
 
 // ------- smooth rendering: latest wins + requestAnimationFrame -------
@@ -446,7 +438,11 @@ function scheduleDraw() {
   scheduled = true;
   requestAnimationFrame(() => {
     scheduled = false;
-    if (!latestFrame) return;
+    if (!latestFrame) {
+      // Even without frames, keep HUD fresh
+      refreshHudOnly();
+      return;
+    }
     drawFrame(latestFrame.frame, latestFrame.stats);
   });
 }
@@ -456,6 +452,11 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!initDom()) return;
 
   console.log("UI ready: waiting for messages…");
+
+  // Periodic HUD refresh so age/dots remain alive even when no messages
+  setInterval(() => {
+    refreshHudOnly();
+  }, 250);
 
   uibuilder.onChange("msg", (msg) => {
     const u = unwrap(msg);
@@ -469,7 +470,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (u.topic === "snake/episode") {
       handleEpisode(u.payload);
-      if (latestFrame) scheduleDraw();
+      scheduleDraw();
       return;
     }
 
