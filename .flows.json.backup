@@ -2727,7 +2727,7 @@
         "winHide": false,
         "oldrc": false,
         "name": "",
-        "x": 570,
+        "x": 550,
         "y": 500,
         "wires": [
             [],
