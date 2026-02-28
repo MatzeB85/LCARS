@@ -3,7 +3,25 @@
 
 uibuilder.start();
 
-// ------- progress tracking -------
+/**
+ * index.js (UIBuilder front-end)
+ *
+ * Shows:
+ *  - Matrix canvas (snake + food + head)
+ *  - Info line with live stats + progress avg(50) + best + MEM + adapt
+ *  - Optional HUD cards (if present in HTML):
+ *      System:   #sysCpuVal/#sysCpuBar, #sysMemVal/#sysMemMB/#sysMemBar, #sysTempVal/#sysTempBar, #sysAge/#sysDot/#sysStatus
+ *      Trainer:  #memTfTensorsVal, #memTfMemVal/#memTfBar, #memHeapVal/#memHeapBar, #memRssVal/#memRssBar, #memAge/#memDot/#memStatus
+ *
+ * Topics supported:
+ *  - "max7219/frame"  payload: {w,h,rows,food,head,ts}  stats: {...}
+ *  - "snake/episode"  payload: {episode,totalSteps,eps,len,bestLen,score,epReturn,...}
+ *  - "snake/info"     payload: {from:"trainer", msg:"mem"| "adapt" | ... }
+ *    mem:   tfNumTensors/tfNumBytesMB/heapUsedMB/rssMB/replayN/ts
+ *    adapt: dynMaxTrainsPerSec/procCpuPct/memUsedPct/tempC
+ *  - "sys/stats" or "system/stats" or "host/stats" (optional): cpuPct, memPct, memUsedMB/memTotalMB, tempC, ts
+ */
+
 const WIN = 50;
 const hist = { len: [], score: [], ret: [] };
 const best = { len: 0, score: 0, ret: -Infinity };
@@ -21,58 +39,23 @@ function avg(arr) {
 function fmt(n, d = 2) {
   return Number.isFinite(n) ? n.toFixed(d) : "n/a";
 }
-function fmtInt(n) {
-  return Number.isFinite(n) ? String(Math.trunc(n)) : "n/a";
+function clamp01(x) {
+  if (!Number.isFinite(x)) return 0;
+  return Math.max(0, Math.min(1, x));
 }
-
-function resetProgress(reason = "") {
-  hist.len.length = 0;
-  hist.score.length = 0;
-  hist.ret.length = 0;
-
-  best.len = 0;
-  best.score = 0;
-  best.ret = -Infinity;
-
-  if (reason) console.log(`Progress reset: ${reason}`);
+function fmtAge(ms) {
+  const m = Math.max(0, ms | 0);
+  if (m < 1000) return `${m}ms`;
+  return `${(m / 1000).toFixed(1)}s`;
 }
 
 // ------- DOM -------
 let canvas, ctx, info;
 const scale = 12;
 
-// HUD elements (System: CPU/MEM/TEMP)
-let elCpuVal,
-  elMemVal,
-  elMemMB,
-  elTempVal,
-  elCpuBar,
-  elMemBar,
-  elTempBar,
-  elSysAge,
-  elSysDot,
-  elSysStatus;
-
-// HUD elements (Trainer memory: TF/Heap/RSS)
-let elTfTensorsVal,
-  elTfMemVal,
-  elHeapVal,
-  elRssVal,
-  elTfBar,
-  elHeapBar,
-  elRssBar;
-
-// Trainer Memory status / age
-let elMemAge,
-  elMemDot,
-  elMemStatus;
-
-// latest system metrics
-let latestSys = null; // {cpuPct, memUsedPct, memUsedMB, memTotalMB, tempC, ts}
-
-// latest trainer memory metrics
-// {rssMB, heapUsedMB, heapTotalMB, externalMB, arrayBuffersMB, tfNumTensors, tfNumBytesMB, replayN, trains, ts}
-let latestMem = null;
+let elSysAge, elSysDot, elSysStatus, elSysCpuVal, elSysCpuBar, elSysMemVal, elSysMemMB, elSysMemBar, elSysTempVal, elSysTempBar;
+let elTfTensorsVal, elTfMemVal, elHeapVal, elRssVal, elTfBar, elHeapBar, elRssBar;
+let elMemAge, elMemDot, elMemStatus;
 
 function initDom() {
   canvas = document.getElementById("matrix");
@@ -84,27 +67,31 @@ function initDom() {
   }
   ctx = canvas.getContext("2d");
 
-  // System HUD (existing ids from our index.html)
-  elCpuVal = document.getElementById("sysCpuVal");
-  elMemVal = document.getElementById("sysMemVal");
-  elMemMB = document.getElementById("sysMemMB");
-  elTempVal = document.getElementById("sysTempVal");
-  elCpuBar = document.getElementById("sysCpuBar");
-  elMemBar = document.getElementById("sysMemBar");
-  elTempBar = document.getElementById("sysTempBar");
+  // --- System HUD (optional) ---
   elSysAge = document.getElementById("sysAge");
   elSysDot = document.getElementById("sysDot");
   elSysStatus = document.getElementById("sysStatus");
 
-  // Trainer Memory HUD (optional ids — only update if they exist in your HTML)
-  // If you haven't added these elements yet, it will just fall back to info-line text.
+  elSysCpuVal = document.getElementById("sysCpuVal");
+  elSysCpuBar = document.getElementById("sysCpuBar");
+
+  elSysMemVal = document.getElementById("sysMemVal");
+  elSysMemMB = document.getElementById("sysMemMB");
+  elSysMemBar = document.getElementById("sysMemBar");
+
+  elSysTempVal = document.getElementById("sysTempVal");
+  elSysTempBar = document.getElementById("sysTempBar");
+
+  // --- Trainer Memory HUD (optional) ---
   elTfTensorsVal = document.getElementById("memTfTensorsVal");
   elTfMemVal = document.getElementById("memTfMemVal");
   elHeapVal = document.getElementById("memHeapVal");
   elRssVal = document.getElementById("memRssVal");
+
   elTfBar = document.getElementById("memTfBar");
   elHeapBar = document.getElementById("memHeapBar");
   elRssBar = document.getElementById("memRssBar");
+
   elMemAge = document.getElementById("memAge");
   elMemDot = document.getElementById("memDot");
   elMemStatus = document.getElementById("memStatus");
@@ -117,160 +104,100 @@ function setSize(w, h) {
   canvas.height = h * scale;
 }
 
-function clamp01(x) {
-  return Math.max(0, Math.min(1, x));
-}
+// ------- state -------
+let latestFrame = null;   // {frame, stats}
+let latestEp = null;      // episode end payload
+let latestMem = null;     // trainer mem payload (normalized)
+let latestAdapt = null;   // trainer adapt payload (normalized)
+let latestSys = null;     // system stats payload (normalized)
 
-function setBar(el, pct01, level) {
+// ------- bars / HUD helpers -------
+function setBar(el, frac01, level /* "ok"|"warn"|"bad"|null */) {
   if (!el) return;
-  const w = `${Math.round(clamp01(pct01) * 100)}%`;
-  el.style.width = w;
-
-  // Use CSS vars defined in index.css
+  const w = Math.round(100 * clamp01(frac01));
+  el.style.width = `${w}%`;
+  if (!level) return;
   if (level === "ok") el.style.backgroundColor = "var(--ok)";
   else if (level === "warn") el.style.backgroundColor = "var(--warn)";
   else if (level === "bad") el.style.backgroundColor = "var(--bad)";
-  else if (level === "cold") el.style.backgroundColor = "var(--cold)";
-  else el.style.backgroundColor = "var(--muted2)";
 }
 
-// ===== System HUD =====
 function updateSysHud() {
   if (!latestSys) return;
 
   const now = Date.now();
-  const ageMs = now - (latestSys.ts || now);
-  const ageTxt = ageMs < 1000 ? `${ageMs}ms` : `${(ageMs / 1000).toFixed(1)}s`;
-  if (elSysAge) elSysAge.textContent = `vor ${ageTxt}`;
+  const ageMs = Number.isFinite(latestSys.ts) ? Math.max(0, now - latestSys.ts) : Infinity;
+  const stale = ageMs > 30000;
 
-  const stale = ageMs > 3000;
+  if (elSysAge) elSysAge.textContent = fmtAge(ageMs);
+  if (elSysDot) elSysDot.style.backgroundColor = stale ? "var(--warn)" : "var(--ok)";
+  if (elSysStatus) elSysStatus.textContent = stale ? "daten alt" : "live";
 
   // CPU
-  if (elCpuVal) elCpuVal.textContent = Number.isFinite(latestSys.cpuPct) ? `${latestSys.cpuPct.toFixed(1)}%` : "n/a";
-  const cpu01 = Number.isFinite(latestSys.cpuPct) ? latestSys.cpuPct / 100 : 0;
-  let cpuLevel = "ok";
-  if (latestSys.cpuPct >= 85) cpuLevel = "bad";
-  else if (latestSys.cpuPct >= 65) cpuLevel = "warn";
-  setBar(elCpuBar, cpu01, stale ? null : cpuLevel);
+  if (elSysCpuVal) elSysCpuVal.textContent = Number.isFinite(latestSys.cpuPct) ? `${latestSys.cpuPct.toFixed(1)}%` : "—";
+  if (elSysCpuBar) {
+    const cpu01 = clamp01((latestSys.cpuPct ?? 0) / 100);
+    const lvl = cpu01 < 0.65 ? "ok" : cpu01 < 0.85 ? "warn" : "bad";
+    setBar(elSysCpuBar, cpu01, stale ? null : lvl);
+  }
 
-  // MEM
-  if (elMemVal) elMemVal.textContent = Number.isFinite(latestSys.memUsedPct) ? `${latestSys.memUsedPct.toFixed(1)}%` : "n/a";
-  if (elMemMB) {
+  // RAM
+  if (elSysMemVal) elSysMemVal.textContent = Number.isFinite(latestSys.memPct) ? `${latestSys.memPct.toFixed(1)}%` : "—";
+  if (elSysMemMB) {
     if (Number.isFinite(latestSys.memUsedMB) && Number.isFinite(latestSys.memTotalMB)) {
-      elMemMB.textContent = `${fmtInt(latestSys.memUsedMB)}/${fmtInt(latestSys.memTotalMB)}MB`;
+      elSysMemMB.textContent = `${latestSys.memUsedMB.toFixed(0)}/${latestSys.memTotalMB.toFixed(0)}MB`;
     } else {
-      elMemMB.textContent = "—";
+      elSysMemMB.textContent = "—";
     }
   }
-  const mem01 = Number.isFinite(latestSys.memUsedPct) ? latestSys.memUsedPct / 100 : 0;
-  let memLevel = "ok";
-  if (latestSys.memUsedPct >= 90) memLevel = "bad";
-  else if (latestSys.memUsedPct >= 75) memLevel = "warn";
-  setBar(elMemBar, mem01, stale ? null : memLevel);
-
-  // TEMP
-  const t = latestSys.tempC;
-  if (elTempVal) elTempVal.textContent = Number.isFinite(t) ? `${t.toFixed(1)}°C` : "n/a";
-  let temp01 = 0;
-  if (Number.isFinite(t)) temp01 = clamp01((t - 30) / (85 - 30));
-  let tempLevel = "cold";
-  if (Number.isFinite(t)) {
-    tempLevel = "ok";
-    if (t >= 80) tempLevel = "bad";
-    else if (t >= 70) tempLevel = "warn";
+  if (elSysMemBar) {
+    const mem01 = clamp01((latestSys.memPct ?? 0) / 100);
+    const lvl = mem01 < 0.70 ? "ok" : mem01 < 0.85 ? "warn" : "bad";
+    setBar(elSysMemBar, mem01, stale ? null : lvl);
   }
-  setBar(elTempBar, temp01, stale ? null : tempLevel);
 
-  // status dot/text
-  if (elSysDot) elSysDot.style.backgroundColor = stale ? "var(--warn)" : "var(--ok)";
-  if (elSysStatus) elSysStatus.textContent = stale ? "daten alt / prüfen" : "live";
-}
-
-// ===== Trainer Memory HUD =====
-// We render it either in dedicated elements (if you added them), and always append summary to #info.
-function memAgeMs() {
-  if (!latestMem || !Number.isFinite(latestMem.ts)) return null;
-  return Date.now() - latestMem.ts;
-}
-
-function formatMemSummary() {
-  if (!latestMem) return "";
-  const age = memAgeMs();
-  const stale = Number.isFinite(age) ? age > 30000 : true;
-  const staleTxt = stale ? " (stale)" : "";
-
-  const tfT = Number.isFinite(latestMem.tfNumTensors) ? latestMem.tfNumTensors : null;
-  const tfMB = Number.isFinite(latestMem.tfNumBytesMB) ? latestMem.tfNumBytesMB : null;
-  const heap = Number.isFinite(latestMem.heapUsedMB) ? latestMem.heapUsedMB : null;
-  const rss = Number.isFinite(latestMem.rssMB) ? latestMem.rssMB : null;
-  const rep = Number.isFinite(latestMem.replayN) ? latestMem.replayN : null;
-
-  const parts = [];
-  if (tfT !== null) parts.push(`tfT=${tfT}`);
-  if (tfMB !== null) parts.push(`tfMB=${tfMB.toFixed(1)}`);
-  if (heap !== null) parts.push(`heapMB=${heap.toFixed(1)}`);
-  if (rss !== null) parts.push(`rssMB=${rss.toFixed(1)}`);
-  if (rep !== null) parts.push(`replay=${rep}`);
-
-  return parts.length ? ` MEM ${parts.join(" ")}${staleTxt}` : "";
+  // Temp
+  if (elSysTempVal) elSysTempVal.textContent = Number.isFinite(latestSys.tempC) ? `${latestSys.tempC.toFixed(1)}°C` : "—";
+  if (elSysTempBar) {
+    const t = latestSys.tempC;
+    const t01 = Number.isFinite(t) ? clamp01((t - 30) / 60) : 0; // map 30..90 to 0..1
+    const lvl = !Number.isFinite(t) ? "ok" : t < 70 ? "ok" : t < 80 ? "warn" : "bad";
+    setBar(elSysTempBar, t01, stale ? null : lvl);
+  }
 }
 
 function updateMemHud() {
   if (!latestMem) return;
 
-  // Age + live/stale status (Trainer Memory)
   const now = Date.now();
-  const ageMs = Number.isFinite(latestMem.ts) ? now - latestMem.ts : Infinity;
+  const ageMs = Number.isFinite(latestMem.ts) ? Math.max(0, now - latestMem.ts) : Infinity;
   const stale = ageMs > 30000;
 
-  if (elMemAge) {
-    elMemAge.textContent = ageMs < 1000 ? `${ageMs}ms` : `${(ageMs / 1000).toFixed(1)}s`;
-  }
-  if (elMemDot) {
-    elMemDot.style.backgroundColor = stale ? "var(--warn)" : "var(--ok)";
-  }
-  if (elMemStatus) {
-    elMemStatus.textContent = stale ? "daten alt" : "live";
-  }
+  if (elMemAge) elMemAge.textContent = fmtAge(ageMs);
+  if (elMemDot) elMemDot.style.backgroundColor = stale ? "var(--warn)" : "var(--ok)";
+  if (elMemStatus) elMemStatus.textContent = stale ? "daten alt" : "live";
 
-  // Values
-  if (elTfTensorsVal) elTfTensorsVal.textContent = Number.isFinite(latestMem.tfNumTensors) ? String(latestMem.tfNumTensors) : "—";
-  if (elTfMemVal) elTfMemVal.textContent = Number.isFinite(latestMem.tfNumBytesMB) ? `${latestMem.tfNumBytesMB.toFixed(1)}MB` : "—";
-  if (elHeapVal) elHeapVal.textContent = Number.isFinite(latestMem.heapUsedMB) ? `${latestMem.heapUsedMB.toFixed(1)}MB` : "—";
+  if (elTfTensorsVal) elTfTensorsVal.textContent = Number.isFinite(latestMem.tfT) ? `${Math.trunc(latestMem.tfT)}` : "—";
+  if (elTfMemVal) elTfMemVal.textContent = Number.isFinite(latestMem.tfMB) ? `${latestMem.tfMB.toFixed(1)}MB` : "—";
+  if (elHeapVal) elHeapVal.textContent = Number.isFinite(latestMem.heapMB) ? `${latestMem.heapMB.toFixed(1)}MB` : "—";
   if (elRssVal) elRssVal.textContent = Number.isFinite(latestMem.rssMB) ? `${latestMem.rssMB.toFixed(1)}MB` : "—";
 
-  // Bars: we don't know absolute limits, so we map with reasonable soft scales:
-  // TF MB: 0..800MB (soft), Heap: 0..800MB, RSS: 0..2000MB
-  const tf01 = Number.isFinite(latestMem.tfNumBytesMB) ? latestMem.tfNumBytesMB / 800 : 0;
-  const heap01 = Number.isFinite(latestMem.heapUsedMB) ? latestMem.heapUsedMB / 800 : 0;
-  const rss01 = Number.isFinite(latestMem.rssMB) ? latestMem.rssMB / 2000 : 0;
+  // Bars are relative scales (not absolute "true"), good enough for a HUD
+  // TF: scale 0..800MB, Heap: 0..1000MB, RSS: 0..2000MB
+  const tf01 = Number.isFinite(latestMem.tfMB) ? clamp01(latestMem.tfMB / 800) : 0;
+  const heap01 = Number.isFinite(latestMem.heapMB) ? clamp01(latestMem.heapMB / 1000) : 0;
+  const rss01 = Number.isFinite(latestMem.rssMB) ? clamp01(latestMem.rssMB / 2000) : 0;
 
-  // Levels: TF tensors growth is often the leak indicator -> mark warn/bad by amount
-  let tfLevel = "ok";
-  if (Number.isFinite(latestMem.tfNumBytesMB)) {
-    if (latestMem.tfNumBytesMB >= 700) tfLevel = "bad";
-    else if (latestMem.tfNumBytesMB >= 450) tfLevel = "warn";
-  }
+  const tfLvl = tf01 < 0.50 ? "ok" : tf01 < 0.75 ? "warn" : "bad";
+  const heapLvl = heap01 < 0.50 ? "ok" : heap01 < 0.75 ? "warn" : "bad";
+  const rssLvl = rss01 < 0.50 ? "ok" : rss01 < 0.75 ? "warn" : "bad";
 
-  let heapLevel = "ok";
-  if (Number.isFinite(latestMem.heapUsedMB)) {
-    if (latestMem.heapUsedMB >= 650) heapLevel = "bad";
-    else if (latestMem.heapUsedMB >= 400) heapLevel = "warn";
-  }
-
-  let rssLevel = "ok";
-  if (Number.isFinite(latestMem.rssMB)) {
-    if (latestMem.rssMB >= 1600) rssLevel = "bad";
-    else if (latestMem.rssMB >= 1100) rssLevel = "warn";
-  }
-
- 
-
-  setBar(elTfBar, tf01, stale ? null : tfLevel);
-  setBar(elHeapBar, heap01, stale ? null : heapLevel);
-  setBar(elRssBar, rss01, stale ? null : rssLevel);
+  setBar(elTfBar, tf01, stale ? null : tfLvl);
+  setBar(elHeapBar, heap01, stale ? null : heapLvl);
+  setBar(elRssBar, rss01, stale ? null : rssLvl);
 }
 
+// ------- drawing -------
 function drawFrame(frame, stats) {
   if (!canvas || !ctx) return;
 
@@ -283,7 +210,7 @@ function drawFrame(frame, stats) {
   setSize(w, h);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Snake
+  // Snake (green): draw all bits from rows
   ctx.fillStyle = "#00ff66";
   for (let y = 0; y < h; y++) {
     const row = rows[y];
@@ -300,79 +227,65 @@ function drawFrame(frame, stats) {
     }
   }
 
-  // Food
+  // Food (red)
   if (frame.food && Number.isInteger(frame.food.x) && Number.isInteger(frame.food.y)) {
     ctx.fillStyle = "#ff3355";
     ctx.fillRect(frame.food.x * scale, frame.food.y * scale, scale, scale);
   }
 
-  // Head
+  // Head (blue)
   if (frame.head && Number.isInteger(frame.head.x) && Number.isInteger(frame.head.y)) {
     ctx.fillStyle = "#00aaff";
     ctx.fillRect(frame.head.x * scale, frame.head.y * scale, scale, scale);
   }
 
-  // Info overlay
+  // Update HUDs (if present)
+  updateMemHud();
+  updateSysHud();
+
+  // Info overlay: live stats + progress + mem + adapt
   if (info) {
-    const lagMs = Date.now() - (frame?.ts || Date.now());
+    const lagMs = Math.max(0, Date.now() - (frame?.ts || Date.now()));
 
     const pending = stats?.pendingIPC;
     const dropped = stats?.droppedIPC;
-    const pipeTxt =
-      (Number.isFinite(pending) || Number.isFinite(dropped))
-        ? ` pend=${fmtInt(pending)} drop=${fmtInt(dropped)}`
-        : "";
+    const pendTxt = Number.isFinite(pending) ? ` pend=${Math.trunc(pending)}` : "";
+    const dropTxt = Number.isFinite(dropped) ? ` drop=${Math.trunc(dropped)}` : "";
 
-    const sinceEatTxt = Number.isFinite(stats?.sinceEat) ? ` sinceEat=${fmtInt(stats.sinceEat)}` : "";
-
-    // features (if provided by runner)
-    const spaceF = stats?.spaceF;
-    const spaceL = stats?.spaceL;
-    const spaceR = stats?.spaceR;
-    const foodDist = stats?.foodDist;
-    const tailReach = stats?.tailReach;
-
-    const foodReachF = stats?.foodReachF;
-    const foodReachL = stats?.foodReachL;
-    const foodReachR = stats?.foodReachR;
-
-    let featTxt = "";
-
-    const hasSpace =
-      Number.isFinite(spaceF) || Number.isFinite(spaceL) || Number.isFinite(spaceR);
-    const hasFoodDist = Number.isFinite(foodDist);
-    const hasTailReach = Number.isFinite(tailReach);
-    const hasFoodReach =
-      Number.isFinite(foodReachF) || Number.isFinite(foodReachL) || Number.isFinite(foodReachR);
-
-    if (hasSpace || hasFoodDist || hasTailReach || hasFoodReach) {
-      const sf = Number.isFinite(spaceF) ? spaceF.toFixed(3) : "n/a";
-      const sl = Number.isFinite(spaceL) ? spaceL.toFixed(3) : "n/a";
-      const sr = Number.isFinite(spaceR) ? spaceR.toFixed(3) : "n/a";
-      const fd = Number.isFinite(foodDist) ? foodDist.toFixed(3) : "n/a";
-      const tr = Number.isFinite(tailReach) ? String(tailReach | 0) : "n/a";
-
-      featTxt += ` space(F/L/R)=${sf}/${sl}/${sr} foodDist=${fd} tailReach=${tr}`;
-
-      if (hasFoodReach) {
-        const frf = Number.isFinite(foodReachF) ? String(foodReachF | 0) : "n/a";
-        const frl = Number.isFinite(foodReachL) ? String(foodReachL | 0) : "n/a";
-        const frr = Number.isFinite(foodReachR) ? String(foodReachR | 0) : "n/a";
-        featTxt += ` foodReach(F/L/R)=${frf}/${frl}/${frr}`;
-      }
-    }
-
-    const memTxt = formatMemSummary();
+    const te = stats?.trainEvery;
+    const trainEveryTxt = Number.isFinite(te) ? ` trainEvery=${Math.trunc(te)}` : "";
 
     const live = stats
       ? `ep=${stats.episode} steps=${stats.totalSteps} eps=${stats.eps} ` +
       `len=${stats.len} bestLen=${stats.bestLen} score=${stats.score} ` +
-      `ret=${fmt(stats.epReturn, 2)} lag=${lagMs}ms` +
-      sinceEatTxt +
-      pipeTxt +
-      (featTxt ? ` ${featTxt}` : "") +
-      memTxt
-      : `lag=${lagMs}ms${memTxt}`;
+      `ret=${fmt(stats.epReturn, 2)} lag=${lagMs}ms ` +
+      `sinceEat=${stats.sinceEat ?? "n/a"}` +
+      pendTxt + dropTxt + trainEveryTxt +
+      `  space(F/L/R)=${fmt(stats.spaceF, 3)}/${fmt(stats.spaceL, 3)}/${fmt(stats.spaceR, 3)} ` +
+      `foodDist=${fmt(stats.foodDist, 3)} tailReach=${stats.tailReach ?? "n/a"} ` +
+      `foodReach(F/L/R)=${stats.foodReachF ?? "n/a"}/${stats.foodReachL ?? "n/a"}/${stats.foodReachR ?? "n/a"}`
+      : `lag=${lagMs}ms`;
+
+    // MEM summary (trainer)
+    let memTxt = "";
+    if (latestMem) {
+      const tfT = Number.isFinite(latestMem.tfT) ? Math.trunc(latestMem.tfT) : "n/a";
+      const tfMB = Number.isFinite(latestMem.tfMB) ? latestMem.tfMB.toFixed(1) : "n/a";
+      const heapMB = Number.isFinite(latestMem.heapMB) ? latestMem.heapMB.toFixed(1) : "n/a";
+      const rssMB = Number.isFinite(latestMem.rssMB) ? latestMem.rssMB.toFixed(1) : "n/a";
+      const rep = Number.isFinite(latestMem.replay) ? Math.trunc(latestMem.replay) : "n/a";
+      memTxt = `  MEM tfT=${tfT} tfMB=${tfMB} heapMB=${heapMB} rssMB=${rssMB} replay=${rep}`;
+    }
+
+    // ADAPT summary (trainer)
+    let adaptTxt = "";
+    if (latestAdapt && Number.isFinite(latestAdapt.dynMaxTrainsPerSec)) {
+      const tps = Math.trunc(latestAdapt.dynMaxTrainsPerSec);
+      const cpu = Number.isFinite(latestAdapt.procCpuPct) ? latestAdapt.procCpuPct.toFixed(1) : "n/a";
+      const mem = Number.isFinite(latestAdapt.memUsedPct) ? latestAdapt.memUsedPct.toFixed(1) : "n/a";
+      const tmp = Number.isFinite(latestAdapt.tempC) ? latestAdapt.tempC.toFixed(1) : "n/a";
+      adaptTxt = `  adapt tps=${tps} cpu=${cpu}% mem=${mem}% temp=${tmp}°C`;
+    }
 
     const progress =
       hist.len.length
@@ -380,30 +293,40 @@ function drawFrame(frame, stats) {
         `best len=${best.len} score=${best.score} ret=${fmt(best.ret, 2)}`
         : "";
 
-    info.textContent = live + progress;
+    info.textContent = live + memTxt + (adaptTxt ? ` | ${adaptTxt}` : "") + progress;
   }
 }
 
-// ------- message unwrap -------
+// ------- message unwrap (robust) -------
 function unwrap(msg) {
   if (!msg) return null;
 
-  // Direct
-  if (msg.topic === "max7219/frame" && msg.payload?.rows) {
-    return { topic: msg.topic, frame: msg.payload, stats: msg.stats };
-  }
-  if (msg.topic === "snake/episode" && msg.payload) {
-    return { topic: msg.topic, payload: msg.payload };
-  }
-  if (msg.topic === "snake/info" && msg.payload) {
-    return { topic: msg.topic, payload: msg.payload };
-  }
-  if (msg.topic === "sys/metrics" && msg.payload) {
-    return { topic: msg.topic, payload: msg.payload };
+  // uibuilder typical wrapper: msg.topic + msg.payload
+  const topic = msg.topic;
+  const payload = msg.payload;
+
+  // Direct frame
+  if (topic === "max7219/frame" && payload?.rows) {
+    return { topic, frame: payload, stats: msg.stats };
   }
 
-  // Wrapped
-  const o = msg.payload;
+  // Direct episode
+  if (topic === "snake/episode" && payload) {
+    return { topic, payload };
+  }
+
+  // Direct info
+  if (topic === "snake/info" && payload) {
+    return { topic, payload };
+  }
+
+  // Optional system stats topics
+  if ((topic === "sys/stats" || topic === "system/stats" || topic === "host/stats") && payload) {
+    return { topic: "sys/stats", payload };
+  }
+
+  // Nested: msg.payload = { topic, payload, stats }
+  const o = payload;
   if (o?.topic === "max7219/frame" && o?.payload?.rows) {
     return { topic: o.topic, frame: o.payload, stats: o.stats };
   }
@@ -413,61 +336,17 @@ function unwrap(msg) {
   if (o?.topic === "snake/info" && o?.payload) {
     return { topic: o.topic, payload: o.payload };
   }
-  if (o?.topic === "sys/metrics" && o?.payload) {
-    return { topic: o.topic, payload: o.payload };
+  if ((o?.topic === "sys/stats" || o?.topic === "system/stats" || o?.topic === "host/stats") && o?.payload) {
+    return { topic: "sys/stats", payload: o.payload };
   }
 
   return null;
 }
 
-let lastEpisodeSeen = null;
-
-function handleInfo(payload) {
-  if (!payload) return;
-
-  // Reset progress on runner_start (UI only)
-  if (payload.msg === "runner_start") {
-    resetProgress("runner_start");
-    lastEpisodeSeen = null;
-
-    if (info && !latestFrame) {
-      info.textContent = "Runner gestartet – Progress zurückgesetzt.";
-    }
-  }
-
-  // Trainer memory reports: msg: "mem" (from our trainer)
-  // We support several shapes:
-  //  1) payload.msg === "mem" and payload has tfNumTensors, rssMB, heapUsedMB, tfNumBytesMB, ...
-  //  2) payload.tag exists (start/periodic/after_trains)
-  if (payload.msg === "mem" || payload.tfNumTensors !== undefined || payload.tfNumBytesMB !== undefined) {
-    latestMem = {
-      rssMB: Number.isFinite(payload.rssMB) ? payload.rssMB : null,
-      heapUsedMB: Number.isFinite(payload.heapUsedMB) ? payload.heapUsedMB : null,
-      heapTotalMB: Number.isFinite(payload.heapTotalMB) ? payload.heapTotalMB : null,
-      externalMB: Number.isFinite(payload.externalMB) ? payload.externalMB : null,
-      arrayBuffersMB: Number.isFinite(payload.arrayBuffersMB) ? payload.arrayBuffersMB : null,
-      tfNumTensors: Number.isFinite(payload.tfNumTensors) ? payload.tfNumTensors : null,
-      tfNumBytesMB: Number.isFinite(payload.tfNumBytesMB) ? payload.tfNumBytesMB : null,
-      replayN: Number.isFinite(payload.replayN) ? payload.replayN : null,
-      trains: Number.isFinite(payload.trains) ? payload.trains : null,
-      ts: Number.isFinite(payload.ts) ? payload.ts : Date.now(),
-      tag: payload.tag || payload.memTag || null,
-    };
-    updateMemHud();
-    // also refresh overlay on next draw
-    if (latestFrame) scheduleDraw();
-  }
-}
-
 function handleEpisode(ep) {
   if (!ep) return;
 
-  if (Number.isFinite(ep.episode)) {
-    if (lastEpisodeSeen !== null && ep.episode < lastEpisodeSeen) {
-      resetProgress("episode counter went backwards");
-    }
-    lastEpisodeSeen = ep.episode;
-  }
+  latestEp = ep;
 
   if (Number.isFinite(ep.len)) best.len = Math.max(best.len, ep.len);
   if (Number.isFinite(ep.score)) best.score = Math.max(best.score, ep.score);
@@ -477,36 +356,89 @@ function handleEpisode(ep) {
   if (Number.isFinite(ep.score)) pushHist(hist.score, ep.score);
   if (Number.isFinite(ep.epReturn)) pushHist(hist.ret, ep.epReturn);
 
+  // If we currently have no frame, still show progress text
   if (info && !latestFrame) {
     info.textContent =
       `ep=${ep.episode} steps=${ep.totalSteps} eps=${ep.eps} len=${ep.len} bestLen=${ep.bestLen} score=${ep.score} ret=${fmt(ep.epReturn, 2)}` +
       ` | avg(${WIN}) len=${fmt(avg(hist.len), 2)} score=${fmt(avg(hist.score), 2)} ret=${fmt(avg(hist.ret), 2)} ` +
-      `best len=${best.len} score=${best.score} ret=${fmt(best.ret, 2)}` +
-      formatMemSummary();
+      `best len=${best.len} score=${best.score} ret=${fmt(best.ret, 2)}`;
   }
 }
 
-function handleSys(payload) {
-  if (!payload) return;
-  latestSys = {
-    cpuPct: Number.isFinite(payload.cpuPct) ? payload.cpuPct : null,
-    memUsedPct: Number.isFinite(payload.memUsedPct) ? payload.memUsedPct : null,
-    memUsedMB: Number.isFinite(payload.memUsedMB) ? payload.memUsedMB : null,
-    memTotalMB: Number.isFinite(payload.memTotalMB) ? payload.memTotalMB : null,
-    tempC: Number.isFinite(payload.tempC) ? payload.tempC : null,
-    ts: Number.isFinite(payload.ts) ? payload.ts : Date.now(),
+function normalizeTrainerMem(p) {
+  // Accept both "mem" channel shapes and direct ones
+  // Prefer: tfNumTensors, tfNumBytesMB, heapUsedMB, rssMB, replayN, ts
+  const tfT = p.tfNumTensors ?? p.tfT ?? p.tfTensors ?? p.tfNumT ?? null;
+  const tfMB = p.tfNumBytesMB ?? p.tfMB ?? p.tfMemMB ?? null;
+  const heapMB = p.heapUsedMB ?? p.heapMB ?? null;
+  const rssMB = p.rssMB ?? p.rss ?? null;
+  const replay = p.replayN ?? p.replay ?? null;
+  const ts = p.ts ?? Date.now();
+
+  return {
+    tfT: Number.isFinite(tfT) ? tfT : null,
+    tfMB: Number.isFinite(tfMB) ? tfMB : null,
+    heapMB: Number.isFinite(heapMB) ? heapMB : null,
+    rssMB: Number.isFinite(rssMB) ? rssMB : null,
+    replay: Number.isFinite(replay) ? replay : null,
+    ts: Number.isFinite(ts) ? ts : Date.now(),
   };
-  updateSysHud();
 }
 
-// Refresh HUD age/stale indicator periodically
-setInterval(() => {
-  if (latestSys) updateSysHud();
-  if (latestMem) updateMemHud();
-}, 500);
+function handleInfoPayload(p) {
+  if (!p) return;
 
-// ------- smooth rendering -------
-let latestFrame = null;
+  // trainer forwarded into snake/info: {from:"trainer", msg:"mem"/"adapt", ...}
+  if (p.msg === "mem") {
+    latestMem = normalizeTrainerMem(p);
+    if (latestFrame) scheduleDraw();
+    return;
+  }
+
+  if (p.msg === "adapt") {
+    latestAdapt = {
+      dynMaxTrainsPerSec: Number.isFinite(p.dynMaxTrainsPerSec) ? p.dynMaxTrainsPerSec : null,
+      procCpuPct: Number.isFinite(p.procCpuPct) ? p.procCpuPct : null,
+      memUsedPct: Number.isFinite(p.memUsedPct) ? p.memUsedPct : null,
+      tempC: Number.isFinite(p.tempC) ? p.tempC : null,
+      ts: Date.now(),
+    };
+    if (latestFrame) scheduleDraw();
+    return;
+  }
+
+  // Sometimes mem may be sent as a dedicated object without msg==="mem"
+  if (Number.isFinite(p.tfNumTensors) || Number.isFinite(p.tfNumBytesMB)) {
+    latestMem = normalizeTrainerMem(p);
+    if (latestFrame) scheduleDraw();
+    return;
+  }
+}
+
+function handleSysStatsPayload(p) {
+  if (!p) return;
+
+  // Expect a flexible shape
+  const ts = p.ts ?? Date.now();
+  const cpuPct = p.cpuPct ?? p.cpu ?? p.cpu_percent ?? null;
+  const memPct = p.memPct ?? p.mem ?? p.ramPct ?? null;
+  const memUsedMB = p.memUsedMB ?? p.ramUsedMB ?? p.usedMB ?? null;
+  const memTotalMB = p.memTotalMB ?? p.ramTotalMB ?? p.totalMB ?? null;
+  const tempC = p.tempC ?? p.temp ?? p.temperature ?? null;
+
+  latestSys = {
+    ts: Number.isFinite(ts) ? ts : Date.now(),
+    cpuPct: Number.isFinite(cpuPct) ? cpuPct : null,
+    memPct: Number.isFinite(memPct) ? memPct : null,
+    memUsedMB: Number.isFinite(memUsedMB) ? memUsedMB : null,
+    memTotalMB: Number.isFinite(memTotalMB) ? memTotalMB : null,
+    tempC: Number.isFinite(tempC) ? tempC : null,
+  };
+
+  if (latestFrame) scheduleDraw();
+}
+
+// ------- smooth rendering: latest wins + requestAnimationFrame -------
 let scheduled = false;
 
 function scheduleDraw() {
@@ -519,7 +451,7 @@ function scheduleDraw() {
   });
 }
 
-// ------- start -------
+// ------- start after DOM is ready -------
 document.addEventListener("DOMContentLoaded", () => {
   if (!initDom()) return;
 
@@ -542,14 +474,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (u.topic === "snake/info") {
-      handleInfo(u.payload);
-      if (latestFrame) scheduleDraw();
+      handleInfoPayload(u.payload);
       return;
     }
 
-    if (u.topic === "sys/metrics") {
-      handleSys(u.payload);
-      if (latestFrame) scheduleDraw();
+    if (u.topic === "sys/stats") {
+      handleSysStatsPayload(u.payload);
+      return;
     }
   });
 });
