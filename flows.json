@@ -2676,8 +2676,8 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1260,
-        "y": 540,
+        "x": 1920,
+        "y": 880,
         "wires": []
     },
     {
@@ -2835,7 +2835,7 @@
         "type": "debug",
         "z": "0e584f7610b443dd",
         "name": "debug 3",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
