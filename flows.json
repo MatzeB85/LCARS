@@ -2416,7 +2416,7 @@
         "command": "SNAKE_MAX_TENSORS=999999 SNAKE_MAX_TFMB=999999 node --expose-gc /home/matze/.node-red/snake-runner.js \\   --tickms 20  \\ --hold 3    \\    --emitms 30 \\  --emitevery 1 \\ --eps0 1.0 \\   --eps1 0.10 \\   --epsdecay 150000 \\   --maxpend 2000",
         "addpay": "",
         "append": "",
-        "useSpawn": "true",
+        "useSpawn": "false",
         "timer": "",
         "winHide": false,
         "oldrc": false,
@@ -2908,8 +2908,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1620,
-        "y": 620,
+        "x": 1700,
+        "y": 340,
         "wires": [
             [
                 "0367071fd9ce9f91"
@@ -2933,8 +2933,8 @@
         "drop": false,
         "allowrate": false,
         "outputs": 1,
-        "x": 1900,
-        "y": 620,
+        "x": 1940,
+        "y": 480,
         "wires": [
             [
                 "02ad02e556b683d5"
@@ -2952,8 +2952,8 @@
         "noerr": 0,
         "initialize": "",
         "finalize": "",
-        "x": 2130,
-        "y": 620,
+        "x": 2230,
+        "y": 340,
         "wires": [
             []
         ]
