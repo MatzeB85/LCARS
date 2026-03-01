@@ -2837,5 +2837,91 @@
         "x": 1240,
         "y": 740,
         "wires": []
+    },
+    {
+        "id": "611056938f132e26",
+        "type": "status",
+        "z": "0e584f7610b443dd",
+        "name": "",
+        "scope": [
+            "f8a493e36579018c"
+        ],
+        "x": 100,
+        "y": 360,
+        "wires": [
+            [
+                "7afdfa4900a9bd95"
+            ]
+        ]
+    },
+    {
+        "id": "7afdfa4900a9bd95",
+        "type": "switch",
+        "z": "0e584f7610b443dd",
+        "name": "",
+        "property": "status.text",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "stopped",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 330,
+        "y": 360,
+        "wires": [
+            [
+                "d792536cd54633cc"
+            ]
+        ]
+    },
+    {
+        "id": "d792536cd54633cc",
+        "type": "delay",
+        "z": "0e584f7610b443dd",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "2",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 520,
+        "y": 360,
+        "wires": [
+            [
+                "49630bc2dd2ca473"
+            ]
+        ]
+    },
+    {
+        "id": "49630bc2dd2ca473",
+        "type": "function",
+        "z": "0e584f7610b443dd",
+        "name": "function 7",
+        "func": "\"start\"\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 420,
+        "wires": [
+            [
+                "f8a493e36579018c"
+            ]
+        ]
     }
 ]
