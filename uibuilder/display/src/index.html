@@ -1,32 +1,4 @@
 <!doctype html>
-<html lang="en"><head>
-
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="../uibuilder/images/node-blue.ico">
-
-    <title>Blank template - Node-RED UIBUILDER</title>
-    <meta name="description" content="Node-RED UIBUILDER - Blank template">
-
-    <!-- Your own CSS (defaults to loading uibuilders css)-->
-    <link type="text/css" rel="stylesheet" href="./index.css" media="all">
-
-    <!-- #region Supporting Scripts. These MUST be in the right order. Note no leading / -->
-    <script defer src="../uibuilder/uibuilder.iife.min.js">/* THE UIBUILDER LIBRARY MUST BE IN THE HTML! DO NOT REMOVE */</script>
-    <!-- <script defer src="./index.js">/* OPTIONAL: Put your custom code in that */</script> -->
-    <!-- #endregion -->
-
-</head><body>
-    
-    <h1 class="with-subtitle">Blank Template</h1>
-    <div role="doc-subtitle">Using UIBUILDER for Node-RED</div>
-
-    <!-- '#more' is used as a parent for dynamic HTML content in examples
-         Also, send {topic:"more", payload:"Hello from <b>Node-RED</b>"} to auto-display the payload -->
-    <div id="more" uib-topic="more"></div>
-
-</body></html>
-<!doctype html>
 <html lang="de">
 
 <head>
@@ -54,14 +26,6 @@
             <section class="left">
                 <canvas id="matrix"></canvas>
                 <div id="info" class="info">Warte auf Daten…</div>
-
-                <div class="logs-panel">
-                    <div class="logs-head">
-                        <div class="logs-title">Logs</div>
-                        <button id="clearLogs" class="btn">Clear</button>
-                    </div>
-                    <pre id="logs" class="logs">—</pre>
-                </div>
             </section>
 
             <!-- HUD stack -->
@@ -154,64 +118,119 @@
                     </div>
                 </section>
 
-                <!-- Training HUD -->
-                <section id="trHud" class="hud" aria-label="Training Status">
+                <!-- NEW: Training HUD -->
+                <section id="trainHud" class="hud" aria-label="Training">
                     <div class="hud-header">
                         <div class="hud-title">Training</div>
-                        <div class="hud-age" id="trAge">—</div>
+                        <div class="hud-age" id="trainAge">—</div>
                     </div>
 
                     <div class="hud-row">
                         <div class="hud-label">Replay</div>
-                        <div class="hud-value"><span id="trReplay">—</span></div>
+                        <div class="hud-value"><span id="trainReplayVal">—</span></div>
                     </div>
+
                     <div class="hud-row">
                         <div class="hud-label">Trains</div>
-                        <div class="hud-value"><span id="trTrains">—</span></div>
-                    </div>
-                    <div class="hud-row">
-                        <div class="hud-label">TPS</div>
-                        <div class="hud-value"><span id="trTPS">—</span></div>
-                    </div>
-                    <div class="hud-row">
-                        <div class="hud-label">Temp</div>
-                        <div class="hud-value"><span id="trTemp">—</span></div>
-                    </div>
-                    <div class="hud-row">
-                        <div class="hud-label">PausedHot</div>
-                        <div class="hud-value"><span id="trPaused">—</span></div>
+                        <div class="hud-value"><span id="trainTrainsVal">—</span></div>
                     </div>
 
                     <div class="hud-row">
-                        <div class="hud-label">Attempts</div>
-                        <div class="hud-value"><span id="trAttempts">—</span></div>
+                        <div class="hud-label">Attempts / Errors</div>
+                        <div class="hud-value">
+                            <span id="trainAttemptsVal">—</span>
+                            <span class="hud-value-dim" id="trainErrorsVal">—</span>
+                        </div>
                     </div>
-                    <div class="hud-row">
-                        <div class="hud-label">Errors</div>
-                        <div class="hud-value"><span id="trErrors">—</span></div>
-                    </div>
+
                     <div class="hud-row">
                         <div class="hud-label">Loss EMA</div>
-                        <div class="hud-value"><span id="trLoss">—</span></div>
+                        <div class="hud-value"><span id="trainLossVal">—</span></div>
                     </div>
-                    <div class="hud-row">
-                        <div class="hud-label">TD EMA</div>
-                        <div class="hud-value"><span id="trTD">—</span></div>
+                    <div class="bar">
+                        <div id="trainLossBar" class="bar-fill"></div>
                     </div>
 
                     <div class="hud-row">
-                        <div class="hud-label">Last Train Err</div>
-                        <div class="hud-value hud-value-dim"><span id="trLastErr">—</span></div>
+                        <div class="hud-label">TD EMA</div>
+                        <div class="hud-value"><span id="trainTdVal">—</span></div>
+                    </div>
+                    <div class="bar">
+                        <div id="trainTdBar" class="bar-fill"></div>
+                    </div>
+
+                    <div class="hud-row">
+                        <div class="hud-label">Exploration (ε)</div>
+                        <div class="hud-value">
+                            <span id="trainEpsVal">—</span>
+                            <span class="hud-value-dim" id="trainEpsTrainVal">—</span>
+                        </div>
+                    </div>
+                    <div class="bar">
+                        <div id="trainEpsBar" class="bar-fill"></div>
                     </div>
 
                     <div class="hud-foot">
-                        <span class="dot" id="trDot"></span>
-                        <span id="trStatus">warte…</span>
+                        <span class="dot" id="trainDot"></span>
+                        <span id="trainStatus">warte…</span>
                     </div>
 
                     <div class="hud-hint">
-                        Hinweis: <b>Replay</b> muss erst &gt;= Warmup/MinReplay werden, bevor <b>Trains</b> steigt.
-                        Wenn <b>Errors</b> wächst → sieh <b>Last Train Err</b> und Logs.
+                        Fortschritt: Replay & Trains sollten steigen. Loss/TD stabilisieren sich meist mit der Zeit.
+                        78–82°C ist am Limit auf RasPi 5 → ggf. TPS runter oder bessere Kühlung.
+                    </div>
+                </section>
+
+                <!-- NEW: Policy/Qualität HUD -->
+                <section id="qualHud" class="hud" aria-label="Policy und Qualität">
+                    <div class="hud-header">
+                        <div class="hud-title">Policy / Qualität</div>
+                        <div class="hud-age" id="qualAge">—</div>
+                    </div>
+
+                    <div class="hud-row">
+                        <div class="hud-label">Model vs Random</div>
+                        <div class="hud-value">
+                            <span id="qualModelFrac">—</span>
+                            <span class="hud-value-dim" id="qualRandomFrac">—</span>
+                        </div>
+                    </div>
+                    <div class="bar">
+                        <div id="qualModelBar" class="bar-fill"></div>
+                    </div>
+
+                    <div class="hud-row">
+                        <div class="hud-label">Q Max / Spread</div>
+                        <div class="hud-value">
+                            <span id="qualQMax">—</span>
+                            <span class="hud-value-dim" id="qualQSpread">—</span>
+                        </div>
+                    </div>
+
+                    <div class="hud-row">
+                        <div class="hud-label">Länge</div>
+                        <div class="hud-value">
+                            <span id="qualLen">—</span>
+                            <span class="hud-value-dim" id="qualBestLen">—</span>
+                        </div>
+                    </div>
+                    <div class="bar">
+                        <div id="qualLenBar" class="bar-fill"></div>
+                    </div>
+
+                    <div class="hud-row">
+                        <div class="hud-label">Return (Episode)</div>
+                        <div class="hud-value"><span id="qualReturn">—</span></div>
+                    </div>
+
+                    <div class="hud-foot">
+                        <span class="dot" id="qualDot"></span>
+                        <span id="qualStatus">warte…</span>
+                    </div>
+
+                    <div class="hud-hint">
+                        Wenn <b>Model-Frac</b> hochgeht und <b>BestLen</b> regelmäßig steigt → Policy wird besser.
+                        Q-Spread sehr hoch + Loss sehr niedrig kann auch Overconfidence bedeuten.
                     </div>
                 </section>
 
