@@ -2,21 +2,20 @@
 "use strict";
 
 /**
- * index.js - Snake RL Monitor UI
- * - Draws 32x8 matrix as scaled grid
- * - Shows rich HUD stats (system, memory, training, policy quality)
- * - Works with runner output topic "max7219/frame" containing payload+stats
+ * Ultra-robustes uibuilder UI:
+ * - akzeptiert viele msg-Formen (topic oben, topic in payload, frame direkt im payload)
+ * - zeigt Debug im Info-Feld (letzte Nachricht) statt "nichts"
+ * - zeichnet immer dann, wenn irgendwo rows/w/h auftauchen
  */
 
 const canvas = document.getElementById("matrix");
 const infoEl = document.getElementById("info");
-
 const ctx = canvas.getContext("2d", { alpha: false });
 
 const W = 32;
 const H = 8;
 
-// UI tuning
+// Canvas fix (falls CSS width:100% skaliert)
 const CELL = 18;
 canvas.width = W * CELL;
 canvas.height = H * CELL;
@@ -41,18 +40,12 @@ function fmtNum(x) {
     return String(Math.round(x));
 }
 
-function fmtPct(x, digits = 0) {
-    if (x == null || !Number.isFinite(x)) return "—";
-    return `${x.toFixed(digits)}%`;
-}
-
 function fmtMB(x) {
     if (x == null || !Number.isFinite(x)) return "—";
     return `${x.toFixed(0)} MB`;
 }
 
 function setDot(dotEl, level) {
-    // level: "ok" | "warn" | "bad" | "cold" | "muted"
     const map = {
         ok: "var(--ok)",
         warn: "var(--warn)",
@@ -60,10 +53,12 @@ function setDot(dotEl, level) {
         cold: "var(--cold)",
         muted: "var(--muted2)",
     };
+    if (!dotEl) return;
     dotEl.style.background = map[level] || map.muted;
 }
 
 function setBar(barEl, pct, level) {
+    if (!barEl) return;
     const p = Math.max(0, Math.min(100, Number.isFinite(pct) ? pct : 0));
     barEl.style.width = `${p}%`;
     if (level === "bad") barEl.style.background = "var(--bad)";
@@ -80,15 +75,12 @@ function clearCanvas() {
 function drawFrame(frame) {
     clearCanvas();
 
-    // frame: {w,h,rows,head,food}
-    // rows: H x 4 bytes (bitset 32)
-    // We'll draw: snake body = green, head = cold blue, food = warn
     const rows = frame?.rows;
     const head = frame?.head;
     const food = frame?.food;
 
-    // build occupancy
     const occ = new Uint8Array(W * H);
+
     if (Array.isArray(rows) && rows.length === H) {
         for (let y = 0; y < H; y++) {
             const r = rows[y];
@@ -103,17 +95,16 @@ function drawFrame(frame) {
         }
     }
 
-    // draw grid
+    // draw cells
     for (let y = 0; y < H; y++) {
         for (let x = 0; x < W; x++) {
             const idx = y * W + x;
             if (occ[idx]) {
-                ctx.fillStyle = "rgba(53, 208, 127, 0.9)";
-                ctx.fillRect(x * CELL, y * CELL, CELL - 1, CELL - 1);
+                ctx.fillStyle = "rgba(53, 208, 127, 0.9)"; // body
             } else {
                 ctx.fillStyle = "rgba(255,255,255,0.03)";
-                ctx.fillRect(x * CELL, y * CELL, CELL - 1, CELL - 1);
             }
+            ctx.fillRect(x * CELL, y * CELL, CELL - 1, CELL - 1);
         }
     }
 
@@ -130,90 +121,130 @@ function drawFrame(frame) {
     }
 }
 
+// HUD state
 let lastFrameTs = 0;
 let lastStats = null;
+let lastTrainerMem = null;
 
-function updateInfoPanel(stats) {
-    if (!stats) return;
+// ---- Extract helpers (handle many msg shapes) ----
+function safeKeys(o) {
+    if (!o || typeof o !== "object") return "";
+    return Object.keys(o).slice(0, 12).join(",");
+}
 
-    const lines = [];
-    lines.push(`Episode: ${fmtNum(stats.episode)}   Steps: ${fmtNum(stats.totalSteps)}   Mode: ${stats.mode || "—"}`);
-    lines.push(`Len: ${fmtNum(stats.len)}   BestLen: ${fmtNum(stats.bestLen)}   Score: ${fmtNum(stats.score)}   SinceEat: ${fmtNum(stats.sinceEat)}`);
-    lines.push(`Return: ${stats.epReturn != null ? stats.epReturn.toFixed(2) : "—"}   FoodDist: ${stats.foodDist != null ? stats.foodDist.toFixed(3) : "—"}`);
-    lines.push(`ε: ${stats.eps != null ? stats.eps.toFixed(3) : "—"}   ε(train): ${stats.epsTrain != null ? stats.epsTrain.toFixed(3) : "—"}`);
-    lines.push(`IPC pending: ${fmtNum(stats.pendingIPC)}   dropped: ${fmtNum(stats.droppedIPC)}   trainEvery: ${fmtNum(stats.trainEvery)}   hold: ${fmtNum(stats.hold)}`);
+function normalizeMsg(msg) {
+    // returns { topic, frame, stats, infoPayload, raw }
+    const out = { topic: null, frame: null, stats: null, infoPayload: null, raw: msg };
 
-    // trainer status summary
-    const t = stats.trainer || {};
-    const tr = [];
-    tr.push(`Trainer connected: ${t.connected ? "ja" : "nein"}`);
-    if (t.replayN != null) tr.push(`Replay=${fmtNum(t.replayN)} Trains=${fmtNum(t.trains)} TPS=${t.tps ?? "—"}`);
-    if (t.lossEma != null || t.tdAbsEma != null) tr.push(`LossEMA=${t.lossEma ?? "—"} TD-EMA=${t.tdAbsEma ?? "—"}`);
-    if (t.lastTrainErr) tr.push(`LastTrainErr=${t.lastTrainErr}`);
-    if (t.tempC != null) tr.push(`Temp=${t.tempC}°C pausedHot=${t.pausedHot ? "ja" : "nein"}`);
-    lines.push("");
-    lines.push(tr.join("   "));
+    if (!msg || typeof msg !== "object") return out;
 
-    infoEl.textContent = lines.join("\n");
+    // Common: msg.topic on root
+    let topic = msg.topic;
+
+    // Sometimes: msg.payload.topic exists (wrapped)
+    if (!topic && msg.payload && typeof msg.payload === "object" && msg.payload.topic) {
+        topic = msg.payload.topic;
+    }
+
+    out.topic = topic || null;
+
+    // Frame candidates:
+    // 1) root payload is frame
+    if (msg.payload && msg.payload.rows && msg.payload.w && msg.payload.h) {
+        out.frame = msg.payload;
+    }
+
+    // 2) wrapped: msg.payload.payload is frame
+    if (!out.frame && msg.payload && msg.payload.payload && msg.payload.payload.rows) {
+        out.frame = msg.payload.payload;
+    }
+
+    // 3) sometimes whole msg IS the frame
+    if (!out.frame && msg.rows && msg.w && msg.h) {
+        out.frame = msg;
+    }
+
+    // Stats candidates:
+    // 1) root stats
+    if (msg.stats && typeof msg.stats === "object") out.stats = msg.stats;
+
+    // 2) wrapped stats
+    if (!out.stats && msg.payload && msg.payload.stats && typeof msg.payload.stats === "object") out.stats = msg.payload.stats;
+
+    // info payload (trainer mem messages etc.)
+    if (out.topic === "snake/info") {
+        out.infoPayload = msg.payload;
+    } else if (msg.payload && msg.payload.topic === "snake/info") {
+        out.infoPayload = msg.payload.payload || msg.payload; // tolerate wrapper
+    }
+
+    return out;
+}
+
+// ---- HUD updates (keep compatible with your existing HUD elements) ----
+function updateInfoPanel(textLines) {
+    infoEl.textContent = textLines.join("\n");
 }
 
 function updateSystemHud(stats) {
     const t = stats?.trainer || {};
     const now = Date.now();
 
-    // Use trainer.tempC if present, else runner might not have it
-    const tempC = t.tempC;
-
-    // We don't have real CPU/RAM from runner by default; show what we have:
-    // - CPU: approximated from runner "adapt" messages could be wired later
-    // Here: show IPC pressure + temp as "system"
-    const cpuPct = null;
-
     const sysAge = now - (lastFrameTs || now);
-    $("sysAge").textContent = fmtAge(sysAge);
+    $("sysAge") && ($("sysAge").textContent = fmtAge(sysAge));
 
-    $("sysCpuVal").textContent = cpuPct == null ? "—" : fmtPct(cpuPct, 0);
-    setBar($("sysCpuBar"), cpuPct ?? 0, "ok");
-
-    // RAM: show as node heap/rss if available from trainer mem HUD (updated below)
-    $("sysMemVal").textContent = "—";
-    $("sysMemMB").textContent = "—";
-    setBar($("sysMemBar"), 0, "ok");
-
-    $("sysTempVal").textContent = tempC == null ? "—" : `${tempC.toFixed(1)}°C`;
+    const tempC = t.tempC;
+    $("sysTempVal") && ($("sysTempVal").textContent = tempC == null ? "—" : `${tempC.toFixed(1)}°C`);
 
     let tempPct = 0;
     let tempLevel = "ok";
     if (Number.isFinite(tempC)) {
-        // map 40..85°C => 0..100
         tempPct = Math.max(0, Math.min(100, ((tempC - 40) / 45) * 100));
         if (tempC >= 82) tempLevel = "bad";
         else if (tempC >= 75) tempLevel = "warn";
     }
     setBar($("sysTempBar"), tempPct, tempLevel);
 
+    // we don't have CPU% unless you pipe it; show IPC load instead in sysCpu
+    $("sysCpuVal") && ($("sysCpuVal").textContent = stats.pendingIPC != null ? `IPC ${fmtNum(stats.pendingIPC)}` : "—");
+    setBar($("sysCpuBar"), stats.pendingIPC != null ? Math.min(100, (stats.pendingIPC / 2000) * 100) : 0, "cold");
+
+    // memory line from trainer mem (if available)
+    if (lastTrainerMem) {
+        const heap = lastTrainerMem.heapUsedMB;
+        const rss = lastTrainerMem.rssMB;
+        $("sysMemVal") && ($("sysMemVal").textContent =
+            `${heap != null ? "Heap " + fmtMB(heap) : ""}${(heap != null && rss != null) ? " / " : ""}${rss != null ? "RSS " + fmtMB(rss) : ""}` || "—"
+        );
+        $("sysMemMB") && ($("sysMemMB").textContent = "");
+        const rssPct = rss == null ? 0 : Math.max(0, Math.min(100, (rss / 2500) * 100));
+        setBar($("sysMemBar"), rssPct, rssPct > 90 ? "warn" : "ok");
+    } else {
+        $("sysMemVal") && ($("sysMemVal").textContent = "—");
+        $("sysMemMB") && ($("sysMemMB").textContent = "—");
+        setBar($("sysMemBar"), 0, "ok");
+    }
+
     const ok = (now - lastFrameTs) < 2000;
-    setDot($("sysDot"), ok ? (tempLevel === "bad" ? "bad" : tempLevel === "warn" ? "warn" : "ok") : "muted");
-    $("sysStatus").textContent = ok ? (tempLevel === "bad" ? "heiß (Limit!)" : tempLevel === "warn" ? "warm" : "ok") : "keine Daten";
+    setDot($("sysDot"), ok ? tempLevel : "muted");
+    $("sysStatus") && ($("sysStatus").textContent = ok ? "live" : "keine Daten");
 }
 
-function updateMemHud(memMsg, stats) {
-    // memMsg comes from trainer "mem" info; stats.trainer also has some values
+function updateMemHud() {
     const now = Date.now();
-    const age = memMsg?.ts ? (now - memMsg.ts) : null;
-    $("memAge").textContent = fmtAge(age);
+    const age = lastTrainerMem?.ts ? (now - lastTrainerMem.ts) : null;
+    $("memAge") && ($("memAge").textContent = fmtAge(age));
 
-    const tfTensors = memMsg?.tfNumTensors;
-    const tfMB = memMsg?.tfNumBytesMB;
-    const heapMB = memMsg?.heapUsedMB;
-    const rssMB = memMsg?.rssMB;
+    const tfTensors = lastTrainerMem?.tfNumTensors;
+    const tfMB = lastTrainerMem?.tfNumBytesMB;
+    const heapMB = lastTrainerMem?.heapUsedMB;
+    const rssMB = lastTrainerMem?.rssMB;
 
-    $("memTfTensorsVal").textContent = tfTensors == null ? "—" : fmtNum(tfTensors);
-    $("memTfMemVal").textContent = tfMB == null ? "—" : fmtMB(tfMB);
-    $("memHeapVal").textContent = heapMB == null ? "—" : fmtMB(heapMB);
-    $("memRssVal").textContent = rssMB == null ? "—" : fmtMB(rssMB);
+    $("memTfTensorsVal") && ($("memTfTensorsVal").textContent = tfTensors == null ? "—" : fmtNum(tfTensors));
+    $("memTfMemVal") && ($("memTfMemVal").textContent = tfMB == null ? "—" : fmtMB(tfMB));
+    $("memHeapVal") && ($("memHeapVal").textContent = heapMB == null ? "—" : fmtMB(heapMB));
+    $("memRssVal") && ($("memRssVal").textContent = rssMB == null ? "—" : fmtMB(rssMB));
 
-    // bars: TF memory up to ~1400MB, heap up to 1000MB, rss up to 2500MB (rough)
     const tfPct = tfMB == null ? 0 : Math.max(0, Math.min(100, (tfMB / 1400) * 100));
     const heapPct = heapMB == null ? 0 : Math.max(0, Math.min(100, (heapMB / 1000) * 100));
     const rssPct = rssMB == null ? 0 : Math.max(0, Math.min(100, (rssMB / 2500) * 100));
@@ -224,165 +255,163 @@ function updateMemHud(memMsg, stats) {
 
     const ok = (age != null && age < 4000);
     setDot($("memDot"), ok ? "ok" : "muted");
-    $("memStatus").textContent = ok ? "live" : "warte…";
-
-    // also map some memory info into system RAM line
-    if (heapMB != null || rssMB != null) {
-        const ramLine = [];
-        if (heapMB != null) ramLine.push(`Heap ${fmtMB(heapMB)}`);
-        if (rssMB != null) ramLine.push(`RSS ${fmtMB(rssMB)}`);
-        $("sysMemVal").textContent = ramLine.join(" / ");
-        $("sysMemMB").textContent = "";
-        setBar($("sysMemBar"), rssPct || heapPct, (rssPct > 90 || heapPct > 90) ? "warn" : "ok");
-    }
+    $("memStatus") && ($("memStatus").textContent = ok ? "live" : "warte…");
 }
 
 function updateTrainHud(stats) {
     const t = stats?.trainer || {};
     const now = Date.now();
+    $("trainAge") && ($("trainAge").textContent = fmtAge(t.ageMs));
 
-    const age = t.ageMs;
-    $("trainAge").textContent = fmtAge(age);
+    $("trainReplayVal") && ($("trainReplayVal").textContent = t.replayN == null ? "—" : fmtNum(t.replayN));
+    $("trainTrainsVal") && ($("trainTrainsVal").textContent = t.trains == null ? "—" : fmtNum(t.trains));
 
-    $("trainReplayVal").textContent = t.replayN == null ? "—" : fmtNum(t.replayN);
-    $("trainTrainsVal").textContent = t.trains == null ? "—" : fmtNum(t.trains);
+    $("trainAttemptsVal") && ($("trainAttemptsVal").textContent = t.trainAttempts == null ? "—" : fmtNum(t.trainAttempts));
+    $("trainErrorsVal") && ($("trainErrorsVal").textContent = t.trainErrors == null ? "—" : `Errors ${fmtNum(t.trainErrors)}`);
 
-    $("trainAttemptsVal").textContent = t.trainAttempts == null ? "—" : fmtNum(t.trainAttempts);
-    $("trainErrorsVal").textContent = t.trainErrors == null ? "—" : `Errors ${fmtNum(t.trainErrors)}`;
+    $("trainLossVal") && ($("trainLossVal").textContent = t.lossEma == null ? "—" : String(t.lossEma));
+    $("trainTdVal") && ($("trainTdVal").textContent = t.tdAbsEma == null ? "—" : String(t.tdAbsEma));
 
-    $("trainLossVal").textContent = t.lossEma == null ? "—" : String(t.lossEma);
-    $("trainTdVal").textContent = t.tdAbsEma == null ? "—" : String(t.tdAbsEma);
-
-    // Loss bar: map 0..0.02 => 0..100 (small)
     const loss = (t.lossEma == null) ? null : Number(t.lossEma);
     const lossPct = loss == null ? 0 : Math.max(0, Math.min(100, (loss / 0.02) * 100));
-    setBar($("trainLossBar"), lossPct, lossPct > 80 ? "warn" : "ok");
+    setBar($("trainLossBar"), lossPct, lossPct > 85 ? "warn" : "ok");
 
-    // TD bar: map 0..0.3 => 0..100
     const td = (t.tdAbsEma == null) ? null : Number(t.tdAbsEma);
     const tdPct = td == null ? 0 : Math.max(0, Math.min(100, (td / 0.3) * 100));
-    setBar($("trainTdBar"), tdPct, tdPct > 85 ? "warn" : "ok");
+    setBar($("trainTdBar"), tdPct, tdPct > 90 ? "warn" : "ok");
 
-    // Epsilon values from runner stats
-    $("trainEpsVal").textContent = stats.eps == null ? "—" : `ε ${stats.eps.toFixed(3)}`;
-    $("trainEpsTrainVal").textContent = stats.epsTrain == null ? "—" : `train ${stats.epsTrain.toFixed(3)}`;
-    const epsPct = stats.eps == null ? 0 : Math.max(0, Math.min(100, stats.eps * 100));
-    setBar($("trainEpsBar"), epsPct, stats.eps != null && stats.eps > 0.4 ? "cold" : "ok");
+    $("trainEpsVal") && ($("trainEpsVal").textContent = stats.eps == null ? "—" : `ε ${stats.eps.toFixed(3)}`);
+    $("trainEpsTrainVal") && ($("trainEpsTrainVal").textContent = stats.epsTrain == null ? "—" : `train ${stats.epsTrain.toFixed(3)}`);
+    setBar($("trainEpsBar"), stats.eps == null ? 0 : stats.eps * 100, stats.eps != null && stats.eps > 0.4 ? "cold" : "ok");
 
-    // status
-    const connected = !!t.connected;
-    const errRate = (t.trainAttempts && t.trainErrors != null) ? (t.trainErrors / Math.max(1, t.trainAttempts)) : null;
     const hot = (t.tempC != null && t.tempC >= 82) || !!t.pausedHot;
-
-    let level = connected ? "ok" : "muted";
-    let text = connected ? "live" : "kein Trainer";
-
-    if (errRate != null && errRate > 0.05) { level = "warn"; text = "Fehler im Training"; }
-    if (hot) { level = "warn"; text = "Thermal nahe Limit"; }
-    if (t.pausedHot) { level = "bad"; text = "Thermal Pause"; }
-
+    let level = t.connected ? "ok" : "muted";
+    let text = t.connected ? "live" : "kein Trainer";
+    if (hot) { level = "warn"; text = t.pausedHot ? "Thermal Pause" : "Thermal nahe Limit"; }
     setDot($("trainDot"), level);
-    $("trainStatus").textContent = text;
+    $("trainStatus") && ($("trainStatus").textContent = text);
 }
 
 function updateQualityHud(stats) {
     const now = Date.now();
-    $("qualAge").textContent = fmtAge(now - (lastFrameTs || now));
+    $("qualAge") && ($("qualAge").textContent = fmtAge(now - (lastFrameTs || now)));
 
     const pol = stats?.policy || {};
     const modelFrac = pol.modelFrac;
     const randomFrac = pol.randomFrac;
 
-    $("qualModelFrac").textContent = modelFrac == null ? "—" : `Model ${(modelFrac * 100).toFixed(1)}%`;
-    $("qualRandomFrac").textContent = randomFrac == null ? "—" : `Random ${(randomFrac * 100).toFixed(1)}%`;
-
+    $("qualModelFrac") && ($("qualModelFrac").textContent = modelFrac == null ? "—" : `Model ${(modelFrac * 100).toFixed(1)}%`);
+    $("qualRandomFrac") && ($("qualRandomFrac").textContent = randomFrac == null ? "—" : `Random ${(randomFrac * 100).toFixed(1)}%`);
     setBar($("qualModelBar"), modelFrac == null ? 0 : modelFrac * 100, modelFrac != null && modelFrac < 0.5 ? "cold" : "ok");
 
-    $("qualQMax").textContent = pol.qMax == null ? "—" : `Qmax ${pol.qMax.toFixed(3)}`;
-    $("qualQSpread").textContent = pol.qSpread == null ? "—" : `spread ${pol.qSpread.toFixed(3)}`;
+    $("qualQMax") && ($("qualQMax").textContent = pol.qMax == null ? "—" : `Qmax ${pol.qMax.toFixed(3)}`);
+    $("qualQSpread") && ($("qualQSpread").textContent = pol.qSpread == null ? "—" : `spread ${pol.qSpread.toFixed(3)}`);
 
-    $("qualLen").textContent = stats.len == null ? "—" : `Len ${fmtNum(stats.len)}`;
-    $("qualBestLen").textContent = stats.bestLen == null ? "—" : `Best ${fmtNum(stats.bestLen)}`;
+    $("qualLen") && ($("qualLen").textContent = stats.len == null ? "—" : `Len ${fmtNum(stats.len)}`);
+    $("qualBestLen") && ($("qualBestLen").textContent = stats.bestLen == null ? "—" : `Best ${fmtNum(stats.bestLen)}`);
 
     const lenPct = (stats.len == null) ? 0 : Math.max(0, Math.min(100, (stats.len / (W * H)) * 100));
     setBar($("qualLenBar"), lenPct, lenPct > 70 ? "ok" : "cold");
 
-    $("qualReturn").textContent = stats.epReturn == null ? "—" : stats.epReturn.toFixed(2);
+    $("qualReturn") && ($("qualReturn").textContent = stats.epReturn == null ? "—" : stats.epReturn.toFixed(2));
 
     const ok = (now - lastFrameTs) < 2000;
     setDot($("qualDot"), ok ? "ok" : "muted");
-    $("qualStatus").textContent = ok ? "live" : "warte…";
+    $("qualStatus") && ($("qualStatus").textContent = ok ? "live" : "warte…");
 }
 
-// keep last trainer mem message
-let lastTrainerMem = null;
+// ---- Start uibuilder ----
+function boot() {
+    clearCanvas();
+    updateInfoPanel([
+        "UI gestartet.",
+        "Warte auf Daten…",
+        "",
+        "Debug-Tipp: Öffne Browser-Konsole (F12) → dort siehst du, ob Messages reinkommen."
+    ]);
 
-// --- uibuilder wiring ---
-uibuilder.start();
-
-uibuilder.onChange("msg", (msg) => {
     try {
-        if (!msg) return;
-
-        // Accept either:
-        // - msg.topic === "max7219/frame" with msg.payload + msg.stats
-        // - or msg.payload.topic embedded (some flows wrap it)
-        const topic = msg.topic || msg?.payload?.topic;
-
-        if (topic === "snake/info") {
-            // trainer info messages can include mem
-            const p = msg.payload;
-            if (p && p.msg === "mem") {
-                lastTrainerMem = p;
-            }
-            return;
-        }
-
-        if (topic === "max7219/frame") {
-            const frame = msg.payload || msg?.payload?.payload;
-            const stats = msg.stats || msg?.payload?.stats;
-
-            if (frame) {
-                drawFrame(frame);
-                lastFrameTs = frame.ts || Date.now();
-            }
-            if (stats) {
-                lastStats = stats;
-                updateInfoPanel(stats);
-                updateSystemHud(stats);
-                updateTrainHud(stats);
-                updateQualityHud(stats);
-                updateMemHud(lastTrainerMem, stats);
-            }
-            return;
-        }
-
-        // fallback: sometimes node-red sends full object into payload
-        if (msg.payload && msg.payload.rows && msg.payload.w === W && msg.payload.h === H) {
-            drawFrame(msg.payload);
-            lastFrameTs = msg.payload.ts || Date.now();
-            if (msg.stats) {
-                lastStats = msg.stats;
-                updateInfoPanel(msg.stats);
-                updateSystemHud(msg.stats);
-                updateTrainHud(msg.stats);
-                updateQualityHud(msg.stats);
-                updateMemHud(lastTrainerMem, msg.stats);
-            }
-        }
+        uibuilder.start();
     } catch (e) {
-        console.error(e);
+        updateInfoPanel([
+            "FEHLER: uibuilder.start() fehlgeschlagen",
+            String(e && (e.stack || e)),
+            "",
+            "Prüfe: script src ../uibuilder/uibuilder.iife.min.js"
+        ]);
+        return;
     }
-});
 
-// initial paint
-clearCanvas();
+    uibuilder.onChange("msg", (msg) => {
+        try {
+            const n = normalizeMsg(msg);
 
-// heartbeat: if no updates, show stale indicators
-setInterval(() => {
-    const now = Date.now();
-    if (lastStats) {
-        updateSystemHud(lastStats);
-        updateQualityHud(lastStats);
-    }
-}, 1000);
+            // Debug in console
+            console.log("uibuilder msg:", msg);
+
+            // Show last received meta ALWAYS (so you never get 'black hole' again)
+            const debugLines = [
+                `Last msg topic: ${n.topic || "—"}`,
+                `Root keys: ${safeKeys(msg) || "—"}`,
+                `Payload keys: ${safeKeys(msg?.payload) || "—"}`,
+                `Has frame: ${n.frame ? "ja" : "nein"}   Has stats: ${n.stats ? "ja" : "nein"}`,
+            ];
+
+            // Handle trainer mem info
+            if (n.topic === "snake/info" && n.infoPayload && n.infoPayload.msg === "mem") {
+                lastTrainerMem = n.infoPayload;
+                debugLines.push("Trainer mem update: ja");
+            }
+
+            // Handle frame
+            if (n.frame && n.frame.w === W && n.frame.h === H) {
+                drawFrame(n.frame);
+                lastFrameTs = n.frame.ts || Date.now();
+                debugLines.push(`Frame ts age: ${fmtAge(Date.now() - lastFrameTs)}`);
+            }
+
+            // Handle stats (prefer newest)
+            if (n.stats && typeof n.stats === "object") {
+                lastStats = n.stats;
+            }
+
+            // Update HUDs if we have stats
+            if (lastStats) {
+                updateSystemHud(lastStats);
+                updateMemHud();
+                updateTrainHud(lastStats);
+                updateQualityHud(lastStats);
+
+                debugLines.push("");
+                debugLines.push(`Episode: ${fmtNum(lastStats.episode)}  Steps: ${fmtNum(lastStats.totalSteps)}  Mode: ${lastStats.mode || "—"}`);
+                debugLines.push(`Len: ${fmtNum(lastStats.len)}  BestLen: ${fmtNum(lastStats.bestLen)}  ε: ${lastStats.eps != null ? lastStats.eps.toFixed(3) : "—"}`);
+                const t = lastStats.trainer || {};
+                debugLines.push(`Replay: ${fmtNum(t.replayN)}  Trains: ${fmtNum(t.trains)}  Errors: ${fmtNum(t.trainErrors)}  Temp: ${t.tempC != null ? t.tempC.toFixed(1) + "°C" : "—"}`);
+            }
+
+            updateInfoPanel(debugLines);
+        } catch (e) {
+            updateInfoPanel([
+                "UI FEHLER beim Verarbeiten der Nachricht:",
+                String(e && (e.stack || e)),
+                "",
+                "Wenn das hier erscheint: Topic/Payload passt, aber JS crashed irgendwo."
+            ]);
+            console.error(e);
+        }
+    });
+
+    // heartbeat: stale indicator
+    setInterval(() => {
+        if (lastStats) {
+            updateSystemHud(lastStats);
+            updateQualityHud(lastStats);
+        }
+    }, 1000);
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+} else {
+    boot();
+}
