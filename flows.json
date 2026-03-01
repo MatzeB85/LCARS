@@ -2848,9 +2848,9 @@
         "propertyType": "msg",
         "rules": [
             {
-                "t": "eq",
-                "v": "stopped",
-                "vt": "str"
+                "t": "neq",
+                "v": "0",
+                "vt": "num"
             }
         ],
         "checkall": "true",
