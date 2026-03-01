@@ -63,6 +63,13 @@
         "env": []
     },
     {
+        "id": "a1f1b2c3d4e5f6a7",
+        "type": "tab",
+        "label": "snake auto-restart (rc!=0)",
+        "disabled": false,
+        "info": ""
+    },
+    {
         "id": "776cbcab809a4f68",
         "type": "subflow",
         "name": "Testsub",
@@ -2426,7 +2433,7 @@
             ],
             [
                 "e5bb78fd6c4a7053",
-                "7afdfa4900a9bd95"
+                "92a54df6b087dc08"
             ]
         ]
     },
@@ -2840,31 +2847,6 @@
         "wires": []
     },
     {
-        "id": "7afdfa4900a9bd95",
-        "type": "switch",
-        "z": "0e584f7610b443dd",
-        "name": "",
-        "property": "status.text",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "neq",
-                "v": "0",
-                "vt": "num"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 1,
-        "x": 1530,
-        "y": 640,
-        "wires": [
-            [
-                "d792536cd54633cc"
-            ]
-        ]
-    },
-    {
         "id": "d792536cd54633cc",
         "type": "delay",
         "z": "0e584f7610b443dd",
@@ -2908,5 +2890,207 @@
                 "f8a493e36579018c"
             ]
         ]
+    },
+    {
+        "id": "92a54df6b087dc08",
+        "type": "switch",
+        "z": "0e584f7610b443dd",
+        "name": "Restart nur bei rc != 0",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1620,
+        "y": 620,
+        "wires": [
+            [
+                "0367071fd9ce9f91"
+            ]
+        ]
+    },
+    {
+        "id": "0367071fd9ce9f91",
+        "type": "delay",
+        "z": "0e584f7610b443dd",
+        "name": "Warte 5s (Anti-Loop)",
+        "pauseType": "delay",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "5",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1900,
+        "y": 620,
+        "wires": [
+            [
+                "02ad02e556b683d5"
+            ]
+        ]
+    },
+    {
+        "id": "02ad02e556b683d5",
+        "type": "function",
+        "z": "0e584f7610b443dd",
+        "name": "Trigger Start",
+        "func": "msg.payload = \"start\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 2130,
+        "y": 620,
+        "wires": [
+            [
+                "f8a493e36579018c"
+            ]
+        ]
+    },
+    {
+        "id": "exec_snake",
+        "type": "exec",
+        "z": "a1f1b2c3d4e5f6a7",
+        "command": "node --expose-gc /home/matze/.node-red/snake-runner.js",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "oldrc": false,
+        "name": "Snake Runner (spawn)",
+        "x": 380,
+        "y": 180,
+        "wires": [
+            [],
+            [],
+            [
+                "sw_restart_rc",
+                "dbg_rc"
+            ]
+        ]
+    },
+    {
+        "id": "sw_restart_rc",
+        "type": "switch",
+        "z": "a1f1b2c3d4e5f6a7",
+        "name": "Restart nur bei rc != 0",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 650,
+        "y": 180,
+        "wires": [
+            [
+                "delay_restart"
+            ]
+        ]
+    },
+    {
+        "id": "delay_restart",
+        "type": "delay",
+        "z": "a1f1b2c3d4e5f6a7",
+        "name": "Warte 5s (Anti-Loop)",
+        "pauseType": "delay",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "5",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 870,
+        "y": 180,
+        "wires": [
+            [
+                "fn_start"
+            ]
+        ]
+    },
+    {
+        "id": "fn_start",
+        "type": "function",
+        "z": "a1f1b2c3d4e5f6a7",
+        "name": "Trigger Start",
+        "func": "msg.payload = \"start\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 1040,
+        "y": 180,
+        "wires": [
+            [
+                "exec_snake"
+            ]
+        ]
+    },
+    {
+        "id": "inj_start",
+        "type": "inject",
+        "z": "a1f1b2c3d4e5f6a7",
+        "name": "Start Runner (manuell/Deploy)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0.5",
+        "topic": "",
+        "payload": "start",
+        "payloadType": "str",
+        "x": 250,
+        "y": 360,
+        "wires": [
+            [
+                "exec_snake"
+            ]
+        ]
+    },
+    {
+        "id": "dbg_rc",
+        "type": "debug",
+        "z": "a1f1b2c3d4e5f6a7",
+        "name": "Exit Code",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 640,
+        "y": 300,
+        "wires": []
     }
 ]
