@@ -2416,7 +2416,7 @@
         "command": "node --expose-gc /home/matze/.node-red/snake-runner.js \\   --tickms 20  \\ --hold 3    \\    --emitms 30 \\  --emitevery 1 \\ --eps0 1.0 \\   --eps1 0.10 \\   --epsdecay 150000 \\   --maxpend 2000",
         "addpay": "",
         "append": "",
-        "useSpawn": "false",
+        "useSpawn": "true",
         "timer": "",
         "winHide": false,
         "oldrc": false,
