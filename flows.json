@@ -2591,7 +2591,7 @@
         "reverseOrder": false,
         "mirrorX": false,
         "rotate180": false,
-        "x": 1460,
+        "x": 1500,
         "y": 80,
         "wires": []
     },
