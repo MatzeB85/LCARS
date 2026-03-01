@@ -55,19 +55,12 @@
         "env": []
     },
     {
-        "id": "0e584f7610b443dd",
+        "id": "382f42b732fc3acb",
         "type": "tab",
         "label": "snake dqn",
         "disabled": false,
         "info": "",
         "env": []
-    },
-    {
-        "id": "a1f1b2c3d4e5f6a7",
-        "type": "tab",
-        "label": "snake auto-restart (rc!=0)",
-        "disabled": false,
-        "info": ""
     },
     {
         "id": "776cbcab809a4f68",
@@ -2410,9 +2403,9 @@
         ]
     },
     {
-        "id": "f8a493e36579018c",
+        "id": "cf9bac078e8cedc7",
         "type": "exec",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "command": "/bin/bash -lc \"SNAKE_STATE_VERSION=13 SNAKE_TRAINER_PATH=/home/matze/.node-red/snake-trainer.js node --expose-gc /home/matze/.node-red/snake-runner.js --reset --tickms=20 --hold=3 --emitms=30 --emitevery=1 --eps0=1.0 --eps1=0.10 --epsdecay=150000 --maxpend=2000\"",
         "addpay": "",
         "append": "",
@@ -2425,22 +2418,22 @@
         "y": 620,
         "wires": [
             [
-                "b187ff21444315df",
-                "efc9401e26392beb"
+                "0bc14d4ec3fbe61f",
+                "d69244a0f315bd1e"
             ],
             [
-                "71263f26ac4593a7"
+                "4cb69871479f2fe2"
             ],
             [
-                "e5bb78fd6c4a7053",
-                "92a54df6b087dc08"
+                "4344eddb30ade14e",
+                "1626fb44eea63cde"
             ]
         ]
     },
     {
-        "id": "452fcc2ea71bcecc",
+        "id": "0019c17f6343d857",
         "type": "inject",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "name": "learn",
         "props": [
             {
@@ -2457,14 +2450,14 @@
         "y": 620,
         "wires": [
             [
-                "f8a493e36579018c"
+                "cf9bac078e8cedc7"
             ]
         ]
     },
     {
-        "id": "57df4fd69aa0d9b2",
+        "id": "ec157cbfea1230c1",
         "type": "json",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "name": "",
         "property": "payload",
         "action": "obj",
@@ -2473,16 +2466,16 @@
         "y": 160,
         "wires": [
             [
-                "b2df0734e5ad4dba",
-                "2f9755857a854e2e"
+                "1255fede3873919b",
+                "fd6bcda03d5d71ff"
             ]
         ]
     },
     {
-        "id": "b2df0734e5ad4dba",
+        "id": "1255fede3873919b",
         "type": "switch",
-        "z": "0e584f7610b443dd",
-        "name": "",
+        "z": "382f42b732fc3acb",
+        "name": "to UI / matrix / logs",
         "property": "payload.topic",
         "propertyType": "msg",
         "rules": [
@@ -2498,36 +2491,52 @@
             },
             {
                 "t": "eq",
-                "v": "snake/memory",
+                "v": "snake/error",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "snake/trainer_stdout",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "snake/trainer_stderr",
                 "vt": "str"
             }
         ],
         "checkall": "true",
         "repair": false,
-        "outputs": 3,
-        "x": 990,
+        "outputs": 5,
+        "x": 1010,
         "y": 160,
         "wires": [
             [
-                "38b7638ec98a565e",
-                "fe94baf1ad115901"
+                "57cf339153a7fbbf",
+                "0aba405d8aa651da"
             ],
             [
-                "38b7638ec98a565e"
+                "57cf339153a7fbbf"
             ],
             [
-                "38b7638ec98a565e"
+                "57cf339153a7fbbf"
+            ],
+            [
+                "57cf339153a7fbbf"
+            ],
+            [
+                "57cf339153a7fbbf"
             ]
         ]
     },
     {
-        "id": "38b7638ec98a565e",
+        "id": "57cf339153a7fbbf",
         "type": "uibuilder",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "name": "",
         "topic": "",
         "url": "display",
-        "okToGo": true,
+        "okToGo": false,
         "fwdInMessages": false,
         "allowScripts": false,
         "allowStyles": false,
@@ -2550,9 +2559,9 @@
         ]
     },
     {
-        "id": "fe94baf1ad115901",
+        "id": "0aba405d8aa651da",
         "type": "function",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "name": "function 6",
         "func": "// msg.payload kommt vom JSON node und ist ein Objekt:\n// { topic:\"max7219/frame\", payload:{rows:[8][4], w:32, h:8}, stats:{...} }\n\nfunction reverseByte(b) {\n    b &= 0xFF;\n    b = ((b & 0xF0) >> 4) | ((b & 0x0F) << 4);\n    b = ((b & 0xCC) >> 2) | ((b & 0x33) << 2);\n    b = ((b & 0xAA) >> 1) | ((b & 0x55) << 1);\n    return b & 0xFF;\n}\n\nconst obj = msg.payload;\nif (!obj || obj.topic !== \"max7219/frame\" || !obj.payload || !obj.payload.rows) return null;\n\nconst rows = obj.payload.rows;\n\n// Du hast MirrorX=true am max7219-raw.\n// Der Treiber spiegelt beim Flush (reverseByte). Damit das Bild normal bleibt,\n// drehen wir hier jedes Byte einmal um.\nconst bitmap = rows.map(r => r.map(b => reverseByte(b)));\n\nreturn {\n    payload: { bitmap },\n    topic: \"bitmap\",\n    stats: obj.stats\n};\nreturn msg;",
         "outputs": 1,
@@ -2565,14 +2574,14 @@
         "y": 260,
         "wires": [
             [
-                "dbb8c7914a78fabc"
+                "750328e01c09b5db"
             ]
         ]
     },
     {
-        "id": "dbb8c7914a78fabc",
+        "id": "750328e01c09b5db",
         "type": "max7219-raw",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "name": "",
         "bus": "0",
         "device": "0",
@@ -2587,9 +2596,9 @@
         "wires": []
     },
     {
-        "id": "2f9755857a854e2e",
+        "id": "fd6bcda03d5d71ff",
         "type": "switch",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "name": "",
         "property": "payload.topic",
         "propertyType": "msg",
@@ -2607,15 +2616,15 @@
         "y": 360,
         "wires": [
             [
-                "d66da012f3b0aa17",
-                "38b7638ec98a565e"
+                "50a29dad30362458",
+                "57cf339153a7fbbf"
             ]
         ]
     },
     {
-        "id": "d66da012f3b0aa17",
+        "id": "50a29dad30362458",
         "type": "debug",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "name": "debug 4",
         "active": false,
         "tosidebar": true,
@@ -2629,9 +2638,9 @@
         "wires": []
     },
     {
-        "id": "b187ff21444315df",
+        "id": "0bc14d4ec3fbe61f",
         "type": "split",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "name": "",
         "splt": "\\n",
         "spltType": "str",
@@ -2644,14 +2653,14 @@
         "y": 200,
         "wires": [
             [
-                "57df4fd69aa0d9b2"
+                "ec157cbfea1230c1"
             ]
         ]
     },
     {
-        "id": "71263f26ac4593a7",
+        "id": "4cb69871479f2fe2",
         "type": "debug",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "name": "debug 5",
         "active": false,
         "tosidebar": true,
@@ -2665,9 +2674,9 @@
         "wires": []
     },
     {
-        "id": "e5bb78fd6c4a7053",
+        "id": "4344eddb30ade14e",
         "type": "debug",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "name": "debug 7",
         "active": true,
         "tosidebar": true,
@@ -2681,9 +2690,9 @@
         "wires": []
     },
     {
-        "id": "51c602a6127efeae",
+        "id": "85b2da13bd6bc7ac",
         "type": "exec",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "command": "node /home/matze/.node-red/snake-dqn.js --play",
         "addpay": "",
         "append": "",
@@ -2701,9 +2710,9 @@
         ]
     },
     {
-        "id": "10b6962d8cdfc749",
+        "id": "53bfd544827dffba",
         "type": "inject",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "name": "play",
         "props": [
             {
@@ -2720,14 +2729,14 @@
         "y": 80,
         "wires": [
             [
-                "51c602a6127efeae"
+                "85b2da13bd6bc7ac"
             ]
         ]
     },
     {
-        "id": "dbd6a8e7f5f301b6",
+        "id": "a7812c9a4418dc97",
         "type": "exec",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "command": "node /home/matze/.node-red/snake-dqn.js --stepms 10 --emitms 120 --emitevery 2",
         "addpay": "",
         "append": "",
@@ -2745,9 +2754,9 @@
         ]
     },
     {
-        "id": "18552c7b717a34f6",
+        "id": "dda8bd1abf59a2b6",
         "type": "inject",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "name": "schneller",
         "props": [
             {
@@ -2764,14 +2773,14 @@
         "y": 500,
         "wires": [
             [
-                "dbd6a8e7f5f301b6"
+                "a7812c9a4418dc97"
             ]
         ]
     },
     {
-        "id": "3ae67f1a31737f09",
+        "id": "7984acc2f9e2a09e",
         "type": "exec",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "command": "node /home/matze/.node-red/sys-metrics.js",
         "addpay": "",
         "append": "",
@@ -2784,16 +2793,16 @@
         "y": 800,
         "wires": [
             [
-                "c024a8132ea2f61c"
+                "018456c0bac5f498"
             ],
             [],
             []
         ]
     },
     {
-        "id": "c4f6c11acb5fea95",
+        "id": "2d80837e72012a7b",
         "type": "inject",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "name": "spawn",
         "props": [
             {
@@ -2810,14 +2819,14 @@
         "y": 800,
         "wires": [
             [
-                "3ae67f1a31737f09"
+                "7984acc2f9e2a09e"
             ]
         ]
     },
     {
-        "id": "c024a8132ea2f61c",
+        "id": "018456c0bac5f498",
         "type": "json",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "name": "",
         "property": "payload",
         "action": "obj",
@@ -2826,14 +2835,14 @@
         "y": 780,
         "wires": [
             [
-                "38b7638ec98a565e"
+                "57cf339153a7fbbf"
             ]
         ]
     },
     {
-        "id": "efc9401e26392beb",
+        "id": "d69244a0f315bd1e",
         "type": "debug",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "name": "debug 3",
         "active": false,
         "tosidebar": true,
@@ -2848,9 +2857,9 @@
         "wires": []
     },
     {
-        "id": "d792536cd54633cc",
+        "id": "7dff5d2d658714e1",
         "type": "delay",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "name": "",
         "pauseType": "delay",
         "timeout": "5",
@@ -2868,14 +2877,14 @@
         "y": 700,
         "wires": [
             [
-                "49630bc2dd2ca473"
+                "d1de178bf51313c8"
             ]
         ]
     },
     {
-        "id": "49630bc2dd2ca473",
+        "id": "d1de178bf51313c8",
         "type": "function",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "name": "function 7",
         "func": "// restart trigger\nmsg.payload = \"start\";\nreturn msg;",
         "outputs": 1,
@@ -2888,14 +2897,14 @@
         "y": 700,
         "wires": [
             [
-                "f8a493e36579018c"
+                "cf9bac078e8cedc7"
             ]
         ]
     },
     {
-        "id": "92a54df6b087dc08",
+        "id": "1626fb44eea63cde",
         "type": "switch",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "name": "Restart nur bei rc != 0",
         "property": "payload",
         "propertyType": "msg",
@@ -2913,14 +2922,14 @@
         "y": 340,
         "wires": [
             [
-                "0367071fd9ce9f91"
+                "e00722942aad6b83"
             ]
         ]
     },
     {
-        "id": "0367071fd9ce9f91",
+        "id": "e00722942aad6b83",
         "type": "delay",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "name": "Warte 5s (Anti-Loop)",
         "pauseType": "delay",
         "timeout": "5",
@@ -2938,14 +2947,14 @@
         "y": 480,
         "wires": [
             [
-                "02ad02e556b683d5"
+                "19c1dc3e88aae6b9"
             ]
         ]
     },
     {
-        "id": "02ad02e556b683d5",
+        "id": "19c1dc3e88aae6b9",
         "type": "function",
-        "z": "0e584f7610b443dd",
+        "z": "382f42b732fc3acb",
         "name": "Trigger Start",
         "func": "msg.payload = \"start\";\nreturn msg;",
         "outputs": 1,
@@ -2958,138 +2967,5 @@
         "wires": [
             []
         ]
-    },
-    {
-        "id": "exec_snake",
-        "type": "exec",
-        "z": "a1f1b2c3d4e5f6a7",
-        "command": "node --expose-gc /home/matze/.node-red/snake-runner.js",
-        "addpay": false,
-        "append": "",
-        "useSpawn": "true",
-        "timer": "",
-        "oldrc": false,
-        "name": "Snake Runner (spawn)",
-        "x": 380,
-        "y": 180,
-        "wires": [
-            [],
-            [],
-            [
-                "sw_restart_rc",
-                "dbg_rc"
-            ]
-        ]
-    },
-    {
-        "id": "sw_restart_rc",
-        "type": "switch",
-        "z": "a1f1b2c3d4e5f6a7",
-        "name": "Restart nur bei rc != 0",
-        "property": "payload",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "neq",
-                "v": "0",
-                "vt": "num"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 1,
-        "x": 650,
-        "y": 180,
-        "wires": [
-            [
-                "delay_restart"
-            ]
-        ]
-    },
-    {
-        "id": "delay_restart",
-        "type": "delay",
-        "z": "a1f1b2c3d4e5f6a7",
-        "name": "Warte 5s (Anti-Loop)",
-        "pauseType": "delay",
-        "timeout": "5",
-        "timeoutUnits": "seconds",
-        "rate": "1",
-        "nbRateUnits": "5",
-        "rateUnits": "second",
-        "randomFirst": "1",
-        "randomLast": "5",
-        "randomUnits": "seconds",
-        "drop": false,
-        "allowrate": false,
-        "outputs": 1,
-        "x": 870,
-        "y": 180,
-        "wires": [
-            [
-                "fn_start"
-            ]
-        ]
-    },
-    {
-        "id": "fn_start",
-        "type": "function",
-        "z": "a1f1b2c3d4e5f6a7",
-        "name": "Trigger Start",
-        "func": "msg.payload = \"start\";\nreturn msg;",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "x": 1040,
-        "y": 180,
-        "wires": [
-            [
-                "exec_snake"
-            ]
-        ]
-    },
-    {
-        "id": "inj_start",
-        "type": "inject",
-        "z": "a1f1b2c3d4e5f6a7",
-        "name": "Start Runner (manuell/Deploy)",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": true,
-        "onceDelay": "0.5",
-        "topic": "",
-        "payload": "start",
-        "payloadType": "str",
-        "x": 250,
-        "y": 360,
-        "wires": [
-            [
-                "exec_snake"
-            ]
-        ]
-    },
-    {
-        "id": "dbg_rc",
-        "type": "debug",
-        "z": "a1f1b2c3d4e5f6a7",
-        "name": "Exit Code",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 640,
-        "y": 300,
-        "wires": []
     }
 ]
