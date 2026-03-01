@@ -2551,7 +2551,7 @@
         "title": "",
         "descr": "",
         "editurl": "vscode://vscode-remote/ssh-remote+192.168.2.107/home/matze/.node-red/projects/LCARS/uibuilder/display/?windowId=_blank",
-        "x": 1320,
+        "x": 1480,
         "y": 160,
         "wires": [
             [],
@@ -2570,8 +2570,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1020,
-        "y": 260,
+        "x": 1240,
+        "y": 60,
         "wires": [
             [
                 "750328e01c09b5db"
@@ -2591,8 +2591,8 @@
         "reverseOrder": false,
         "mirrorX": false,
         "rotate180": false,
-        "x": 1270,
-        "y": 260,
+        "x": 1440,
+        "y": 60,
         "wires": []
     },
     {
