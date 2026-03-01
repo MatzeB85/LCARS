@@ -2413,7 +2413,7 @@
         "id": "f8a493e36579018c",
         "type": "exec",
         "z": "0e584f7610b443dd",
-        "command": "node --expose-gc /home/matze/.node-red/snake-runner.js \\   --tickms 20  \\ --hold 3    \\    --emitms 30 \\  --emitevery 1 \\ --eps0 1.0 \\   --eps1 0.10 \\   --epsdecay 150000 \\   --maxpend 2000",
+        "command": "SNAKE_MAX_TENSORS=999999 SNAKE_MAX_TFMB=999999 node --expose-gc /home/matze/.node-red/snake-runner.js \\   --tickms 20  \\ --hold 3    \\    --emitms 30 \\  --emitevery 1 \\ --eps0 1.0 \\   --eps1 0.10 \\   --epsdecay 150000 \\   --maxpend 2000",
         "addpay": "",
         "append": "",
         "useSpawn": "true",
@@ -2421,7 +2421,7 @@
         "winHide": false,
         "oldrc": false,
         "name": "",
-        "x": 830,
+        "x": 1040,
         "y": 620,
         "wires": [
             [
