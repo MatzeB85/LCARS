@@ -2835,15 +2835,15 @@
         "type": "debug",
         "z": "0e584f7610b443dd",
         "name": "debug 3",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 2060,
-        "y": 600,
+        "x": 2300,
+        "y": 440,
         "wires": []
     },
     {
