@@ -2909,7 +2909,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1560,
+        "x": 1540,
         "y": 340,
         "wires": [
             [
