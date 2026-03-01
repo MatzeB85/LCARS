@@ -2413,7 +2413,7 @@
         "id": "f8a493e36579018c",
         "type": "exec",
         "z": "0e584f7610b443dd",
-        "command": "/bin/bash -lc \"SNAKE_STATE_VERSION=13 SNAKE_TRAINER_PATH=/home/matze/.node-red/snake-trainer.js node --expose-gc /home/matze/.node-red/snake-runner.js --tickms=20 --hold=3 --emitms=30 --emitevery=1 --eps0=1.0 --eps1=0.10 --epsdecay=150000 --maxpend=2000\"",
+        "command": "/bin/bash -lc \"SNAKE_STATE_VERSION=13 SNAKE_TRAINER_PATH=/home/matze/.node-red/snake-trainer.js SNAKE_WARMUP_STEPS=200 SNAKE_MIN_REPLAY_FOR_TRAIN=200 node --expose-gc /home/matze/.node-red/snake-runner.js --tickms=20 --hold=3 --emitms=30 --emitevery=1 --eps0=1.0 --eps1=0.10 --epsdecay=150000 --maxpend=2000\"",
         "addpay": "",
         "append": "",
         "useSpawn": "true",
@@ -2421,7 +2421,7 @@
         "winHide": false,
         "oldrc": false,
         "name": "",
-        "x": 1170,
+        "x": 1250,
         "y": 620,
         "wires": [
             [
@@ -2835,7 +2835,7 @@
         "type": "debug",
         "z": "0e584f7610b443dd",
         "name": "debug 3",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
