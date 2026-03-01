@@ -2,11 +2,15 @@
 "use strict";
 
 /**
- * index.js - Snake RL Monitor UI (mit System+TrainerMem+Log)
- * Erwartete Messages (aber tolerant):
- * - max7219/frame: frame in msg.payload (oder msg.payload.payload), stats in msg.stats (oder msg.payload.stats)
- * - snake/info: payload {msg:"mem"...} oder {msg:"adapt"...} oder sonstige Info
- * - snake/error, snake/trainer_stdout, snake/trainer_stderr: log
+ * FIX für deinen Node-RED Flow:
+ * Bei dir kommt in uibuilder typischerweise:
+ *   msg.payload = { topic:"snake/info", payload:{...}, stats:{...} }
+ * (weil Switch auf payload.topic prüft)  :contentReference[oaicite:1]{index=1}
+ *
+ * Diese UI:
+ * - entpackt Wrapper automatisch
+ * - nimmt sys-metrics.js Output (payload enthält procCpuPct/memUsedPct/tempC) als "System/adapt"
+ * - füllt System / Trainer Memory / Log zuverlässig
  */
 
 const canvas = document.getElementById("matrix");
@@ -21,7 +25,6 @@ const W = 32;
 const H = 8;
 const CELL = 18;
 
-// fix canvas resolution
 canvas.width = W * CELL;
 canvas.height = H * CELL;
 
@@ -36,7 +39,6 @@ function fmtAge(ms) {
     const rs = Math.round(s - m * 60);
     return `${m}m ${rs}s`;
 }
-
 function fmtNum(x) {
     if (x == null || !Number.isFinite(x)) return "—";
     if (x >= 1e9) return (x / 1e9).toFixed(2) + "B";
@@ -44,12 +46,10 @@ function fmtNum(x) {
     if (x >= 1e3) return (x / 1e3).toFixed(1) + "k";
     return String(Math.round(x));
 }
-
 function fmtMB(x) {
     if (x == null || !Number.isFinite(x)) return "—";
     return `${x.toFixed(0)} MB`;
 }
-
 function setDot(dotEl, level) {
     const map = {
         ok: "var(--ok)",
@@ -61,7 +61,6 @@ function setDot(dotEl, level) {
     if (!dotEl) return;
     dotEl.style.background = map[level] || map.muted;
 }
-
 function setBar(barEl, pct, level) {
     if (!barEl) return;
     const p = Math.max(0, Math.min(100, Number.isFinite(pct) ? pct : 0));
@@ -100,7 +99,6 @@ function drawFrame(frame) {
         }
     }
 
-    // body/grid
     for (let y = 0; y < H; y++) {
         for (let x = 0; x < W; x++) {
             const idx = y * W + x;
@@ -109,21 +107,18 @@ function drawFrame(frame) {
         }
     }
 
-    // food overlay
     if (food && Number.isFinite(food.x) && Number.isFinite(food.y)) {
         ctx.fillStyle = "rgba(255, 204, 102, 0.95)";
         ctx.fillRect(food.x * CELL, food.y * CELL, CELL - 1, CELL - 1);
     }
-
-    // head overlay
     if (head && Number.isFinite(head.x) && Number.isFinite(head.y)) {
         ctx.fillStyle = "rgba(88, 166, 255, 0.95)";
         ctx.fillRect(head.x * CELL, head.y * CELL, CELL - 1, CELL - 1);
     }
 }
 
-// ----- Log -----
-const LOG_MAX = 350;
+// ---------- LOG ----------
+const LOG_MAX = 450;
 const logLines = [];
 let lastLogAt = 0;
 
@@ -134,7 +129,6 @@ function ts() {
     const ss = String(d.getSeconds()).padStart(2, "0");
     return `${hh}:${mm}:${ss}`;
 }
-
 function pushLog(kind, text) {
     const line = `[${ts()}] ${kind}: ${text}`;
     logLines.push(line);
@@ -142,107 +136,125 @@ function pushLog(kind, text) {
     logEl.textContent = logLines.join("\n");
     lastLogAt = Date.now();
     logMetaEl.textContent = `${fmtNum(logLines.length)} lines • last ${fmtAge(Date.now() - lastLogAt)}`;
+    // auto-scroll
+    logEl.scrollTop = logEl.scrollHeight;
 }
-
 if (logClearBtn) {
     logClearBtn.addEventListener("click", () => {
         logLines.length = 0;
         logEl.textContent = "Log geleert.";
+        lastLogAt = Date.now();
         logMetaEl.textContent = "0 lines";
     });
 }
 
-// ----- State caches -----
+// ---------- STATE ----------
 let lastFrameTs = 0;
 let lastStats = null;
 
-// from snake/info msg:"mem"
+// comes from snake/info {msg:"mem", ...}
 let lastTrainerMem = null;
 
-// from snake/info msg:"adapt"
+// comes from snake/info {msg:"adapt", procCpuPct, memUsedPct, tempC}
 let lastAdapt = null;
 
-// ----- Message normalization -----
-function safeKeys(o) {
-    if (!o || typeof o !== "object") return "—";
-    return Object.keys(o).slice(0, 14).join(",");
+// sys-metrics.js output often comes without topic; we accept it too
+let lastSysMetrics = null;
+
+// ---------- NORMALIZATION (wichtig für deinen Flow) ----------
+function isWrapperPayload(p) {
+    // wrapper shape: {topic:"...", payload:..., stats:...}
+    return p && typeof p === "object" && typeof p.topic === "string" && ("payload" in p);
 }
 
-function normalizeMsg(msg) {
-    const out = { topic: null, frame: null, stats: null, payload: null, raw: msg };
+function normalizeInbound(msg) {
+    // returns { topic, payload, stats, raw }
+    // 1) direct msg.topic/msg.payload
+    // 2) OR wrapper stored in msg.payload
+    // 3) OR wrapper stored in msg.payload.payload (rare)
+    const out = { topic: msg?.topic || null, payload: msg?.payload, stats: msg?.stats || null, raw: msg };
 
-    if (!msg || typeof msg !== "object") return out;
+    // if msg.payload is wrapper => unpack
+    if (isWrapperPayload(out.payload)) {
+        out.topic = out.payload.topic;
+        out.stats = out.payload.stats || out.stats;
+        out.payload = out.payload.payload;
+        return out;
+    }
 
-    let topic = msg.topic;
-    if (!topic && msg.payload && typeof msg.payload === "object" && msg.payload.topic) topic = msg.payload.topic;
-    out.topic = topic || null;
+    // if msg.payload.payload is wrapper => unpack
+    if (msg?.payload?.payload && isWrapperPayload(msg.payload.payload)) {
+        out.topic = msg.payload.payload.topic;
+        out.stats = msg.payload.payload.stats || out.stats;
+        out.payload = msg.payload.payload.payload;
+        return out;
+    }
 
-    // payload reference
-    out.payload = msg.payload;
-
-    // frame
-    if (msg.payload && msg.payload.rows && msg.payload.w && msg.payload.h) out.frame = msg.payload;
-    if (!out.frame && msg.payload && msg.payload.payload && msg.payload.payload.rows) out.frame = msg.payload.payload;
-    if (!out.frame && msg.rows && msg.w && msg.h) out.frame = msg;
-
-    // stats
-    if (msg.stats && typeof msg.stats === "object") out.stats = msg.stats;
-    if (!out.stats && msg.payload && msg.payload.stats && typeof msg.payload.stats === "object") out.stats = msg.payload.stats;
+    // if msg.payload.topic exists but no wrapper (another common pattern)
+    if (!out.topic && msg?.payload?.topic && ("payload" in msg.payload)) {
+        // still treat as wrapper-ish
+        out.topic = msg.payload.topic;
+        out.stats = msg.payload.stats || out.stats;
+        out.payload = msg.payload.payload;
+        return out;
+    }
 
     return out;
 }
 
-// ----- HUD updates -----
-function updateInfoPanel(stats) {
+function looksLikeSysMetrics(p) {
+    return p && typeof p === "object" &&
+        (Number.isFinite(p.procCpuPct) || Number.isFinite(p.memUsedPct) || Number.isFinite(p.tempC));
+}
+
+// ---------- HUD UPDATES ----------
+function updateInfo() {
+    const now = Date.now();
     const lines = [];
 
-    // Always show where data comes from
-    lines.push(`Last frame age: ${fmtAge(Date.now() - (lastFrameTs || Date.now()))}`);
-    lines.push(`snake/info mem: ${lastTrainerMem ? "ja" : "nein"}   adapt: ${lastAdapt ? "ja" : "nein"}`);
+    lines.push(`Frame age: ${fmtAge(now - (lastFrameTs || now))}`);
+    lines.push(`adapt: ${lastAdapt ? "ja" : "nein"}  mem: ${lastTrainerMem ? "ja" : "nein"}  sys-metrics: ${lastSysMetrics ? "ja" : "nein"}`);
     lines.push("");
 
-    if (!stats) {
-        lines.push("Keine stats im UI empfangen.");
-        lines.push("Tipp: uibuilder muss msg.stats (oder payload.stats) durchreichen.");
+    if (!lastStats) {
+        lines.push("Keine stats empfangen (nur System/Logs möglich).");
+        lines.push("Hinweis: Bei dir steckt stats oft im Wrapper payload.stats.");
         infoEl.textContent = lines.join("\n");
         return;
     }
 
-    lines.push(`Episode: ${fmtNum(stats.episode)}   Steps: ${fmtNum(stats.totalSteps)}   Mode: ${stats.mode || "—"}`);
-    lines.push(`Len: ${fmtNum(stats.len)}   BestLen: ${fmtNum(stats.bestLen)}   Score: ${fmtNum(stats.score)}   SinceEat: ${fmtNum(stats.sinceEat)}`);
-    lines.push(`Return: ${stats.epReturn != null ? stats.epReturn.toFixed(2) : "—"}   FoodDist: ${stats.foodDist != null ? stats.foodDist.toFixed(3) : "—"}`);
-    lines.push(`ε: ${stats.eps != null ? stats.eps.toFixed(3) : "—"}   ε(train): ${stats.epsTrain != null ? stats.epsTrain.toFixed(3) : "—"}`);
+    lines.push(`Episode: ${fmtNum(lastStats.episode)}  Steps: ${fmtNum(lastStats.totalSteps)}  Mode: ${lastStats.mode || "—"}`);
+    lines.push(`Len: ${fmtNum(lastStats.len)}  BestLen: ${fmtNum(lastStats.bestLen)}  Score: ${fmtNum(lastStats.score)}  SinceEat: ${fmtNum(lastStats.sinceEat)}`);
+    lines.push(`Return: ${lastStats.epReturn != null ? lastStats.epReturn.toFixed(2) : "—"}  FoodDist: ${lastStats.foodDist != null ? lastStats.foodDist.toFixed(3) : "—"}`);
+    lines.push(`ε: ${lastStats.eps != null ? lastStats.eps.toFixed(3) : "—"}  ε(train): ${lastStats.epsTrain != null ? lastStats.epsTrain.toFixed(3) : "—"}`);
 
-    const t = stats.trainer || {};
+    const t = lastStats.trainer || {};
     lines.push("");
-    lines.push(`Trainer: ${t.connected ? "connected" : "disconnected"} • Replay ${fmtNum(t.replayN)} • Trains ${fmtNum(t.trains)} • Errors ${fmtNum(t.trainErrors)}`);
-    lines.push(`LossEMA ${t.lossEma ?? "—"} • TD-EMA ${t.tdAbsEma ?? "—"} • Temp ${t.tempC != null ? t.tempC.toFixed(1) + "°C" : "—"}`);
+    lines.push(`Trainer: ${t.connected ? "connected" : "disconnected"}  Replay ${fmtNum(t.replayN)}  Trains ${fmtNum(t.trains)}  Errors ${fmtNum(t.trainErrors)}`);
+    lines.push(`LossEMA ${t.lossEma ?? "—"}  TD-EMA ${t.tdAbsEma ?? "—"}  Temp ${t.tempC != null ? t.tempC.toFixed(1) + "°C" : "—"}`);
 
     infoEl.textContent = lines.join("\n");
 }
 
-function updateSystemHud(stats) {
+function updateSystemHud() {
     const now = Date.now();
-    $("sysAge") && ($("sysAge").textContent = fmtAge(now - (lastFrameTs || now)));
+    const age = now - (lastFrameTs || now);
+    $("sysAge") && ($("sysAge").textContent = fmtAge(age));
 
-    // Best source: adapt message (CPU/Mem/Temp)
-    const cpuPct = lastAdapt?.procCpuPct;
-    const memUsedPct = lastAdapt?.memUsedPct;
-    const tempC_adapt = lastAdapt?.tempC;
+    // prefer: adapt
+    const cpuPct = lastAdapt?.procCpuPct ?? lastSysMetrics?.procCpuPct ?? null;
+    const memUsedPct = lastAdapt?.memUsedPct ?? lastSysMetrics?.memUsedPct ?? null;
 
-    // Fallback temp from stats.trainer.tempC
-    const tempC = Number.isFinite(tempC_adapt) ? tempC_adapt : (stats?.trainer?.tempC);
+    // temp: prefer adapt/sys-metrics, fallback stats.trainer.tempC
+    const tempC = (lastAdapt?.tempC ?? lastSysMetrics?.tempC ?? lastStats?.trainer?.tempC ?? null);
 
-    // CPU
     $("sysCpuVal") && ($("sysCpuVal").textContent = cpuPct == null ? "—" : `${cpuPct.toFixed(1)}%`);
     setBar($("sysCpuBar"), cpuPct == null ? 0 : cpuPct, cpuPct != null && cpuPct > 70 ? "warn" : "ok");
 
-    // RAM (system percent)
     $("sysMemVal") && ($("sysMemVal").textContent = memUsedPct == null ? "—" : `${memUsedPct.toFixed(1)}%`);
     $("sysMemMB") && ($("sysMemMB").textContent = lastTrainerMem?.rssMB != null ? `RSS ${fmtMB(lastTrainerMem.rssMB)}` : "—");
     setBar($("sysMemBar"), memUsedPct == null ? 0 : memUsedPct, memUsedPct != null && memUsedPct > 85 ? "warn" : "ok");
 
-    // Temp
     $("sysTempVal") && ($("sysTempVal").textContent = tempC == null ? "—" : `${tempC.toFixed(1)}°C`);
     const tempPct = tempC == null ? 0 : Math.max(0, Math.min(100, ((tempC - 40) / 45) * 100));
     const tempLevel = tempC == null ? "muted" : (tempC >= 82 ? "bad" : tempC >= 75 ? "warn" : "ok");
@@ -250,10 +262,7 @@ function updateSystemHud(stats) {
 
     const fresh = (now - lastFrameTs) < 2500;
     setDot($("sysDot"), fresh ? tempLevel : "muted");
-
-    let status = fresh ? "live" : "keine Daten";
-    if (fresh && !lastAdapt) status = "live (ohne adapt)";
-    $("sysStatus") && ($("sysStatus").textContent = status);
+    $("sysStatus") && ($("sysStatus").textContent = fresh ? "live" : "keine Daten");
 }
 
 function updateMemHud() {
@@ -284,8 +293,8 @@ function updateMemHud() {
     $("memStatus") && ($("memStatus").textContent = ok ? "live" : "warte…");
 }
 
-function updateTrainHud(stats) {
-    const t = stats?.trainer || {};
+function updateTrainHud() {
+    const t = lastStats?.trainer || {};
     $("trainAge") && ($("trainAge").textContent = fmtAge(t.ageMs));
 
     $("trainReplayVal") && ($("trainReplayVal").textContent = t.replayN == null ? "—" : fmtNum(t.replayN));
@@ -305,9 +314,9 @@ function updateTrainHud(stats) {
     const tdPct = td == null ? 0 : Math.max(0, Math.min(100, (td / 0.3) * 100));
     setBar($("trainTdBar"), tdPct, tdPct > 90 ? "warn" : "ok");
 
-    $("trainEpsVal") && ($("trainEpsVal").textContent = stats.eps == null ? "—" : `ε ${stats.eps.toFixed(3)}`);
-    $("trainEpsTrainVal") && ($("trainEpsTrainVal").textContent = stats.epsTrain == null ? "—" : `train ${stats.epsTrain.toFixed(3)}`);
-    setBar($("trainEpsBar"), stats.eps == null ? 0 : stats.eps * 100, stats.eps != null && stats.eps > 0.4 ? "cold" : "ok");
+    $("trainEpsVal") && ($("trainEpsVal").textContent = lastStats?.eps == null ? "—" : `ε ${lastStats.eps.toFixed(3)}`);
+    $("trainEpsTrainVal") && ($("trainEpsTrainVal").textContent = lastStats?.epsTrain == null ? "—" : `train ${lastStats.epsTrain.toFixed(3)}`);
+    setBar($("trainEpsBar"), lastStats?.eps == null ? 0 : lastStats.eps * 100, lastStats?.eps != null && lastStats.eps > 0.4 ? "cold" : "ok");
 
     const hot = (t.tempC != null && t.tempC >= 82) || !!t.pausedHot;
     let level = t.connected ? "ok" : "muted";
@@ -317,11 +326,11 @@ function updateTrainHud(stats) {
     $("trainStatus") && ($("trainStatus").textContent = text);
 }
 
-function updateQualityHud(stats) {
+function updateQualityHud() {
     const now = Date.now();
     $("qualAge") && ($("qualAge").textContent = fmtAge(now - (lastFrameTs || now)));
 
-    const pol = stats?.policy || {};
+    const pol = lastStats?.policy || {};
     const modelFrac = pol.modelFrac;
     const randomFrac = pol.randomFrac;
 
@@ -332,20 +341,20 @@ function updateQualityHud(stats) {
     $("qualQMax") && ($("qualQMax").textContent = pol.qMax == null ? "—" : `Qmax ${pol.qMax.toFixed(3)}`);
     $("qualQSpread") && ($("qualQSpread").textContent = pol.qSpread == null ? "—" : `spread ${pol.qSpread.toFixed(3)}`);
 
-    $("qualLen") && ($("qualLen").textContent = stats.len == null ? "—" : `Len ${fmtNum(stats.len)}`);
-    $("qualBestLen") && ($("qualBestLen").textContent = stats.bestLen == null ? "—" : `Best ${fmtNum(stats.bestLen)}`);
+    $("qualLen") && ($("qualLen").textContent = lastStats?.len == null ? "—" : `Len ${fmtNum(lastStats.len)}`);
+    $("qualBestLen") && ($("qualBestLen").textContent = lastStats?.bestLen == null ? "—" : `Best ${fmtNum(lastStats.bestLen)}`);
 
-    const lenPct = (stats.len == null) ? 0 : Math.max(0, Math.min(100, (stats.len / (W * H)) * 100));
+    const lenPct = (lastStats?.len == null) ? 0 : Math.max(0, Math.min(100, (lastStats.len / (W * H)) * 100));
     setBar($("qualLenBar"), lenPct, lenPct > 70 ? "ok" : "cold");
 
-    $("qualReturn") && ($("qualReturn").textContent = stats.epReturn == null ? "—" : stats.epReturn.toFixed(2));
+    $("qualReturn") && ($("qualReturn").textContent = lastStats?.epReturn == null ? "—" : lastStats.epReturn.toFixed(2));
 
     const ok = (now - lastFrameTs) < 2500;
     setDot($("qualDot"), ok ? "ok" : "muted");
     $("qualStatus") && ($("qualStatus").textContent = ok ? "live" : "warte…");
 }
 
-// ----- Boot -----
+// ---------- BOOT ----------
 function boot() {
     clearCanvas();
     infoEl.textContent = "UI gestartet. Warte auf Daten…";
@@ -355,80 +364,85 @@ function boot() {
     uibuilder.start();
 
     uibuilder.onChange("msg", (msg) => {
-        const n = normalizeMsg(msg);
+        try {
+            const n = normalizeInbound(msg);
 
-        // Logging for these topics
-        if (n.topic === "snake/error") {
-            const p = n.payload;
-            pushLog("ERROR", typeof p === "string" ? p : JSON.stringify(p));
-            return;
-        }
-        if (n.topic === "snake/trainer_stdout") {
-            pushLog("trainer", String(n.payload ?? ""));
-            return;
-        }
-        if (n.topic === "snake/trainer_stderr") {
-            pushLog("trainer!", String(n.payload ?? ""));
-            return;
-        }
-        if (n.topic === "snake/info") {
-            const p = n.payload;
-
-            // mem/adapt caches
-            if (p && typeof p === "object" && p.msg === "mem") {
-                lastTrainerMem = p;
-            }
-            if (p && typeof p === "object" && p.msg === "adapt") {
-                lastAdapt = p;
+            // accept sys-metrics without topic
+            if (!n.topic && looksLikeSysMetrics(n.payload)) {
+                lastSysMetrics = { ...n.payload, ts: Date.now() };
+                pushLog("sys", JSON.stringify(lastSysMetrics));
+                updateSystemHud();
+                updateInfo();
+                return;
             }
 
-            // Put general info into log (but keep it readable)
-            if (p && typeof p === "object") {
-                const brief = p.msg ? `${p.msg} ${JSON.stringify(p)}` : JSON.stringify(p);
-                pushLog("info", brief);
-            } else {
-                pushLog("info", String(p));
+            // log channels (topic comes from wrapper!)
+            if (n.topic === "snake/error") {
+                pushLog("ERROR", typeof n.payload === "string" ? n.payload : JSON.stringify(n.payload));
+                return;
             }
-            return;
-        }
-
-        // Frame handling
-        if (n.topic === "max7219/frame" || n.frame) {
-            if (n.frame && n.frame.w === W && n.frame.h === H) {
-                drawFrame(n.frame);
-                lastFrameTs = n.frame.ts || Date.now();
+            if (n.topic === "snake/trainer_stdout") {
+                pushLog("trainer", String(n.payload ?? ""));
+                return;
+            }
+            if (n.topic === "snake/trainer_stderr") {
+                pushLog("trainer!", String(n.payload ?? ""));
+                return;
             }
 
-            if (n.stats && typeof n.stats === "object") {
-                lastStats = n.stats;
-            }
-
-            if (lastStats) {
-                updateInfoPanel(lastStats);
-                updateSystemHud(lastStats);
+            // info channel
+            if (n.topic === "snake/info") {
+                if (n.payload && typeof n.payload === "object") {
+                    if (n.payload.msg === "mem") lastTrainerMem = n.payload;
+                    if (n.payload.msg === "adapt") lastAdapt = n.payload;
+                    pushLog("info", n.payload.msg ? `${n.payload.msg} ${JSON.stringify(n.payload)}` : JSON.stringify(n.payload));
+                } else {
+                    pushLog("info", String(n.payload));
+                }
+                updateSystemHud();
                 updateMemHud();
-                updateTrainHud(lastStats);
-                updateQualityHud(lastStats);
-            } else {
-                // At least show that frames arrive
-                infoEl.textContent =
-                    `Frames kommen an (topic=${n.topic || "—"}), aber keine stats.\n` +
-                    `Root keys: ${safeKeys(msg)}\nPayload keys: ${safeKeys(msg?.payload)}\n`;
+                updateInfo();
+                return;
             }
-            return;
-        }
 
-        // Unknown message: keep a tiny hint in log (low noise)
-        pushLog("msg", `topic=${n.topic || "—"} keys=${safeKeys(msg)} payloadKeys=${safeKeys(msg?.payload)}`);
+            // frame channel (topic comes from wrapper!)
+            if (n.topic === "max7219/frame") {
+                if (n.payload && n.payload.rows && n.payload.w === W && n.payload.h === H) {
+                    drawFrame(n.payload);
+                    lastFrameTs = n.payload.ts || Date.now();
+                }
+
+                if (n.stats && typeof n.stats === "object") {
+                    lastStats = n.stats;
+                }
+
+                if (lastStats) {
+                    updateSystemHud();
+                    updateMemHud();
+                    updateTrainHud();
+                    updateQualityHud();
+                    updateInfo();
+                } else {
+                    updateInfo();
+                }
+                return;
+            }
+
+            // anything else: keep a small trace
+            if (n.topic) pushLog("msg", `${n.topic} ${typeof n.payload === "string" ? n.payload : ""}`);
+
+        } catch (e) {
+            pushLog("UI-ERR", String(e && (e.stack || e)));
+        }
     });
 
-    // heartbeat for stale statuses
+    // heartbeat
     setInterval(() => {
         if (lastStats) {
-            updateSystemHud(lastStats);
-            updateQualityHud(lastStats);
+            updateSystemHud();
+            updateQualityHud();
+            updateInfo();
         } else {
-            // show stale in dots if nothing yet
             setDot($("sysDot"), "muted");
             setDot($("memDot"), "muted");
             setDot($("trainDot"), "muted");

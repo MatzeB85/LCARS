@@ -40,9 +40,7 @@
                 </div>
             </section>
 
-            <!-- HUD stack -->
             <aside class="hud-stack" aria-label="Statusanzeigen">
-
                 <!-- System HUD -->
                 <section id="sysHud" class="hud" aria-label="Systemdaten">
                     <div class="hud-header">
@@ -80,11 +78,6 @@
                     <div class="hud-foot">
                         <span class="dot" id="sysDot"></span>
                         <span id="sysStatus">warte…</span>
-                    </div>
-
-                    <div class="hud-hint">
-                        Quelle: bevorzugt <b>snake/info → adapt</b> (CPU/Mem/Temp). Fallback: Temp aus
-                        <b>stats.trainer.tempC</b>.
                     </div>
                 </section>
 
@@ -127,11 +120,6 @@
                     <div class="hud-foot">
                         <span class="dot" id="memDot"></span>
                         <span id="memStatus">warte…</span>
-                    </div>
-
-                    <div class="hud-hint">
-                        Quelle: <b>snake/info → mem</b>. Wenn hier nix kommt, wird dein Flow die Info-Messages nicht zu
-                        uibuilder durchreichen.
                     </div>
                 </section>
 
@@ -240,7 +228,6 @@
                         <span id="qualStatus">warte…</span>
                     </div>
                 </section>
-
             </aside>
         </main>
     </div>

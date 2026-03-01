@@ -1,7 +1,6 @@
 :root {
     --bg: #0b0f14;
     --panel: rgba(255, 255, 255, 0.06);
-    --panel2: rgba(255, 255, 255, 0.08);
     --text: rgba(255, 255, 255, 0.92);
     --muted: rgba(255, 255, 255, 0.65);
     --muted2: rgba(255, 255, 255, 0.45);
@@ -102,7 +101,7 @@ body {
     white-space: pre-wrap;
 }
 
-/* Log panel */
+/* Log */
 .logwrap {
     background: rgba(0, 0, 0, 0.25);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -156,7 +155,7 @@ body {
     white-space: pre-wrap;
 }
 
-/* HUD stack (right side) */
+/* HUD stack */
 .hud-stack {
     width: 300px;
     position: sticky;
@@ -167,7 +166,6 @@ body {
     align-self: flex-start;
 }
 
-/* HUD base */
 .hud {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.05));
     border: 1px solid var(--border);
@@ -234,7 +232,6 @@ body {
     transition: width 180ms linear, background-color 180ms linear;
 }
 
-/* status row */
 .hud-foot {
     margin-top: 12px;
     display: flex;
@@ -252,16 +249,6 @@ body {
     box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
 }
 
-.hud-hint {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.10);
-    font-size: 11px;
-    line-height: 1.35;
-    color: var(--muted2);
-}
-
-/* Responsive */
 @media (max-width: 900px) {
     .content {
         flex-direction: column;
