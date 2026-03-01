@@ -25,7 +25,19 @@
         <main class="content">
             <section class="left">
                 <canvas id="matrix"></canvas>
-                <div id="info" class="info">Warte auf Daten…</div>
+
+                <div class="panel-stack">
+                    <div id="info" class="info">Warte auf Daten…</div>
+
+                    <div class="logwrap">
+                        <div class="loghead">
+                            <div class="logtitle">Log</div>
+                            <div class="logmeta" id="logMeta">—</div>
+                            <button class="logbtn" id="logClear" type="button">Clear</button>
+                        </div>
+                        <pre id="log" class="log">Noch keine Log-Einträge…</pre>
+                    </div>
+                </div>
             </section>
 
             <!-- HUD stack -->
@@ -68,6 +80,11 @@
                     <div class="hud-foot">
                         <span class="dot" id="sysDot"></span>
                         <span id="sysStatus">warte…</span>
+                    </div>
+
+                    <div class="hud-hint">
+                        Quelle: bevorzugt <b>snake/info → adapt</b> (CPU/Mem/Temp). Fallback: Temp aus
+                        <b>stats.trainer.tempC</b>.
                     </div>
                 </section>
 
@@ -113,12 +130,12 @@
                     </div>
 
                     <div class="hud-hint">
-                        Leak-Hinweis: Wenn <b>TF Tensors</b> oder <b>TF Memory</b> ohne Plateau steigt → Tensor-Leak.
-                        Wenn <b>JS Heap</b> steigt → JS-Leak. Nur <b>RSS</b> steigt → eher native/allocator/caching.
+                        Quelle: <b>snake/info → mem</b>. Wenn hier nix kommt, wird dein Flow die Info-Messages nicht zu
+                        uibuilder durchreichen.
                     </div>
                 </section>
 
-                <!-- NEW: Training HUD -->
+                <!-- Training HUD -->
                 <section id="trainHud" class="hud" aria-label="Training">
                     <div class="hud-header">
                         <div class="hud-title">Training</div>
@@ -174,14 +191,9 @@
                         <span class="dot" id="trainDot"></span>
                         <span id="trainStatus">warte…</span>
                     </div>
-
-                    <div class="hud-hint">
-                        Fortschritt: Replay & Trains sollten steigen. Loss/TD stabilisieren sich meist mit der Zeit.
-                        78–82°C ist am Limit auf RasPi 5 → ggf. TPS runter oder bessere Kühlung.
-                    </div>
                 </section>
 
-                <!-- NEW: Policy/Qualität HUD -->
+                <!-- Policy/Qualität HUD -->
                 <section id="qualHud" class="hud" aria-label="Policy und Qualität">
                     <div class="hud-header">
                         <div class="hud-title">Policy / Qualität</div>
@@ -226,11 +238,6 @@
                     <div class="hud-foot">
                         <span class="dot" id="qualDot"></span>
                         <span id="qualStatus">warte…</span>
-                    </div>
-
-                    <div class="hud-hint">
-                        Wenn <b>Model-Frac</b> hochgeht und <b>BestLen</b> regelmäßig steigt → Policy wird besser.
-                        Q-Spread sehr hoch + Loss sehr niedrig kann auch Overconfidence bedeuten.
                     </div>
                 </section>
 
