@@ -1,4 +1,267 @@
-/* Load defaults from `<userDir>/node_modules/node-red-contrib-uibuilder/front-end/uib-brand.min.css`
- * This is optional but reasonably complete and allows for light/dark mode switching.
- */
-@import url("../uibuilder/uib-brand.min.css");
+:root {
+    --bg: #0b0f14;
+    --panel: rgba(255, 255, 255, 0.06);
+    --panel2: rgba(255, 255, 255, 0.08);
+    --text: rgba(255, 255, 255, 0.92);
+    --muted: rgba(255, 255, 255, 0.65);
+    --muted2: rgba(255, 255, 255, 0.45);
+    --border: rgba(255, 255, 255, 0.10);
+
+    --ok: #35d07f;
+    --warn: #ffcc66;
+    --bad: #ff5c7a;
+    --cold: #58a6ff;
+
+    --radius: 14px;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(88, 166, 255, 0.15), transparent 60%),
+        radial-gradient(900px 600px at 90% 10%, rgba(53, 208, 127, 0.14), transparent 55%),
+        var(--bg);
+    color: var(--text);
+}
+
+.page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 18px;
+}
+
+.topbar {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 6px 6px 14px 6px;
+}
+
+.title .h1 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.title .sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+}
+
+.content {
+    position: relative;
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+}
+
+.left {
+    flex: 1;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 14px;
+    min-height: 420px;
+}
+
+#matrix {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+}
+
+.info {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.88);
+    line-height: 1.35;
+    white-space: pre-wrap;
+}
+
+/* Logs */
+.logs-panel {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: rgba(0, 0, 0, 0.20);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+}
+
+.logs-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.logs-title {
+    font-weight: 700;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.88);
+}
+
+.btn {
+    appearance: none;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background: rgba(255, 255, 255, 0.10);
+}
+
+.logs {
+    margin: 0;
+    height: 180px;
+    overflow: auto;
+    font-size: 12px;
+    line-height: 1.35;
+    color: rgba(255, 255, 255, 0.85);
+    white-space: pre-wrap;
+}
+
+/* HUD stack (right side) */
+.hud-stack {
+    width: 320px;
+    position: sticky;
+    top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-self: flex-start;
+}
+
+/* HUD base */
+.hud {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.05));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 12px 12px 10px 12px;
+}
+
+.hud-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.hud-title {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.hud-age {
+    font-size: 12px;
+    color: var(--muted2);
+}
+
+.hud-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: 10px;
+    gap: 10px;
+}
+
+.hud-label {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.hud-value {
+    font-size: 12px;
+    color: var(--text);
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    text-align: right;
+}
+
+.hud-value-dim {
+    color: var(--muted2);
+}
+
+.bar {
+    height: 10px;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 6px;
+}
+
+.bar-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--ok);
+    border-radius: 999px;
+    transition: width 180ms linear, background-color 180ms linear;
+}
+
+/* status row */
+.hud-foot {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: var(--muted2);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
+}
+
+.hud-hint {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.10);
+    font-size: 11px;
+    line-height: 1.35;
+    color: var(--muted2);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .content {
+        flex-direction: column;
+    }
+
+    .hud-stack {
+        width: 100%;
+        position: relative;
+        top: auto;
+    }
+}
