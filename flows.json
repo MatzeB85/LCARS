@@ -2908,7 +2908,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1700,
+        "x": 1640,
         "y": 340,
         "wires": [
             [
