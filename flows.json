@@ -2839,11 +2839,12 @@
         "tosidebar": true,
         "console": false,
         "tostatus": false,
-        "complete": "false",
+        "complete": "payload",
+        "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 320,
-        "y": 360,
+        "x": 280,
+        "y": 380,
         "wires": []
     },
     {
