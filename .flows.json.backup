@@ -2633,7 +2633,7 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1000,
+        "x": 1020,
         "y": 360,
         "wires": []
     },
