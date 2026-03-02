@@ -2536,7 +2536,7 @@
         "name": "",
         "topic": "",
         "url": "display",
-        "okToGo": false,
+        "okToGo": true,
         "fwdInMessages": false,
         "allowScripts": false,
         "allowStyles": false,
@@ -2544,7 +2544,6 @@
         "templateFolder": "blank",
         "extTemplate": "",
         "showfolder": false,
-        "oldUrl": "",
         "reload": false,
         "sourceFolder": "src",
         "deployedVersion": "7.5.0",
@@ -2553,7 +2552,7 @@
         "descr": "",
         "editurl": "vscode://vscode-remote/ssh-remote+192.168.2.107/home/matze/.node-red/projects/LCARS/uibuilder/display/?windowId=_blank",
         "x": 1580,
-        "y": 200,
+        "y": 220,
         "wires": [
             [],
             []
