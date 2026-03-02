@@ -2447,7 +2447,7 @@
         "onceDelay": 0.1,
         "topic": "",
         "x": 110,
-        "y": 620,
+        "y": 640,
         "wires": [
             [
                 "e0aa64b0242f0a72"
@@ -2536,7 +2536,7 @@
         "name": "",
         "topic": "",
         "url": "display",
-        "okToGo": false,
+        "okToGo": true,
         "fwdInMessages": false,
         "allowScripts": false,
         "allowStyles": false,
