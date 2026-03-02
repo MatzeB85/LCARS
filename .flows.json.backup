@@ -3068,8 +3068,8 @@
         "winHide": false,
         "oldrc": false,
         "name": "snake learn (runner+trainer)",
-        "x": 820,
-        "y": 140,
+        "x": 800,
+        "y": 240,
         "wires": [
             [
                 "split_lines"
