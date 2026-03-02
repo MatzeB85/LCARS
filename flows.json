@@ -2406,7 +2406,7 @@
         "id": "cf9bac078e8cedc7",
         "type": "exec",
         "z": "382f42b732fc3acb",
-        "command": "/bin/bash -lc \"SNAKE_STATE_VERSION=13 SNAKE_TRAINER_PATH=/home/matze/.node-red/snake-trainer.js node --expose-gc /home/matze/.node-red/snake-runner.js  --reset --tickms=20 --hold=3 --emitms=30 --emitevery=1 --eps0=1.0 --eps1=0.10 --epsdecay=150000 --maxpend=2000\"",
+        "command": "/bin/basnode --expose-gc /home/matze/.node-red/snake-runner.js --reset --tickms 20 --hold 3 --emitms 30 --emitevery 1 --eps0 1.0 --eps1 0.10 --epsdecay 150000 --maxpend 2000",
         "addpay": "",
         "append": "",
         "useSpawn": "true",
@@ -2414,7 +2414,7 @@
         "winHide": false,
         "oldrc": false,
         "name": "",
-        "x": 1190,
+        "x": 850,
         "y": 640,
         "wires": [
             [
