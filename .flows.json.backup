@@ -2406,7 +2406,7 @@
         "id": "cf9bac078e8cedc7",
         "type": "exec",
         "z": "382f42b732fc3acb",
-        "command": "node --expose-gc /home/matze/.node-red/snake-runner.js --reset --tickms 20 --hold 3 --emitms 30 --emitevery 1 --eps0 1.0 --eps1 0.10 --epsdecay 150000 --maxpend 2000",
+        "command": "bash -lc 'export SNAKE_CHECKPOINT_DIR=\"/home/matze/.node-red/snake-checkpoint\"; \\ export SNAKE_TRAINER_PATH=\"/home/matze/.node-red/snake-trainer.js\"; \\ export SNAKE_REPLAY_MAX=50000; \\ export SNAKE_MIN_REPLAY=2000; \\ export SNAKE_WARMUP=1500; \\ export SNAKE_BATCH=128; \\ export SNAKE_LR=0.001; \\ export SNAKE_GAMMA=0.99; \\ export SNAKE_GRAD_CLIP=5; \\ export SNAKE_TARGET_EVERY=1000; \\ export SNAKE_SAVE_EVERY_EP=200; \\ export SNAKE_MAX_TPS=20; \\ node \"/home/matze/.node-red/snake-runner.js\" \\   --tickms 20 --hold 3 --emitms 30 --emitevery 2 \\   --eps0 1.0 --eps1 0.05 --epsdecay 50000 \\   --trainevery 1'",
         "addpay": "",
         "append": "",
         "useSpawn": "true",
@@ -2414,7 +2414,7 @@
         "winHide": false,
         "oldrc": false,
         "name": "",
-        "x": 820,
+        "x": 1250,
         "y": 640,
         "wires": [
             [
