@@ -2536,7 +2536,7 @@
         "name": "",
         "topic": "",
         "url": "display",
-        "okToGo": false,
+        "okToGo": true,
         "fwdInMessages": false,
         "allowScripts": false,
         "allowStyles": false,
@@ -2551,7 +2551,7 @@
         "title": "",
         "descr": "",
         "editurl": "vscode://vscode-remote/ssh-remote+192.168.2.107/home/matze/.node-red/projects/LCARS/uibuilder/display/?windowId=_blank",
-        "x": 1580,
+        "x": 1560,
         "y": 200,
         "wires": [
             [],
