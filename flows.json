@@ -3303,8 +3303,8 @@
         "drop": false,
         "allowrate": false,
         "outputs": 1,
-        "x": 1360,
-        "y": 280,
+        "x": 1340,
+        "y": 300,
         "wires": [
             [
                 "inj_restart_once"
