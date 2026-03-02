@@ -2406,7 +2406,7 @@
         "id": "cf9bac078e8cedc7",
         "type": "exec",
         "z": "382f42b732fc3acb",
-        "command": "/home/matze/.node-red/snake-runner.js --tickms 20 --hold 3 --emitms 30 --emitevery 2 --eps0 1.0 --eps1 0.05 --epsdecay 50000 --trainevery 1",
+        "command": "-lc 'export SNAKE_MAX_TPS=25; export SNAKE_BATCH=128; export SNAKE_MIN_REPLAY=2000; export SNAKE_WARMUP=1500; node /home/matze/.node-red/snake-runner.js --tickms 18 --hold 2 --emitms 30 --emitevery 3 --eps0 1.0 --eps1 0.03 --epsdecay 40000 --trainevery 1'",
         "addpay": "",
         "append": "",
         "useSpawn": "true",
@@ -2414,7 +2414,7 @@
         "winHide": false,
         "oldrc": false,
         "name": "",
-        "x": 730,
+        "x": 1170,
         "y": 640,
         "wires": [
             [
