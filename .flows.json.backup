@@ -2662,15 +2662,15 @@
         "type": "debug",
         "z": "382f42b732fc3acb",
         "name": "debug 5",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1120,
-        "y": 460,
+        "x": 1580,
+        "y": 520,
         "wires": []
     },
     {
