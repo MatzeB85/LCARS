@@ -2570,7 +2570,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1300,
+        "x": 1280,
         "y": 120,
         "wires": [
             [
