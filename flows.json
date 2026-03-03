@@ -2406,7 +2406,7 @@
         "id": "e0aa64b0242f0a72",
         "type": "exec",
         "z": "440340a2edccbbc3",
-        "command": "node --expose-gc /home/matze/.node-red/snake-runner.js  --tickms 1 --hold 3 --emitms 20 --emitevery 1 --eps0 1.0 --eps1 0.10 --epsdecay 150000 --maxpend 2000",
+        "command": "node --expose-gc /home/matze/.node-red/snake-runner.js  --tickms 5 --hold 8 --emitms 20 --emitevery 1 --eps0 1.0 --eps1 0.10 --epsdecay 150000 --maxpend 2000",
         "addpay": "",
         "append": "",
         "useSpawn": "true",
@@ -2853,7 +2853,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 320,
-        "y": 400,
+        "y": 380,
         "wires": []
     },
     {
