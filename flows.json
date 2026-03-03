@@ -2852,7 +2852,7 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 340,
+        "x": 320,
         "y": 400,
         "wires": []
     },
