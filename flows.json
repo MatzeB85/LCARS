@@ -2669,7 +2669,7 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1580,
+        "x": 1600,
         "y": 540,
         "wires": []
     },
