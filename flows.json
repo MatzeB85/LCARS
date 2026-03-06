@@ -2592,7 +2592,7 @@
         "mirrorX": false,
         "rotate180": false,
         "x": 1500,
-        "y": 80,
+        "y": 100,
         "wires": []
     },
     {
